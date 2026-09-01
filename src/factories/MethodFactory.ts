@@ -3,6 +3,8 @@ import { BisectionMethod } from '../domain/methods/Bisection';
 import { FalsePositionMethod } from '../domain/methods/FalsePosition';
 import { NewtonRaphsonMethod } from '../domain/methods/NewtonRaphson';
 import { SecantMethod } from '../domain/methods/Secant';
+import { FixedPointMethod } from '../domain/methods/FixedPoint';
+import { ModifiedNewtonRaphsonMethod } from '../domain/methods/ModifiedNewtonRaphson';
 
 export interface MethodMetadata {
   id: string;
@@ -24,6 +26,8 @@ export class MethodFactory {
     this.register(new FalsePositionMethod());
     this.register(new NewtonRaphsonMethod());
     this.register(new SecantMethod());
+    this.register(new FixedPointMethod());
+    this.register(new ModifiedNewtonRaphsonMethod());
   }
 
   public static register(method: NumericalMethod): void {
@@ -83,6 +87,28 @@ export class MethodFactory {
         tag: 'Abierto • Superlineal',
         difficulty: 'Intermedio',
         recommendedConvergence: 'Orden 1.618 (Sin derivada)',
+      },
+      {
+        id: 'fixed-point',
+        name: 'Método de Punto Fijo',
+        category: 'roots',
+        description: 'Itera x_{i+1} = g(x_i) buscando un valor donde x = g(x).',
+        latexFormula: 'x_{i+1} = g(x_i)',
+        icon: 'repeat',
+        tag: 'Abierto • Punto Fijo',
+        difficulty: 'Intermedio',
+        recommendedConvergence: '|g\'(x)| < 1',
+      },
+      {
+        id: 'modified-newton-raphson',
+        name: 'Método de Newton-Raphson Modificado',
+        category: 'roots',
+        description: 'Utiliza f, f\' y f\'\' para acelerar la convergencia en raíces múltiples.',
+        latexFormula: 'x_{i+1} = x_i - \\frac{f(x_i) f\'(x_i)}{[f\'(x_i)]^2 - f(x_i) f\'\'(x_i)}',
+        icon: 'layers',
+        tag: 'Abierto • Raíces Múltiples',
+        difficulty: 'Avanzado',
+        recommendedConvergence: 'Convergencia cuadrática en raíces múltiples',
       },
     ];
   }

@@ -48,5 +48,6 @@ export function useNumericalSolver() {
     executionError,
     solve,
     reset,
+    setResult,
   };
 }

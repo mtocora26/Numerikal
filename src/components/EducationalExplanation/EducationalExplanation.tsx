@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import type { MethodExecutionResult } from '../../domain/types';
 import { MathView } from '../MathView/MathView';
-import { BookOpen, Lightbulb, CheckCircle2 } from 'lucide-react';
+import { DerivativeStepExplainer } from '../../services/DerivativeStepExplainer';
+import { BookOpen, Lightbulb, CheckCircle2, Sparkles } from 'lucide-react';
 import './EducationalExplanation.css';
 
 interface EducationalExplanationProps {
@@ -13,7 +14,14 @@ export const EducationalExplanation: React.FC<EducationalExplanationProps> = ({
   result,
   className = '',
 }) => {
-  const { educationalInsights, explanations } = result;
+  const { educationalInsights, explanations, methodId, expression } = result;
+
+  const needsDerivatives = methodId === 'newton-raphson' || methodId === 'modified-newton-raphson';
+
+  const derivSteps = useMemo(() => {
+    if (!needsDerivatives || !expression) return null;
+    return DerivativeStepExplainer.explain(expression);
+  }, [needsDerivatives, expression]);
 
   return (
     <div className={`educational-panel-card ${className}`}>
@@ -46,6 +54,56 @@ export const EducationalExplanation: React.FC<EducationalExplanationProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Derivative Step-by-Step Breakdown for Newton / Newton Modificado */}
+      {derivSteps && derivSteps.isValid && (
+        <div className="step-walkthrough-section">
+          <h5 className="walkthrough-title">
+            <Sparkles size={16} /> Obtención Paso a Paso de las Derivadas Necesarias
+          </h5>
+          <div className="deriv-edu-steps-grid">
+            {/* First derivative */}
+            <div className="deriv-edu-col">
+              <span className="col-badge d1-badge">Primera Derivada f'(x)</span>
+              <div className="steps-list">
+                {derivSteps.d1Steps.map((step) => (
+                  <div key={step.stepNumber} className="step-card">
+                    <div className="step-card-header">
+                      <span className="step-number-tag">{step.stepNumber}</span>
+                      <span className="step-card-title">{step.ruleName}</span>
+                    </div>
+                    <div className="step-formula-box">
+                      <MathView math={step.latexFormula} />
+                    </div>
+                    <p className="step-desc">{step.explanation}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Second derivative if modified newton */}
+            {methodId === 'modified-newton-raphson' && (
+              <div className="deriv-edu-col">
+                <span className="col-badge d2-badge">Segunda Derivada f''(x)</span>
+                <div className="steps-list">
+                  {derivSteps.d2Steps.map((step) => (
+                    <div key={step.stepNumber} className="step-card">
+                      <div className="step-card-header">
+                        <span className="step-number-tag d2-tag-bg">{step.stepNumber}</span>
+                        <span className="step-card-title">{step.ruleName}</span>
+                      </div>
+                      <div className="step-formula-box">
+                        <MathView math={step.latexFormula} />
+                      </div>
+                      <p className="step-desc">{step.explanation}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Step by Step Walkthrough */}
       {explanations && explanations.length > 0 && (

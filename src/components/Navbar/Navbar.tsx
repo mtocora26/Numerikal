@@ -1,10 +1,10 @@
 import React from 'react';
-import { Sigma, Compass, Calculator } from 'lucide-react';
+import { Sigma, Compass, Calculator, GraduationCap } from 'lucide-react';
 import './Navbar.css';
 
 interface NavbarProps {
-  activeView: 'home' | 'calculator';
-  onNavigate: (view: 'home' | 'calculator') => void;
+  activeView: 'home' | 'calculator' | 'learn';
+  onNavigate: (view: 'home' | 'calculator' | 'learn') => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ activeView, onNavigate }) => {
@@ -38,6 +38,15 @@ export const Navbar: React.FC<NavbarProps> = ({ activeView, onNavigate }) => {
           >
             <Calculator size={16} />
             <span>Calculadora</span>
+          </button>
+
+          <button
+            type="button"
+            className={`nav-item-btn ${activeView === 'learn' ? 'active' : ''}`}
+            onClick={() => onNavigate('learn')}
+          >
+            <GraduationCap size={16} />
+            <span>Aprende</span>
           </button>
         </nav>
       </div>

@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { Navbar } from './components/Navbar/Navbar';
 import { Home } from './pages/Home/Home';
 import { Calculator } from './pages/Calculator/Calculator';
+import { Learn } from './pages/Learn/Learn';
 
 export function App() {
-  const [currentView, setCurrentView] = useState<'home' | 'calculator'>('calculator');
+  const [currentView, setCurrentView] = useState<'home' | 'calculator' | 'learn'>('calculator');
   const [selectedMethodId, setSelectedMethodId] = useState<string>('bisection');
 
   const handleOpenMethodInCalculator = (methodId: string) => {
@@ -30,6 +31,10 @@ export function App() {
 
         {currentView === 'calculator' && (
           <Calculator initialMethodId={selectedMethodId} />
+        )}
+
+        {currentView === 'learn' && (
+          <Learn />
         )}
       </main>
     </div>

@@ -39,7 +39,7 @@ export class SecantMethod implements NumericalMethod {
   ];
 
   public readonly iterationColumns: IterationColumn[] = [
-    { key: 'iteration', label: 'Iteración', latexLabel: 'i', format: 'number' },
+    { key: 'iteration', label: 'Iteración', latexLabel: 'i', format: 'integer' },
     { key: 'xPrev', label: 'x_{i-1}', latexLabel: 'x_{i-1}', format: 'number', precision: 6 },
     { key: 'xCurr', label: 'x_i', latexLabel: 'x_i', format: 'number', precision: 6 },
     { key: 'fxPrev', label: 'f(x_{i-1})', latexLabel: 'f(x_{i-1})', format: 'number', precision: 6 },

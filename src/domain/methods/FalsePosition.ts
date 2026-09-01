@@ -39,14 +39,13 @@ export class FalsePositionMethod implements NumericalMethod {
   ];
 
   public readonly iterationColumns: IterationColumn[] = [
-    { key: 'iteration', label: 'Iteración', latexLabel: 'i', format: 'number' },
+    { key: 'iteration', label: 'Iteración', latexLabel: 'i', format: 'integer' },
     { key: 'xi', label: 'xi (inferior)', latexLabel: 'x_i', format: 'number', precision: 6 },
     { key: 'xs', label: 'xs (superior)', latexLabel: 'x_s', format: 'number', precision: 6 },
+    { key: 'xr', label: 'Raíz falsa (xr)', latexLabel: 'x_{r}', format: 'number', precision: 6 },
     { key: 'fxi', label: 'f(xi)', latexLabel: 'f(x_i)', format: 'number', precision: 6 },
     { key: 'fxs', label: 'f(xs)', latexLabel: 'f(x_s)', format: 'number', precision: 6 },
-    { key: 'xr', label: 'Raíz falsa (xr)', latexLabel: 'x_{r}', format: 'number', precision: 6 },
     { key: 'fxr', label: 'f(xr)', latexLabel: 'f(x_{r})', format: 'number', precision: 6 },
-    { key: 'signCheck', label: 'f(xi)·f(xr)', latexLabel: 'f(x_i) \\cdot f(x_r)', format: 'text' },
     { key: 'error', label: 'Error', latexLabel: 'E', format: 'scientific', precision: 6 },
   ];
 

@@ -9,6 +9,7 @@ import { ResultCard } from '../../components/ResultCard/ResultCard';
 import { IterationTable } from '../../components/IterationTable/IterationTable';
 import { FunctionGraph } from '../../components/FunctionGraph/FunctionGraph';
 import { EducationalExplanation } from '../../components/EducationalExplanation/EducationalExplanation';
+import { SessionHistory, type HistoryItem } from '../../components/SessionHistory/SessionHistory';
 import confetti from 'canvas-confetti';
 import { Play, RotateCcw, AlertTriangle, LineChart, Table, BookOpen, Zap } from 'lucide-react';
 import './Calculator.css';
@@ -28,13 +29,27 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
   const [maxIterations, setMaxIterations] = useState<number>(30);
   const [errorType, setErrorType] = useState<ErrorType>('relative');
   const [activeTab, setActiveTab] = useState<'graph' | 'table' | 'educational'>('table');
+  const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [activeHistoryId, setActiveHistoryId] = useState<string | null>(null);
 
   // Custom Hooks
   const parsedExpression = useExpressionParser(expression);
-  const { result, validation, isCalculating, executionError, solve, reset } = useNumericalSolver();
+  const { result, validation, isCalculating, executionError, solve, reset, setResult } = useNumericalSolver();
 
   // Selected Method Strategy instance
   const currentMethod = MethodFactory.create(selectedMethodId);
+
+  // Load history from sessionStorage on mount
+  useEffect(() => {
+    try {
+      const stored = sessionStorage.getItem('numerikal_session_history');
+      if (stored) {
+        setHistory(JSON.parse(stored));
+      }
+    } catch {
+      // Ignore storage read errors
+    }
+  }, []);
 
   useEffect(() => {
     if (initialMethodId) {
@@ -63,6 +78,57 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
         origin: { y: 0.8 },
         colors: ['#6366f1', '#22d3ee', '#10b981'],
       });
+
+      // Save calculation to session history
+      const solveResult = MethodFactory.create(selectedMethodId).execute(
+        parsedExpression.evaluate,
+        params
+      );
+
+      const newItem: HistoryItem = {
+        id: Date.now().toString(),
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        methodId: selectedMethodId,
+        methodName: currentMethod.name,
+        expression,
+        paramValues: { ...paramValues },
+        tolerance,
+        maxIterations,
+        errorType,
+        result: solveResult,
+      };
+
+      setHistory((prev) => {
+        const updated = [newItem, ...prev.filter((h) => h.id !== newItem.id)].slice(0, 15);
+        try {
+          sessionStorage.setItem('numerikal_session_history', JSON.stringify(updated));
+        } catch {
+          // ignore
+        }
+        return updated;
+      });
+      setActiveHistoryId(newItem.id);
+    }
+  };
+
+  const handleSelectHistoryItem = (item: HistoryItem) => {
+    setSelectedMethodId(item.methodId);
+    setExpression(item.expression);
+    setParamValues(item.paramValues);
+    setTolerance(item.tolerance);
+    setMaxIterations(item.maxIterations);
+    setErrorType(item.errorType);
+    setResult(item.result);
+    setActiveHistoryId(item.id);
+  };
+
+  const handleClearHistory = () => {
+    setHistory([]);
+    setActiveHistoryId(null);
+    try {
+      sessionStorage.removeItem('numerikal_session_history');
+    } catch {
+      // ignore
     }
   };
 
@@ -183,6 +249,14 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
               ))}
             </select>
           </div>
+
+          {/* Session History Component */}
+          <SessionHistory
+            history={history}
+            activeHistoryId={activeHistoryId}
+            onSelectHistoryItem={handleSelectHistoryItem}
+            onClearHistory={handleClearHistory}
+          />
         </div>
 
         {/* Right Column: Dynamic Results, Graphs, Tables & Insights */}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { MethodFactory } from '../../factories/MethodFactory';
 import { MathView } from '../../components/MathView/MathView';
-import { ArrowRight, Layers, Eye, BookCheck, Sparkles, Compass, Divide, Minimize, Zap, TrendingUp } from 'lucide-react';
+import { ArrowRight, Layers, Eye, BookCheck, Sparkles, Compass, Divide, Minimize, Zap, TrendingUp, RotateCcw } from 'lucide-react';
 import './Home.css';
 
 interface HomeProps {
@@ -97,6 +97,8 @@ export const Home: React.FC<HomeProps> = ({ onSelectMethodAndOpenCalc }) => {
                 case 'minimize': return <Minimize size={24} />;
                 case 'zap': return <Zap size={24} />;
                 case 'trending-up': return <TrendingUp size={24} />;
+                case 'repeat': return <RotateCcw size={24} />;
+                case 'layers': return <Layers size={24} />;
                 default: return <Layers size={24} />;
               }
             };

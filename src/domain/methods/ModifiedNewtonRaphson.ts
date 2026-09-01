@@ -10,20 +10,20 @@ import type { IterationColumn, IterationData } from '../Iteration';
 import { ErrorCalculator } from '../../services/ErrorCalculator';
 import { ExpressionParser } from '../../services/ExpressionParser';
 
-export class NewtonRaphsonMethod implements NumericalMethod {
-  public readonly id = 'newton-raphson';
-  public readonly name = 'Método de Newton-Raphson';
+export class ModifiedNewtonRaphsonMethod implements NumericalMethod {
+  public readonly id = 'modified-newton-raphson';
+  public readonly name = 'Método de Newton-Raphson Modificado';
   public readonly category = 'roots';
   public readonly description = 
-    'Método abierto de convergencia cuadrática que utiliza la recta tangente a la curva en el punto actual para proyectar la siguiente aproximación.';
-  public readonly latexFormula = 'x_{i+1} = x_i - \\frac{f(x_i)}{f\'(x_i)}';
+    'Aplica la fórmula de Ralston/Chapra para raíces múltiples utilizando la primera y segunda derivada, manteniendo la convergencia cuadrática aun cuando f\'(x) se aproxime a cero.';
+  public readonly latexFormula = 'x_{i+1} = x_i - \\frac{f(x_i) \\cdot f\'(x_i)}{[f\'(x_i)]^2 - f(x_i) \\cdot f\'\'(x_i)}';
 
   public readonly parameters: MethodParameterDef[] = [
     {
       name: 'xi',
       label: 'Punto inicial (xi)',
       latexLabel: 'x_i',
-      description: 'Estimación inicial de la raíz',
+      description: 'Estimación inicial x_0 de la raíz',
       defaultValue: 1.5,
       step: 0.1,
       placeholder: 'Ej. 1.5',
@@ -35,6 +35,7 @@ export class NewtonRaphsonMethod implements NumericalMethod {
     { key: 'xi', label: 'x_i', latexLabel: 'x_i', format: 'number', precision: 6 },
     { key: 'fxi', label: 'f(x_i)', latexLabel: 'f(x_i)', format: 'number', precision: 6 },
     { key: 'dfxi', label: "f'(x_i)", latexLabel: "f'(x_i)", format: 'number', precision: 6 },
+    { key: 'd2fxi', label: "f''(x_i)", latexLabel: "f''(x_i)", format: 'number', precision: 6 },
     { key: 'xNext', label: 'x_{i+1}', latexLabel: 'x_{i+1}', format: 'number', precision: 6 },
     { key: 'error', label: 'Error', latexLabel: 'E', format: 'scientific', precision: 6 },
   ];
@@ -49,18 +50,7 @@ export class NewtonRaphsonMethod implements NumericalMethod {
     } else {
       const fxi = f(xi);
       if (!Number.isFinite(fxi)) {
-        errors.push(`f(xi) no está definida en xi = ${xi}.`);
-      }
-
-      const parsed = ExpressionParser.parse(params.expression);
-      let dfxi = parsed.derivative ? parsed.derivative(xi) : NaN;
-      if (Number.isNaN(dfxi)) {
-        const h = 1e-6;
-        dfxi = (f(xi + h) - f(xi - h)) / (2 * h);
-      }
-
-      if (Math.abs(dfxi) < 1e-12) {
-        warnings.push(`La derivada f'(xi) en xi = ${xi} es prácticamente cero (${dfxi.toFixed(6)}), lo que puede causar divergencia por tangente horizontal.`);
+        errors.push(`f(xi) no está definida o es infinita en xi = ${xi}.`);
       }
     }
 
@@ -79,13 +69,21 @@ export class NewtonRaphsonMethod implements NumericalMethod {
     const errorType = params.errorType;
 
     const parsed = ExpressionParser.parse(params.expression);
-    const getDerivative = (x: number): number => {
+
+    // Compute derivative 1 and derivative 2 safely
+    const getDerivatives = (x: number): { df: number; d2f: number } => {
+      let df = NaN;
       if (parsed.derivative) {
-        const val = parsed.derivative(x);
-        if (Number.isFinite(val)) return val;
+        df = parsed.derivative(x);
       }
-      const h = 1e-6;
-      return (f(x + h) - f(x - h)) / (2 * h);
+      const h = 1e-5;
+      if (Number.isNaN(df) || !Number.isFinite(df)) {
+        df = (f(x + h) - f(x - h)) / (2 * h);
+      }
+
+      // Second derivative via central differences: [f(x+h) - 2f(x) + f(x-h)] / h^2
+      const d2f = (f(x + h) - 2 * f(x) + f(x - h)) / (h * h);
+      return { df, d2f };
     };
 
     const iterations: IterationData[] = [];
@@ -96,14 +94,23 @@ export class NewtonRaphsonMethod implements NumericalMethod {
 
     for (let iter = 1; iter <= maxIterations; iter++) {
       const fxi = f(currentX);
-      const dfxi = getDerivative(currentX);
+      const { df: dfxi, d2f: d2fxi } = getDerivatives(currentX);
 
-      if (Math.abs(dfxi) < 1e-15) {
-        convergenceReason = `Derivada nula (f'(x) = 0) en x = ${currentX}. La recta tangente es horizontal y no corta el eje X.`;
+      const denom = dfxi * dfxi - fxi * d2fxi;
+
+      if (Math.abs(denom) < 1e-15) {
+        convergenceReason = `División por cero en el denominador [f'(x)]² - f(x)f''(x) en la iteración ${iter}.`;
         break;
       }
 
-      const xNext = currentX - (fxi / dfxi);
+      const num = fxi * dfxi;
+      const xNext = currentX - num / denom;
+
+      if (!Number.isFinite(xNext)) {
+        convergenceReason = `Se obtuvo un valor no numérico en x_{i+1}. El método se detuvo.`;
+        break;
+      }
+
       currentError = ErrorCalculator.calculate(xNext, currentX, errorType);
 
       const iterData: IterationData = {
@@ -111,6 +118,7 @@ export class NewtonRaphsonMethod implements NumericalMethod {
         xi: currentX,
         fxi,
         dfxi,
+        d2fxi,
         xNext,
         error: currentError,
       };
@@ -119,12 +127,13 @@ export class NewtonRaphsonMethod implements NumericalMethod {
       if (iter <= 3 || iter === maxIterations || Math.abs(fxi) < 1e-12 || ErrorCalculator.isWithinTolerance(currentError, tolerance, errorType)) {
         explanations.push({
           stepNumber: iter,
-          title: `Iteración ${iter}: Tangente en x = ${currentX.toFixed(4)}`,
-          description: `Evaluamos f(${currentX.toFixed(4)}) = ${fxi.toFixed(6)} y f'(${currentX.toFixed(4)}) = ${dfxi.toFixed(6)}. Trazamos la tangente y proyectamos x_{${iter}} = ${xNext.toFixed(6)}.`,
-          latexFormula: `x_{${iter}} = ${currentX.toFixed(4)} - \\frac{${fxi.toFixed(6)}}{${dfxi.toFixed(6)}} = ${xNext.toFixed(6)}`,
+          title: `Iteración ${iter}: x = ${currentX.toFixed(4)}`,
+          description: `f(${currentX.toFixed(4)}) = ${fxi.toFixed(6)}, f' = ${dfxi.toFixed(6)}, f'' = ${d2fxi.toFixed(6)}. x_{${iter}} = ${xNext.toFixed(6)}.`,
+          latexFormula: `x_{${iter}} = ${currentX.toFixed(4)} - \\frac{(${fxi.toFixed(4)})(${dfxi.toFixed(4)})}{(${dfxi.toFixed(4)})^2 - (${fxi.toFixed(4)})(${d2fxi.toFixed(4)})} = ${xNext.toFixed(6)}`,
           dataSnapshot: {
             'x_i': currentX,
             "f'(x_i)": dfxi,
+            "f''(x_i)": d2fxi,
             'x_{i+1}': xNext,
             'Error': currentError,
           },
@@ -134,7 +143,7 @@ export class NewtonRaphsonMethod implements NumericalMethod {
       if (Math.abs(f(xNext)) < 1e-14) {
         converged = true;
         currentX = xNext;
-        convergenceReason = `Se alcanzó la raíz con f(x) = 0 en ${xNext}.`;
+        convergenceReason = `Se alcanzó la raíz exacta con f(x) = 0 en ${xNext}.`;
         break;
       }
 
@@ -168,12 +177,13 @@ export class NewtonRaphsonMethod implements NumericalMethod {
       columns: this.iterationColumns,
       explanations,
       educationalInsights: {
-        methodSummary: 'Newton-Raphson utiliza la serie de Taylor truncada de primer orden (tangente) para aproximar la raíz con velocidad cuadrática.',
-        keyFormula: 'x_{i+1} = x_i - \\frac{f(x_i)}{f\'(x_i)}',
-        convergenceCondition: '|f(x) \\cdot f\'\'(x)| < [f\'(x)]^2 \\quad \\text{(Criterio de Fourier)}',
+        methodSummary:
+          'El método de Newton-Raphson Modificado extiende la técnica de Newton para tratar eficientemente raíces múltiples (de multiplicidad m > 1) donde la primera derivada f\'(x) se anula.',
+        keyFormula: 'x_{i+1} = x_i - \\frac{f(x_i) \\cdot f\'(x_i)}{[f\'(x_i)]^2 - f(x_i) \\cdot f\'\'(x_i)}',
+        convergenceCondition: '[f\'(x)]^2 - f(x)f\'\'(x) ≠ 0',
         remarks: [
-          'Presenta convergencia de segundo orden (el número de cifras significativas aproximadamente se duplica por iteración).',
-          'Sensible al valor inicial x₀: si se escoge cerca de un punto de inflexión o donde f\'(x)=0, puede divergir u oscilar.',
+          'Es especialmente útil para funciones con raíces dobles o triples (ej: f(x) = (x-1)^2).',
+          'Conserva la velocidad de convergencia cuadrática aun en raíces múltiples.',
         ],
       },
       rootEvaluation: f(currentX),

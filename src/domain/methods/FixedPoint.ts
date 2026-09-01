@@ -1,0 +1,168 @@
+import type { NumericalMethod } from '../Method';
+import type { 
+  MethodInputParams, 
+  MethodExecutionResult, 
+  MethodValidationResult, 
+  MethodParameterDef,
+  StepExplanation 
+} from '../types';
+import type { IterationColumn, IterationData } from '../Iteration';
+import { ErrorCalculator } from '../../services/ErrorCalculator';
+
+export class FixedPointMethod implements NumericalMethod {
+  public readonly id = 'fixed-point';
+  public readonly name = 'Método de Punto Fijo';
+  public readonly category = 'roots';
+  public readonly description = 
+    'Transforma la ecuación f(x) = 0 en la forma x = g(x) e calcula iterativamente x_{i+1} = g(x_i). Para garantizar la convergencia, la magnitud de la derivada |g\'(x)| debe ser menor a 1 cerca de la raíz.';
+  public readonly latexFormula = 'x_{i+1} = g(x_i)';
+
+  public readonly parameters: MethodParameterDef[] = [
+    {
+      name: 'xi',
+      label: 'Valor inicial (x0)',
+      latexLabel: 'x_0',
+      description: 'Estimación inicial x_0 para comenzar la iteración de g(x)',
+      defaultValue: 0,
+      step: 0.1,
+      placeholder: 'Ej. 0',
+    },
+  ];
+
+  public readonly iterationColumns: IterationColumn[] = [
+    { key: 'iteration', label: 'Iteración', latexLabel: 'i', format: 'integer' },
+    { key: 'xi', label: 'x_i', latexLabel: 'x_i', format: 'number', precision: 6 },
+    { key: 'gxi', label: 'g(x_i)', latexLabel: 'g(x_i)', format: 'number', precision: 6 },
+    { key: 'diff', label: '|x_{i+1} - x_i|', latexLabel: '|x_{i+1} - x_i|', format: 'number', precision: 6 },
+    { key: 'error', label: 'Error', latexLabel: 'E', format: 'scientific', precision: 6 },
+  ];
+
+  public validate(g: (x: number) => number, params: MethodInputParams): MethodValidationResult {
+    const errors: string[] = [];
+    const warnings: string[] = [];
+
+    const xi = params.params.xi;
+    if (xi === undefined || Number.isNaN(xi)) {
+      errors.push('Debes ingresar un valor inicial válido para xi.');
+    } else {
+      const gxi = g(xi);
+      if (!Number.isFinite(gxi)) {
+        errors.push(`La función g(x) no está definida o produce un valor indeterminado en x = ${xi}.`);
+      } else {
+        // Estimate derivative g'(x) via central difference
+        const h = 1e-5;
+        const dg = (g(xi + h) - g(xi - h)) / (2 * h);
+        if (Math.abs(dg) >= 1) {
+          warnings.push(
+            `|g'(${xi})| ≈ ${dg.toFixed(4)} ≥ 1. El criterio de convergencia de Punto Fijo (|g'(x)| < 1) NO se satisface en x0 = ${xi}, por lo que el método podría diverger.`
+          );
+        }
+      }
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors,
+      warnings,
+    };
+  }
+
+  public execute(g: (x: number) => number, params: MethodInputParams): MethodExecutionResult {
+    const startTime = performance.now();
+    let currentX = params.params.xi ?? 0;
+    const tolerance = params.tolerance;
+    const maxIterations = params.maxIterations;
+    const errorType = params.errorType;
+
+    const iterations: IterationData[] = [];
+    const explanations: StepExplanation[] = [];
+    let currentError = 1.0;
+    let converged = false;
+    let convergenceReason = '';
+
+    for (let iter = 1; iter <= maxIterations; iter++) {
+      const gxi = g(currentX);
+
+      if (!Number.isFinite(gxi)) {
+        convergenceReason = `La función g(x) retornó un valor no finito (${gxi}) en la iteración ${iter}. El método divergió.`;
+        break;
+      }
+
+      const diff = Math.abs(gxi - currentX);
+      if (iter === 1) {
+        currentError = diff;
+      } else {
+        currentError = ErrorCalculator.calculate(gxi, currentX, errorType);
+      }
+
+      const iterData: IterationData = {
+        iteration: iter,
+        xi: currentX,
+        gxi: gxi,
+        diff: diff,
+        error: currentError,
+      };
+      iterations.push(iterData);
+
+      if (iter <= 3 || iter === maxIterations || ErrorCalculator.isWithinTolerance(currentError, tolerance, errorType)) {
+        explanations.push({
+          stepNumber: iter,
+          title: `Iteración ${iter}: Evaluando g(${currentX.toFixed(4)})`,
+          description: `Calculamos x_{${iter}} = g(${currentX.toFixed(4)}) = ${gxi.toFixed(6)}. Diferencia |x_{${iter}} - x_{${iter-1}}| = ${diff.toFixed(6)}.`,
+          latexFormula: `x_{${iter}} = g(${currentX.toFixed(4)}) = ${gxi.toFixed(6)}`,
+          dataSnapshot: {
+            'x_i': currentX,
+            'g(x_i)': gxi,
+            'Error': currentError,
+          },
+        });
+      }
+
+      if (ErrorCalculator.isWithinTolerance(currentError, tolerance, errorType)) {
+        converged = true;
+        currentX = gxi;
+        convergenceReason = `El error calculado (${ErrorCalculator.format(currentError, errorType)}) es menor o igual a la tolerancia (${tolerance}).`;
+        break;
+      }
+
+      if (Math.abs(gxi) > 1e12) {
+        convergenceReason = `El valor de g(x) creció exponencialmente (${gxi}). El método de Punto Fijo está divergiendo.`;
+        break;
+      }
+
+      currentX = gxi;
+    }
+
+    if (!converged && iterations.length >= maxIterations) {
+      convergenceReason = `Se alcanzó el número máximo de iteraciones (${maxIterations}) sin cumplir la tolerancia requerida.`;
+    }
+
+    const endTime = performance.now();
+
+    return {
+      methodId: this.id,
+      methodName: this.name,
+      expression: params.expression,
+      approximateRoot: currentX,
+      finalError: currentError,
+      iterationsCount: iterations.length,
+      converged,
+      convergenceReason,
+      executionTimeMs: Math.round((endTime - startTime) * 100) / 100,
+      iterations,
+      columns: this.iterationColumns,
+      explanations,
+      educationalInsights: {
+        methodSummary:
+          'El método de Punto Fijo requiere reescribir f(x) = 0 como x = g(x). Iterativamente se evalúa x_{i+1} = g(x_i) hasta que la diferencia entre iteraciones consecutivas sea menor a la tolerancia.',
+        keyFormula: 'x_{i+1} = g(x_i)',
+        convergenceCondition: '|g\'(x)| < 1 en el intervalo que contiene a la raíz',
+        remarks: [
+          'Asegúrate de haber despejado x correctamente para formar g(x).',
+          'Si la curva g(x) es demasiado inclinada (|g\'(x)| > 1), las iteraciones se alejarán de la raíz.',
+        ],
+      },
+      rootEvaluation: g(currentX) - currentX,
+    };
+  }
+}
