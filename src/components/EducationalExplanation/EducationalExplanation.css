@@ -1,0 +1,195 @@
+.educational-panel-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  overflow: hidden;
+}
+
+.edu-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.edu-title-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.edu-icon {
+  color: var(--primary-400);
+}
+
+.edu-title {
+  font-family: var(--font-brand);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--slate-100);
+}
+
+.edu-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent-300);
+  background: rgba(6, 182, 212, 0.1);
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+}
+
+.edu-concepts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-3);
+}
+
+.concept-box {
+  background: rgba(13, 19, 34, 0.7);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.concept-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--slate-400);
+}
+
+.concept-text {
+  font-size: 0.85rem;
+  color: var(--slate-300);
+  line-height: 1.5;
+}
+
+.formula-display-area {
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: var(--radius-md);
+  padding: var(--space-2);
+  text-align: center;
+  overflow-x: auto;
+}
+
+/* Walkthrough Section */
+.step-walkthrough-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.walkthrough-title {
+  font-family: var(--font-brand);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--slate-200);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.step-card {
+  background: rgba(13, 19, 34, 0.6);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.step-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.step-number-tag {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-600), var(--primary-500));
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-card-title {
+  font-family: var(--font-brand);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--slate-200);
+}
+
+.step-desc {
+  font-size: 0.85rem;
+  color: var(--slate-300);
+  line-height: 1.5;
+  padding-left: 30px;
+}
+
+.step-formula-box {
+  margin-left: 30px;
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  overflow-x: auto;
+}
+
+/* Remarks Section */
+.remarks-section {
+  background: rgba(13, 19, 34, 0.6);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+}
+
+.remarks-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--slate-200);
+  margin-bottom: var(--space-2);
+}
+
+.remarks-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.remark-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  font-size: 0.85rem;
+  color: var(--slate-300);
+  line-height: 1.5;
+}
+
+.remark-check {
+  color: var(--primary-400);
+  margin-top: 3px;
+  flex-shrink: 0;
+}

@@ -1,0 +1,207 @@
+.result-card-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  position: relative;
+  overflow: hidden;
+  transition: all var(--transition-base);
+}
+
+.result-card-container.converged {
+  border-color: rgba(16, 185, 129, 0.35);
+  background: radial-gradient(ellipse at top right, rgba(16, 185, 129, 0.08) 0%, rgba(17, 24, 39, 0.8) 100%);
+  box-shadow: 0 0 30px rgba(16, 185, 129, 0.12);
+}
+
+.result-card-container.unconverged {
+  border-color: rgba(245, 158, 11, 0.35);
+  background: radial-gradient(ellipse at top right, rgba(245, 158, 11, 0.08) 0%, rgba(17, 24, 39, 0.8) 100%);
+  box-shadow: 0 0 30px rgba(245, 158, 11, 0.12);
+}
+
+.result-status-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.status-badge-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.badge-converged {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--success-bg);
+  color: var(--success-400);
+  border: 1px solid var(--success-border);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+}
+
+.badge-warning {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--warning-bg);
+  color: var(--warning-400);
+  border: 1px solid var(--warning-border);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+}
+
+.method-pill {
+  font-size: 0.75rem;
+  color: var(--slate-300);
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid var(--border-subtle);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+}
+
+.execution-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: 0.75rem;
+  color: var(--slate-400);
+}
+
+.meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Main Root Display Box */
+.main-root-box {
+  background: rgba(13, 19, 34, 0.8);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-6);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.root-label-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
+}
+
+.root-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--slate-400);
+}
+
+.root-formula-symbol {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--primary-300);
+  background: rgba(99, 102, 241, 0.15);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.root-value-display {
+  padding: var(--space-1) 0;
+}
+
+.root-number {
+  font-family: var(--font-brand);
+  font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  text-shadow: 0 0 25px rgba(99, 102, 241, 0.35);
+}
+
+.root-evaluation-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.85rem;
+  color: var(--slate-400);
+  margin-top: 4px;
+}
+
+.eval-label {
+  font-size: 0.75rem;
+  color: var(--slate-500);
+}
+
+/* Metrics Grid */
+.result-metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.metric-box {
+  background: rgba(13, 19, 34, 0.6);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.metric-icon-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: var(--slate-400);
+}
+
+.metric-icon {
+  color: var(--primary-400);
+}
+
+.metric-value {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--slate-100);
+}
+
+/* Convergence Reason */
+.convergence-reason-box {
+  background: rgba(13, 19, 34, 0.5);
+  border-left: 3px solid var(--primary-500);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  padding: var(--space-2) var(--space-3);
+  font-size: 0.8rem;
+}
+
+.reason-title {
+  font-weight: 600;
+  color: var(--slate-300);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.reason-text {
+  color: var(--slate-400);
+  line-height: 1.4;
+}

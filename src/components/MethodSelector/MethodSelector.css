@@ -1,0 +1,111 @@
+.method-selector-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.selector-section-label {
+  font-family: var(--font-brand);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--slate-100);
+}
+
+.methods-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-2);
+}
+
+@media (max-width: 600px) {
+  .methods-cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.method-option-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: all var(--transition-base);
+  outline: none;
+}
+
+.method-option-card:hover {
+  border-color: var(--primary-400);
+  background: var(--bg-card-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.method-option-card.selected {
+  border-color: var(--primary-500);
+  background: radial-gradient(ellipse at top left, rgba(99, 102, 241, 0.15) 0%, rgba(17, 24, 39, 0.9) 100%);
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.25);
+}
+
+.method-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-1);
+}
+
+.method-icon {
+  font-size: 1.2rem;
+}
+
+.method-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--primary-300);
+  background: rgba(99, 102, 241, 0.1);
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+}
+
+.selected-indicator {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--primary-500);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.method-card-title {
+  font-family: var(--font-brand);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--slate-100);
+  margin-bottom: var(--space-1);
+}
+
+.method-card-formula {
+  background: rgba(13, 19, 34, 0.7);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 4px 6px;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+}
+
+.formula-label {
+  font-size: 0.7rem;
+  color: var(--slate-500);
+  font-weight: 600;
+}

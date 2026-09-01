@@ -1,0 +1,111 @@
+.function-graph-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  overflow: hidden;
+}
+
+.graph-header-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.graph-title-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.graph-title-icon {
+  color: var(--accent-400);
+}
+
+.graph-title {
+  font-family: var(--font-brand);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--slate-100);
+}
+
+.graph-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.graph-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid var(--border-subtle);
+  color: var(--slate-300);
+  transition: all var(--transition-fast);
+}
+
+.graph-btn:hover {
+  background: rgba(99, 102, 241, 0.2);
+  border-color: var(--primary-400);
+  color: #ffffff;
+}
+
+.canvas-wrapper {
+  position: relative;
+  width: 100%;
+  height: 380px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+}
+
+.numerical-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.graph-legend-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  font-size: 0.75rem;
+  color: var(--slate-400);
+  padding: var(--space-1) var(--space-2);
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-color-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.dot-function {
+  background: #818cf8;
+  box-shadow: 0 0 6px rgba(129, 140, 248, 0.6);
+}
+
+.dot-root {
+  background: #10b981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+}
+
+.dot-iteration {
+  background: #fbbf24;
+}

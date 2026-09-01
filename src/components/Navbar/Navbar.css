@@ -1,0 +1,101 @@
+.navbar-container {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: rgba(8, 12, 22, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-subtle);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+}
+
+.navbar-content {
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  cursor: pointer;
+  user-select: none;
+}
+
+.brand-logo-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--primary-600), var(--accent-500));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+}
+
+.brand-sigma-icon {
+  color: #ffffff;
+}
+
+.brand-text-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-title {
+  font-family: var(--font-brand);
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #ffffff 0%, var(--primary-200) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.brand-tagline {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--slate-400);
+  font-weight: 600;
+}
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.nav-item-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--slate-300);
+  padding: 6px 14px;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.nav-item-btn:hover {
+  color: #ffffff;
+  background: var(--bg-glass);
+}
+
+.nav-item-btn.active {
+  color: var(--primary-300);
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  font-weight: 600;
+}
