@@ -107,9 +107,11 @@ export const ParameterForm: React.FC<ParameterFormProps> = ({
     }
   }
 
-  // Bolzano check: with two bracket params (xi/xs) same-sign f values mean no guaranteed root
+  // Bolzano check: with two bracket params (xi/xs)
   const bracketNames = ['xi', 'xs'];
   const hasBracket = bracketNames.every((n) => n in paramSigns);
+  const isOppositeSign =
+    requiresSignChange && hasBracket && paramSigns.xi * paramSigns.xs < 0;
   const signMismatch =
     requiresSignChange && hasBracket && paramSigns.xi * paramSigns.xs > 0;
 
@@ -160,11 +162,20 @@ export const ParameterForm: React.FC<ParameterFormProps> = ({
         })}
       </div>
 
-      {signMismatch && (
-        <div className="sign-mismatch-alert">
+      {isOppositeSign && (
+        <div className="sign-status-banner sign-success-banner">
           <HelpCircle size={14} />
           <span>
-            f(xi) y f(xs) tienen el <strong>mismo signo</strong>: Bolzano no garantiza una raíz en este intervalo. Ajusta xi o xs.
+            <strong>Intervalo válido:</strong> f(xi) y f(xs) tienen signos opuestos (cumple Bolzano).
+          </span>
+        </div>
+      )}
+
+      {signMismatch && (
+        <div className="sign-status-banner sign-warning-banner">
+          <HelpCircle size={14} />
+          <span>
+            <strong>Atención:</strong> f(xi) y f(xs) tienen el mismo signo. Para bisección/regla falsa se sugieren signos opuestos.
           </span>
         </div>
       )}

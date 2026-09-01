@@ -55,37 +55,63 @@
   width: fit-content;
 }
 
+/* Positive and Negative signs use neutral/informative colors (NOT error red) */
 .sign-positive {
-  color: var(--primary-400);
-  background: rgba(129, 140, 248, 0.12);
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.25);
 }
 
 .sign-negative {
-  color: var(--error-400);
-  background: var(--error-bg);
+  color: #a78bfa;
+  background: rgba(167, 139, 250, 0.12);
+  border: 1px solid rgba(167, 139, 250, 0.25);
 }
 
 .sign-zero {
   color: var(--success-400);
   background: var(--success-bg);
+  border: 1px solid rgba(52, 211, 153, 0.25);
 }
 
 .input-sign-invalid {
-  border-color: var(--error-400) !important;
-  box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.15);
+  border-color: var(--warning-400) !important;
+  box-shadow: 0 0 0 2px rgba(251, 191, 36, 0.15);
 }
 
-.sign-mismatch-alert {
+.sign-status-banner {
   display: flex;
   align-items: flex-start;
   gap: var(--space-2);
   font-size: 0.78rem;
-  color: #fca5a5;
-  background: var(--error-bg);
-  border: 1px solid var(--error-border);
   border-radius: var(--radius-md);
   padding: var(--space-2) var(--space-3);
-  margin-top: -4px;
+  margin-top: -2px;
+}
+
+.sign-status-banner svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.sign-success-banner {
+  color: #a7f3d0;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.sign-success-banner svg {
+  color: var(--success-400);
+}
+
+.sign-warning-banner {
+  color: #fde68a;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.sign-warning-banner svg {
+  color: var(--warning-400);
 }
 
 .sign-mismatch-alert svg {
