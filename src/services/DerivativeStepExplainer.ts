@@ -94,7 +94,7 @@ export class DerivativeStepExplainer {
       try { derivativeTex = derivative(node, 'x').toTex(); } catch { derivativeTex = nodeTex; }
       steps.push({
         stepNumber: stepNum++,
-        title: `Derivar ${nodeTex}`,
+        title: `Aplicar ${ruleName.toLowerCase()}`,
         ruleName,
         latexFormula: formula || `\\frac{d}{dx}\\left(${nodeTex}\\right) = ${derivativeTex}`,
         explanation,
