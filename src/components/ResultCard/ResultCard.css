@@ -185,6 +185,39 @@
   color: var(--slate-100);
 }
 
+.convergence-diagnostic-box {
+  padding: var(--space-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: rgba(13, 19, 34, 0.6);
+}
+
+.diagnostic-positive { border-color: var(--success-border); }
+.diagnostic-negative { border-color: var(--warning-border); }
+
+.diagnostic-heading,
+.diagnostic-values {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.diagnostic-heading {
+  color: var(--slate-300);
+  font-size: 0.8rem;
+}
+
+.diagnostic-positive .diagnostic-heading strong { color: var(--success-400); }
+.diagnostic-negative .diagnostic-heading strong { color: var(--warning-400); }
+
+.diagnostic-values {
+  justify-content: flex-start;
+  margin-top: var(--space-2);
+  color: var(--slate-400);
+  font-size: 0.8rem;
+}
+
 /* Convergence Reason */
 .convergence-reason-box {
   background: rgba(13, 19, 34, 0.5);

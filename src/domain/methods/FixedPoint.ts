@@ -8,13 +8,14 @@ import type {
 } from '../types';
 import type { IterationColumn, IterationData } from '../Iteration';
 import { ErrorCalculator } from '../../services/ErrorCalculator';
+import { ExpressionParser } from '../../services/ExpressionParser';
 
 export class FixedPointMethod implements NumericalMethod {
   public readonly id = 'fixed-point';
   public readonly name = 'Método de Punto Fijo';
   public readonly category = 'roots';
   public readonly description = 
-    'Transforma la ecuación f(x) = 0 en la forma x = g(x) e calcula iterativamente x_{i+1} = g(x_i). Para garantizar la convergencia, la magnitud de la derivada |g\'(x)| debe ser menor a 1 cerca de la raíz.';
+    'Requiere una función g(x) ya despejada y calcula iterativamente x_{i+1} = g(x_i). No despeja automáticamente una ecuación f(x) = 0. Para garantizar la convergencia, |g\'(x)| debe ser menor a 1 cerca de la raíz.';
   public readonly latexFormula = 'x_{i+1} = g(x_i)';
 
   public readonly parameters: MethodParameterDef[] = [
@@ -32,8 +33,7 @@ export class FixedPointMethod implements NumericalMethod {
   public readonly iterationColumns: IterationColumn[] = [
     { key: 'iteration', label: 'Iteración', latexLabel: 'i', format: 'integer' },
     { key: 'xi', label: 'x_i', latexLabel: 'x_i', format: 'number', precision: 6 },
-    { key: 'gxi', label: 'g(x_i)', latexLabel: 'g(x_i)', format: 'number', precision: 6 },
-    { key: 'diff', label: '|x_{i+1} - x_i|', latexLabel: '|x_{i+1} - x_i|', format: 'number', precision: 6 },
+    { key: 'gxi', label: 'x_{i+1} = g(x_i)', latexLabel: 'x_{i+1} = g(x_i)', format: 'number', precision: 6 },
     { key: 'error', label: 'Error', latexLabel: 'E', format: 'scientific', precision: 6 },
   ];
 
@@ -73,6 +73,15 @@ export class FixedPointMethod implements NumericalMethod {
     const tolerance = params.tolerance;
     const maxIterations = params.maxIterations;
     const errorType = params.errorType;
+    const parsed = ExpressionParser.parse(params.expression);
+    const derivativeAt = (x: number): number => {
+      if (parsed.derivative) {
+        const symbolicValue = parsed.derivative(x);
+        if (Number.isFinite(symbolicValue)) return symbolicValue;
+      }
+      const h = 1e-5;
+      return (g(x + h) - g(x - h)) / (2 * h);
+    };
 
     const iterations: IterationData[] = [];
     const explanations: StepExplanation[] = [];
@@ -88,9 +97,9 @@ export class FixedPointMethod implements NumericalMethod {
         break;
       }
 
-      const diff = Math.abs(gxi - currentX);
+      const gprimeXi = derivativeAt(currentX);
       if (iter === 1) {
-        currentError = diff;
+        currentError = Math.abs(gxi - currentX);
       } else {
         currentError = ErrorCalculator.calculate(gxi, currentX, errorType);
       }
@@ -99,7 +108,6 @@ export class FixedPointMethod implements NumericalMethod {
         iteration: iter,
         xi: currentX,
         gxi: gxi,
-        diff: diff,
         error: currentError,
       };
       iterations.push(iterData);
@@ -108,11 +116,12 @@ export class FixedPointMethod implements NumericalMethod {
         explanations.push({
           stepNumber: iter,
           title: `Iteración ${iter}: Evaluando g(${currentX.toFixed(4)})`,
-          description: `Calculamos x_{${iter}} = g(${currentX.toFixed(4)}) = ${gxi.toFixed(6)}. Diferencia |x_{${iter}} - x_{${iter-1}}| = ${diff.toFixed(6)}.`,
+          description: `Calculamos x_{${iter}} = g(${currentX.toFixed(4)}) = ${gxi.toFixed(6)}. Además, g'(${currentX.toFixed(4)}) = ${gprimeXi.toFixed(6)} y ${Math.abs(gprimeXi) < 1 ? 'cumple' : 'no cumple'} el criterio local |g'(x_i)| < 1.`,
           latexFormula: `x_{${iter}} = g(${currentX.toFixed(4)}) = ${gxi.toFixed(6)}`,
           dataSnapshot: {
             'x_i': currentX,
             'g(x_i)': gxi,
+            "g'(x_i)": gprimeXi,
             'Error': currentError,
           },
         });
@@ -163,6 +172,12 @@ export class FixedPointMethod implements NumericalMethod {
         ],
       },
       rootEvaluation: g(currentX) - currentX,
+      convergenceDiagnostics: {
+        label: "g'(x_i)",
+        value: derivativeAt(params.params.xi ?? 0),
+        criterion: '|g\'(x_i)| < 1',
+        criterionMet: Math.abs(derivativeAt(params.params.xi ?? 0)) < 1,
+      },
     };
   }
 }

@@ -48,6 +48,12 @@ export interface MethodExecutionResult {
     remarks: string[];
   };
   rootEvaluation: number; // f(xr)
+  convergenceDiagnostics?: {
+    label: string;
+    value: number;
+    criterion: string;
+    criterionMet: boolean;
+  };
 }
 
 export interface MethodValidationResult {

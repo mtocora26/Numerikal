@@ -10,6 +10,7 @@ import { IterationTable } from '../../components/IterationTable/IterationTable';
 import { FunctionGraph } from '../../components/FunctionGraph/FunctionGraph';
 import { EducationalExplanation } from '../../components/EducationalExplanation/EducationalExplanation';
 import { SessionHistory, type HistoryItem } from '../../components/SessionHistory/SessionHistory';
+import { DerivativeCalculator } from './DerivativeCalculator';
 import confetti from 'canvas-confetti';
 import { Play, RotateCcw, AlertTriangle, LineChart, Table, BookOpen, Zap } from 'lucide-react';
 import './Calculator.css';
@@ -20,6 +21,7 @@ interface CalculatorProps {
 
 export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisection' }) => {
   const methods = MethodFactory.getAllMethods();
+  const [calculatorSession, setCalculatorSession] = useState<'roots' | 'derivatives'>('roots');
 
   // State
   const [selectedMethodId, setSelectedMethodId] = useState<string>(initialMethodId);
@@ -152,8 +154,21 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
         </div>
       </div>
 
+      <div className="calculator-session-switcher" role="tablist" aria-label="Tipo de calculadora">
+        <button type="button" role="tab" aria-selected={calculatorSession === 'roots'} className={`session-tab ${calculatorSession === 'roots' ? 'active' : ''}`} onClick={() => setCalculatorSession('roots')}>
+          <Zap size={16} />
+          <span>Resolver raíces</span>
+        </button>
+        <button type="button" role="tab" aria-selected={calculatorSession === 'derivatives'} className={`session-tab ${calculatorSession === 'derivatives' ? 'active' : ''}`} onClick={() => setCalculatorSession('derivatives')}>
+          <span className="session-tab-symbol">f&apos;</span>
+          <span>Calcular derivadas</span>
+        </button>
+      </div>
+
+      {calculatorSession === 'derivatives' && <DerivativeCalculator />}
+
       {/* Validation Warnings / Error Banner */}
-      {(executionError || (validation && !validation.isValid)) && (
+      {calculatorSession === 'roots' && (executionError || (validation && !validation.isValid)) && (
         <div className="workspace-alert alert-error">
           <AlertTriangle size={18} className="alert-icon" />
           <div className="alert-text">
@@ -163,7 +178,7 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
         </div>
       )}
 
-      {validation && validation.warnings && validation.warnings.length > 0 && (
+      {calculatorSession === 'roots' && validation && validation.warnings && validation.warnings.length > 0 && (
         <div className="workspace-alert alert-warning">
           <AlertTriangle size={18} className="alert-icon" />
           <div className="alert-text">
@@ -174,7 +189,7 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
       )}
 
       {/* Two Column Layout */}
-      <div className="workspace-grid">
+      {calculatorSession === 'roots' && <div className="workspace-grid">
         {/* Left Column: Form & Configuration */}
         <div className="workspace-left-pane">
           {/* Action Buttons - TOP PRIORITY */}
@@ -206,7 +221,15 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
               value={expression}
               onChange={setExpression}
               parsed={parsedExpression}
+              inputLabel={selectedMethodId === 'fixed-point' ? 'Función de iteración' : undefined}
+              inputSymbol={selectedMethodId === 'fixed-point' ? 'g(x)' : undefined}
+              inputPrefix={selectedMethodId === 'fixed-point' ? 'g(x) =' : undefined}
             />
+            {selectedMethodId === 'fixed-point' && (
+              <p className="fixed-point-hint">
+                Punto Fijo necesita la función despejada <strong>g(x)</strong>. Si partes de f(x) = 0, primero despeja x; la calculadora usa xᵢ₊₁ = g(xᵢ) y no transforma f(x) automáticamente.
+              </p>
+            )}
           </div>
 
           {/* Execution Parameters - HIGH PRIORITY */}
@@ -330,7 +353,7 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
             </div>
           )}
         </div>
-      </div>
+      </div>}
     </div>
   );
 };

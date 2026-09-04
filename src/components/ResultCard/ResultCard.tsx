@@ -80,6 +80,19 @@ export const ResultCard: React.FC<ResultCardProps> = ({ result, className = '' }
         </div>
       </div>
 
+      {result.convergenceDiagnostics && (
+        <div className={`convergence-diagnostic-box ${result.convergenceDiagnostics.criterionMet ? 'diagnostic-positive' : 'diagnostic-negative'}`}>
+          <div className="diagnostic-heading">
+            <span>Comprobación de convergencia</span>
+            <strong>{result.convergenceDiagnostics.criterionMet ? 'Criterio cumplido' : 'Criterio no cumplido'}</strong>
+          </div>
+          <div className="diagnostic-values">
+            <MathView math={`${result.convergenceDiagnostics.label} = ${result.convergenceDiagnostics.value.toFixed(6)}`} />
+            <span>{result.convergenceDiagnostics.criterion}</span>
+          </div>
+        </div>
+      )}
+
       {/* Convergence Reason */}
       <div className="convergence-reason-box">
         <span className="reason-title">Motivo de finalización:</span>

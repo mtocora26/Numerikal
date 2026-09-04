@@ -24,7 +24,7 @@ export class DerivativeStepExplainer {
    * Generates step-by-step explanations for 1st and 2nd derivatives of f(x)
    */
   public static explain(exprStr: string): DerivativeExplanationResult {
-    const clean = ExpressionParser.sanitize(exprStr);
+    const clean = ExpressionParser.normalizeForDifferentiation(exprStr);
     if (!clean) {
       return {
         isValid: false,
@@ -84,56 +84,71 @@ export class DerivativeStepExplainer {
     const steps: DerivativeStep[] = [];
     let stepNum = 1;
 
-    let inputTex = '';
     let resultTex = '';
-    try { inputTex = inputNode.toTex(); } catch { inputTex = inputNode.toString(); }
     try { resultTex = resultNode.toTex(); } catch { resultTex = resultNode.toString(); }
 
-    // Step 1: Sum/Difference rule breakdown
-    steps.push({
-      stepNumber: stepNum++,
-      title: `Aplicar la regla de suma/resta`,
-      ruleName: 'Regla de la Suma y Resta',
-      latexFormula: `\\frac{d}{dx}[${inputTex}]`,
-      explanation: `Separamos el análisis término a término. La derivada de una suma de funciones es la suma de sus derivadas individuales: \\frac{d}{dx}[u \\pm v] = \\frac{d}{dx}[u] \\pm \\frac{d}{dx}[v].`,
-    });
-
-    // Extract terms if sum/subtraction
-    const terms = this.extractTerms(inputNode);
-
-    if (terms.length > 1) {
-      terms.forEach((term, idx) => {
-        let termTex = '';
-        try { termTex = term.toTex(); } catch { termTex = term.toString(); }
-
-        try {
-          const dTerm = derivative(term, 'x');
-          let dTermTex = '';
-          try { dTermTex = dTerm.toTex(); } catch { dTermTex = dTerm.toString(); }
-
-          const termRule = this.identifyRule(term);
-
-          steps.push({
-            stepNumber: stepNum++,
-            title: `Derivar término ${idx + 1}: ${termTex}`,
-            ruleName: termRule.ruleName,
-            latexFormula: `\\frac{d}{dx}\\left(${termTex}\\right) = ${dTermTex}`,
-            explanation: termRule.explanation,
-          });
-        } catch {
-          // ignore single term error
-        }
-      });
-    } else {
-      const rule = this.identifyRule(inputNode);
+    const addStep = (node: MathNode, ruleName: string, explanation: string, formula?: string) => {
+      let nodeTex = '';
+      let derivativeTex = '';
+      try { nodeTex = node.toTex(); } catch { nodeTex = node.toString(); }
+      try { derivativeTex = derivative(node, 'x').toTex(); } catch { derivativeTex = nodeTex; }
       steps.push({
         stepNumber: stepNum++,
-        title: `Aplicar regla de derivación principal`,
-        ruleName: rule.ruleName,
-        latexFormula: `\\frac{d}{dx}\\left(${inputTex}\\right) = ${resultTex}`,
-        explanation: rule.explanation,
+        title: `Derivar ${nodeTex}`,
+        ruleName,
+        latexFormula: formula || `\\frac{d}{dx}\\left(${nodeTex}\\right) = ${derivativeTex}`,
+        explanation,
       });
-    }
+    };
+
+    const explainNode = (node: MathNode) => {
+      if (node.type === 'OperatorNode') {
+        const opNode = node as unknown as { op: string; args: MathNode[] };
+        if (opNode.op === '+' || opNode.op === '-') {
+          addStep(node, 'Regla de la Suma y Resta', 'Se deriva cada término por separado y se conserva el signo: (u ± v)\' = u\' ± v\'.');
+          opNode.args.forEach(explainNode);
+          return;
+        }
+        if (opNode.op === '*') {
+          const hasConstantFactor = opNode.args.some((arg) => this.isConstantNode(arg));
+          addStep(
+            node,
+            hasConstantFactor ? 'Regla del Múltiplo Constante' : 'Regla del Producto',
+            hasConstantFactor
+              ? 'Sacamos la constante y derivamos únicamente la función variable: (c·u)\' = c·u\'.'
+              : 'Para un producto de funciones se deriva la primera manteniendo la segunda y luego se suma la primera manteniendo la derivada de la segunda: (u·v)\' = u\'v + uv\'.'
+          );
+          opNode.args.forEach(explainNode);
+          return;
+        }
+        if (opNode.op === '^') {
+          if (this.isConstantNode(opNode.args[1])) {
+            addStep(node, 'Regla de la Potencia', 'Bajamos el exponente como factor y restamos uno al exponente: (x^n)\' = n·x^(n-1).');
+            return;
+          }
+          addStep(node, 'Regla de la Cadena', 'El exponente es una función de x. Se deriva la función exterior y se multiplica por la derivada del exponente: (e^u)\' = e^u·u\'.');
+          explainNode(opNode.args[1]);
+          return;
+        }
+      }
+
+      if (node.type === 'FunctionNode') {
+        const functionNode = node as unknown as { name: string; args: MathNode[] };
+        const argument = functionNode.args[0];
+        if (argument && argument.toString() !== 'x') {
+          addStep(node, 'Regla de la Cadena', 'Se deriva la función exterior y se multiplica por la derivada de la función interior: (F(g(x)))\' = F\'(g(x))·g\'(x).');
+          explainNode(argument);
+        } else {
+          addStep(node, this.identifyRule(node).ruleName, this.identifyRule(node).explanation);
+        }
+        return;
+      }
+
+      const rule = this.identifyRule(node);
+      addStep(node, rule.ruleName, rule.explanation);
+    };
+
+    explainNode(inputNode);
 
     // Final Step: Simplification & Result
     steps.push({
@@ -149,22 +164,10 @@ export class DerivativeStepExplainer {
     return steps;
   }
 
-  private static extractTerms(node: MathNode): MathNode[] {
-    const terms: MathNode[] = [];
-
-    const traverse = (n: MathNode) => {
-      if (n.type === 'OperatorNode') {
-        const opNode = n as unknown as { isOperatorNode?: boolean; op: string; args: MathNode[] };
-        if (opNode.op === '+' || opNode.op === '-') {
-          opNode.args.forEach((arg) => traverse(arg));
-          return;
-        }
-      }
-      terms.push(n);
-    };
-
-    traverse(node);
-    return terms.length > 0 ? terms : [node];
+  private static isConstantNode(node: MathNode | undefined): boolean {
+    if (!node) return false;
+    if (node.type === 'ConstantNode') return true;
+    return node.type === 'SymbolNode' && (node as unknown as { name: string }).name !== 'x';
   }
 
   private static identifyRule(node: MathNode): { ruleName: string; explanation: string } {

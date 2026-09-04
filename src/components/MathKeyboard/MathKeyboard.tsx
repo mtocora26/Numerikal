@@ -32,6 +32,7 @@ export const MathKeyboard: React.FC<MathKeyboardProps> = ({
     { label: 'x³', value: '^3', type: 'op' },
     { label: 'xⁿ', value: '^', type: 'op' },
     { label: '√x', value: 'sqrt(', type: 'func' },
+    { label: '∛x', value: 'cbrt(', type: 'func' },
     { label: '÷', value: '/', type: 'op' },
 
     { label: 'sin', value: 'sin(', type: 'func' },

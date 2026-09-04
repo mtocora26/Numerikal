@@ -10,6 +10,9 @@ interface MathInputProps {
   onChange: (value: string) => void;
   parsed: ParsedExpression;
   className?: string;
+  inputLabel?: string;
+  inputSymbol?: string;
+  inputPrefix?: string;
 }
 
 const PRESETS = [
@@ -25,6 +28,9 @@ export const MathInput: React.FC<MathInputProps> = ({
   onChange,
   parsed,
   className = '',
+  inputLabel = 'Función Matemática',
+  inputSymbol = 'f(x) = 0',
+  inputPrefix = 'f(x) =',
 }) => {
   const [showKeyboard, setShowKeyboard] = useState(false);
   const [showPresets, setShowPresets] = useState(false);
@@ -78,7 +84,7 @@ export const MathInput: React.FC<MathInputProps> = ({
     <div className={`math-input-container ${className}`}>
       <div className="math-input-header">
         <label htmlFor="math-input-field" className="math-input-label">
-          Función Matemática <span className="math-symbol">f(x) = 0</span>
+          {inputLabel} <span className="math-symbol">{inputSymbol}</span>
         </label>
         <div className="math-input-tools">
           <button
@@ -116,7 +122,7 @@ export const MathInput: React.FC<MathInputProps> = ({
 
       {/* Raw input field */}
       <div className="input-field-wrapper">
-        <span className="input-prefix">f(x) =</span>
+        <span className="input-prefix">{inputPrefix}</span>
         <input
           id="math-input-field"
           ref={inputRef}
