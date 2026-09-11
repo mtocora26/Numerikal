@@ -139,3 +139,41 @@
   color: var(--primary-400);
   font-weight: 700;
 }
+
+.table-scroll-container {
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-scroll-container::-webkit-scrollbar {
+  height: 6px;
+}
+
+.table-scroll-container::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: var(--radius-full);
+}
+
+.table-scroll-container::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.3);
+  border-radius: var(--radius-full);
+}
+
+.table-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.5);
+}
+
+@media (max-width: 640px) {
+  .iteration-table-card {
+    padding: var(--space-4);
+  }
+
+  .table-header-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .copy-table-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

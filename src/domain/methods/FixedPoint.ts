@@ -163,12 +163,13 @@ export class FixedPointMethod implements NumericalMethod {
       explanations,
       educationalInsights: {
         methodSummary:
-          'El método de Punto Fijo requiere reescribir f(x) = 0 como x = g(x). Iterativamente se evalúa x_{i+1} = g(x_i) hasta que la diferencia entre iteraciones consecutivas sea menor a la tolerancia.',
+          'El método de Punto Fijo reescribe la ecuación $f(x) = 0$ en la forma equivalente $x = g(x)$, evaluando sucesivamente $x_{i+1} = g(x_i)$ hasta converger.',
         keyFormula: 'x_{i+1} = g(x_i)',
-        convergenceCondition: '|g\'(x)| < 1 en el intervalo que contiene a la raíz',
+        convergenceCondition: '|g\'(x)| < 1 \\quad \\text{en el entorno de la raíz}',
         remarks: [
-          'Asegúrate de haber despejado x correctamente para formar g(x).',
-          'Si la curva g(x) es demasiado inclinada (|g\'(x)| > 1), las iteraciones se alejarán de la raíz.',
+          'Despeje de la función generadora: asegúrate de haber despejado $x$ correctamente para construir una función $g(x)$ adecuada.',
+          'Condición de convergencia local: si $|g\'(x)| < 1$, las iteraciones convergen de forma monótona o en espiral hacia el punto fijo.',
+          'Diagnóstico de divergencia: si $|g\'(x)| > 1$, los valores se alejan de la raíz. En ese caso es indispensable plantear otro despeje algebraico para $g(x)$.',
         ],
       },
       rootEvaluation: g(currentX) - currentX,

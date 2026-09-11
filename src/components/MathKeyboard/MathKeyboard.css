@@ -100,3 +100,15 @@
   border-color: var(--error-500);
   color: #ffffff;
 }
+
+@media (max-width: 480px) {
+  .math-keyboard-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+  }
+
+  .key-btn {
+    height: 34px;
+    font-size: 0.82rem;
+  }
+}

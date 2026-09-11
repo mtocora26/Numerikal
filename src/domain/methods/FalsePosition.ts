@@ -203,13 +203,13 @@ export class FalsePositionMethod implements NumericalMethod {
       columns: this.iterationColumns,
       explanations,
       educationalInsights: {
-        methodSummary: 'La Regla Falsa acelera la búsqueda uniendo los extremos con una secante lineal, ajustando el punto de corte según la magnitud de f(xi) y f(xs).',
+        methodSummary: 'La Regla Falsa (Falsa Posición) acelera la búsqueda uniendo los extremos del intervalo con una recta secante e intersectando con el eje X.',
         keyFormula: 'x_r = \\frac{x_i f(x_s) - x_s f(x_i)}{f(x_s) - f(x_i)}',
-        convergenceCondition: 'f(x_i) \\cdot f(x_s) < 0',
+        convergenceCondition: 'f(x_i) \\cdot f(x_s) < 0 \\quad \\text{en cada iteración}',
         remarks: [
-          'Es un método cerrado: combina la seguridad de la bisección con la velocidad de la interpolación lineal.',
-          'Si la función tiene una curvatura pronunciada (ej. exponencial o cóncava persistente), uno de los extremos puede quedar estancado (punto fijo).',
-          'Suele ser significativamente más rápido que Bisección para la mayoría de funciones suaves.',
+          'Método cerrado con interpolación lineal: combina la seguridad de convergencia de la bisección con una mejor aproximación geométrica.',
+          'Riesgo de punto estancado: si la curva posee concavidad pronunciada y persistente, uno de los extremos del intervalo puede permanecer fijo, ralentizando el ritmo de convergencia.',
+          'Mayor velocidad práctica: para funciones continuas y suaves, suele alcanzar la tolerancia en sustancialmente menos iteraciones que la bisección.',
         ],
       },
       rootEvaluation: f(xr),

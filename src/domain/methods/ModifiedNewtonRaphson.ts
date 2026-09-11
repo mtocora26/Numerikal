@@ -178,12 +178,13 @@ export class ModifiedNewtonRaphsonMethod implements NumericalMethod {
       explanations,
       educationalInsights: {
         methodSummary:
-          'El método de Newton-Raphson Modificado extiende la técnica de Newton para tratar eficientemente raíces múltiples (de multiplicidad m > 1) donde la primera derivada f\'(x) se anula.',
+          'El método de Newton-Raphson Modificado incorpora la segunda derivada para resolver eficientemente raíces múltiples ($m > 1$) donde la primera derivada $f\'(x)$ también se anula.',
         keyFormula: 'x_{i+1} = x_i - \\frac{f(x_i) \\cdot f\'(x_i)}{[f\'(x_i)]^2 - f(x_i) \\cdot f\'\'(x_i)}',
-        convergenceCondition: '[f\'(x)]^2 - f(x)f\'\'(x) ≠ 0',
+        convergenceCondition: '[f\'(x)]^2 - f(x) \\cdot f\'\'(x) \\neq 0',
         remarks: [
-          'Es especialmente útil para funciones con raíces dobles o triples (ej: f(x) = (x-1)^2).',
-          'Conserva la velocidad de convergencia cuadrática aun en raíces múltiples.',
+          'Tratamiento de raíces múltiples: restaura la rapidez cuadrática del método en problemas con raíces dobles o triples donde el Newton clásico se degrada a lineal.',
+          'Uso conjunto de derivadas: requiere evaluar tanto la primera derivada $f\'(x)$ como la segunda derivada $f\'\'(x)$ en cada ciclo iterativo.',
+          'Comportamiento en raíces simples: también converge cuadráticamente en raíces simples ($m = 1$), con un costo computacional adicional por evaluar $f\'\'(x)$.',
         ],
       },
       rootEvaluation: f(currentX),

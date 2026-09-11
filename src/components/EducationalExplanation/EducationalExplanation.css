@@ -69,18 +69,21 @@
 }
 
 .concept-text {
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   color: var(--slate-300);
-  line-height: 1.5;
+  line-height: 1.6;
+  word-break: normal;
+  overflow-wrap: break-word;
 }
 
 .formula-display-area {
   background: rgba(99, 102, 241, 0.08);
   border: 1px solid rgba(99, 102, 241, 0.2);
   border-radius: var(--radius-md);
-  padding: var(--space-2);
+  padding: var(--space-2) var(--space-3);
   text-align: center;
   overflow-x: auto;
+  max-width: 100%;
 }
 
 /* Walkthrough Section */
@@ -152,7 +155,7 @@
   padding: var(--space-3) var(--space-4);
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .step-card-header {
@@ -172,6 +175,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .step-card-title {
@@ -182,10 +186,11 @@
 }
 
 .step-desc {
-  font-size: 0.85rem;
+  font-size: 0.86rem;
   color: var(--slate-300);
-  line-height: 1.5;
+  line-height: 1.6;
   padding-left: 30px;
+  overflow-wrap: break-word;
 }
 
 .step-formula-box {
@@ -193,42 +198,75 @@
   background: rgba(99, 102, 241, 0.08);
   border: 1px solid rgba(99, 102, 241, 0.15);
   border-radius: var(--radius-sm);
-  padding: 6px 12px;
+  padding: 8px 12px;
   font-size: 0.9rem;
   overflow-x: auto;
+  max-width: 100%;
 }
 
 /* Remarks Section */
 .remarks-section {
   background: rgba(13, 19, 34, 0.6);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
-  padding: var(--space-4);
+  padding: var(--space-4) var(--space-5);
 }
 
 .remarks-title {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 700;
-  color: var(--slate-200);
-  margin-bottom: var(--space-2);
+  color: var(--slate-100);
+  margin-bottom: var(--space-3);
+  font-family: var(--font-brand);
 }
 
 .remarks-list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-3);
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .remark-item {
   display: flex;
   align-items: flex-start;
-  gap: var(--space-2);
-  font-size: 0.85rem;
-  color: var(--slate-300);
-  line-height: 1.5;
+  gap: var(--space-3);
+  font-size: 0.88rem;
+  color: var(--slate-200);
+  line-height: 1.65;
+}
+
+.remark-text {
+  flex: 1;
+  word-break: normal;
+  overflow-wrap: break-word;
 }
 
 .remark-check {
   color: var(--primary-400);
-  margin-top: 3px;
+  margin-top: 4px;
   flex-shrink: 0;
+}
+
+/* Responsive Overrides */
+@media (max-width: 768px) {
+  .edu-concepts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .deriv-edu-steps-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .step-desc,
+  .step-formula-box {
+    margin-left: 0;
+    padding-left: 0;
+  }
+
+  .remarks-section {
+    padding: var(--space-3) var(--space-4);
+  }
 }

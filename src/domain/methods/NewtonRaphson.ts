@@ -168,12 +168,13 @@ export class NewtonRaphsonMethod implements NumericalMethod {
       columns: this.iterationColumns,
       explanations,
       educationalInsights: {
-        methodSummary: 'Newton-Raphson utiliza la serie de Taylor truncada de primer orden (tangente) para aproximar la raíz con velocidad cuadrática.',
+        methodSummary: 'Newton-Raphson utiliza la recta tangente basada en la serie de Taylor de primer orden para aproximar la raíz con velocidad cuadrática.',
         keyFormula: 'x_{i+1} = x_i - \\frac{f(x_i)}{f\'(x_i)}',
         convergenceCondition: '|f(x) \\cdot f\'\'(x)| < [f\'(x)]^2 \\quad \\text{(Criterio de Fourier)}',
         remarks: [
-          'Presenta convergencia de segundo orden (el número de cifras significativas aproximadamente se duplica por iteración).',
-          'Sensible al valor inicial x₀: si se escoge cerca de un punto de inflexión o donde f\'(x)=0, puede divergir u oscilar.',
+          'Convergencia cuadrática: el número de dígitos significativos correctos se duplica aproximadamente en cada iteración exitosa.',
+          'Sensibilidad al punto inicial $x_0$: si se elige cerca de un punto de inflexión o donde $f\'(x) \\approx 0$, el método puede divergir, ciclar o fallar por división entre cero.',
+          'Cálculo de derivadas: requiere evaluar tanto la función $f(x)$ como su primera derivada $f\'(x)$ en cada paso iterativo.',
         ],
       },
       rootEvaluation: f(currentX),

@@ -705,10 +705,43 @@
   margin-top: var(--space-2);
 }
 
+@media (max-width: 768px) {
+  .rules-cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .step-groups-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .assistant-results-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .lessons-roles-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 640px) {
+  .learn-container {
+    padding: var(--space-3) var(--space-3) var(--space-10);
+  }
+
   .learn-tabs-nav {
     flex-direction: column;
     max-width: 100%;
+  }
+
+  .learn-tab-btn {
+    width: 100%;
+    padding: 8px 12px;
+  }
+
+  .assistant-card,
+  .quiz-card,
+  .lessons-intro {
+    padding: var(--space-4);
   }
 
   .assistant-inputs-row {
@@ -717,5 +750,9 @@
 
   .assistant-input-group.point-group {
     flex: 1 1 auto;
+  }
+
+  .quiz-option-btn {
+    padding: var(--space-3);
   }
 }

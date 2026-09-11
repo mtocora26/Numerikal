@@ -287,3 +287,34 @@
   color: var(--accent-300);
   transform: translateX(3px);
 }
+
+@media (max-width: 768px) {
+  .home-container {
+    padding: var(--space-6) var(--space-4) var(--space-12);
+    gap: var(--space-10);
+  }
+
+  .hero-section {
+    padding: var(--space-6) 0 var(--space-4);
+  }
+
+  .hero-actions-row {
+    flex-direction: column;
+    width: 100%;
+    gap: var(--space-3);
+  }
+
+  .hero-main-btn,
+  .hero-actions-row .btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .pillars-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .catalog-grid {
+    grid-template-columns: 1fr;
+  }
+}

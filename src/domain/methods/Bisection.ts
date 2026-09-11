@@ -198,13 +198,13 @@ export class BisectionMethod implements NumericalMethod {
       columns: this.iterationColumns,
       explanations,
       educationalInsights: {
-        methodSummary: 'El método de Bisección garantiza convergencia reduciendo el intervalo a la mitad en cada paso de forma lineal.',
+        methodSummary: 'El método de Bisección garantiza convergencia reduciendo sucesivamente el intervalo a la mitad mediante división binaria.',
         keyFormula: 'x_r = \\frac{x_i + x_s}{2}',
         convergenceCondition: 'f(x_i) \\cdot f(x_s) < 0 \\quad \\text{en cada iteración}',
         remarks: [
-          'La tasa de convergencia es lineal, con factor de reducción constante de 1/2 por iteración.',
-          'Es infalible siempre que la función sea continua y exista cambio de signo en el intervalo.',
-          'El número de iteraciones necesarias se puede calcular de antemano: n \\ge \\frac{\\ln(x_{s0} - x_{i0}) - \\ln(\\text{Tol})}{\\ln 2}.',
+          'Tasa de convergencia lineal: el tamaño del intervalo de búsqueda se reduce a la mitad ($1/2$) en cada iteración consecutiva.',
+          'Garantía de Bolzano: el método es infalible si la función $f(x)$ es continua y existe un cambio de signo en el intervalo inicial $[x_i, x_s]$.',
+          'Cálculo analítico del número de iteraciones: es posible predecir las iteraciones mínimas requeridas mediante la fórmula $n \\ge \\frac{\\ln(x_s - x_i) - \\ln(\\text{Tol})}{\\ln(2)}$.',
         ],
       },
       rootEvaluation: f(xr),

@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import type { MethodExecutionResult } from '../../domain/types';
 import { MathView } from '../MathView/MathView';
+import { FormattedMathText } from '../MathView/FormattedMathText';
 import { DerivativeStepExplainer } from '../../services/DerivativeStepExplainer';
 import { BookOpen, Lightbulb, CheckCircle2, Sparkles } from 'lucide-react';
 import './EducationalExplanation.css';
@@ -37,7 +38,9 @@ export const EducationalExplanation: React.FC<EducationalExplanationProps> = ({
       <div className="edu-concepts-grid">
         <div className="concept-box">
           <span className="concept-label">Fundamento Teórico</span>
-          <p className="concept-text">{educationalInsights.methodSummary}</p>
+          <p className="concept-text">
+            <FormattedMathText text={educationalInsights.methodSummary} />
+          </p>
         </div>
 
         <div className="concept-box">
@@ -75,7 +78,9 @@ export const EducationalExplanation: React.FC<EducationalExplanationProps> = ({
                     <div className="step-formula-box">
                       <MathView math={step.latexFormula} />
                     </div>
-                    <p className="step-desc">{step.explanation}</p>
+                    <p className="step-desc">
+                      <FormattedMathText text={step.explanation} />
+                    </p>
                   </div>
                 ))}
               </div>
@@ -95,7 +100,9 @@ export const EducationalExplanation: React.FC<EducationalExplanationProps> = ({
                       <div className="step-formula-box">
                         <MathView math={step.latexFormula} />
                       </div>
-                      <p className="step-desc">{step.explanation}</p>
+                      <p className="step-desc">
+                        <FormattedMathText text={step.explanation} />
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -118,7 +125,9 @@ export const EducationalExplanation: React.FC<EducationalExplanationProps> = ({
                   <span className="step-number-tag">{step.stepNumber}</span>
                   <span className="step-card-title">{step.title}</span>
                 </div>
-                <p className="step-desc">{step.description}</p>
+                <p className="step-desc">
+                  <FormattedMathText text={step.description} />
+                </p>
                 {step.latexFormula && (
                   <div className="step-formula-box">
                     <MathView math={step.latexFormula} />
@@ -137,9 +146,9 @@ export const EducationalExplanation: React.FC<EducationalExplanationProps> = ({
           <ul className="remarks-list">
             {educationalInsights.remarks.map((rem, idx) => (
               <li key={idx} className="remark-item">
-                <CheckCircle2 size={14} className="remark-check" />
-                <span>
-                  <MathView math={rem} />
+                <CheckCircle2 size={16} className="remark-check" />
+                <span className="remark-text">
+                  <FormattedMathText text={rem} />
                 </span>
               </li>
             ))}

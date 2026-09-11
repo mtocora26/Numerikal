@@ -163,7 +163,7 @@
 .param-number-input,
 .param-select-input {
   width: 100%;
-  min-width: 120px;
+  min-width: 0;
   background: var(--bg-input);
   border: 1px solid var(--border-medium);
   border-radius: var(--radius-md);
@@ -173,6 +173,7 @@
   color: var(--slate-100);
   outline: none;
   transition: all var(--transition-fast);
+  box-sizing: border-box;
 }
 
 .param-number-input:focus,
@@ -184,4 +185,14 @@
 .param-select-input option {
   background: #0f172a;
   color: var(--slate-100);
+}
+
+@media (max-width: 480px) {
+  .method-params-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stopping-conditions-grid {
+    grid-template-columns: 1fr;
+  }
 }

@@ -99,3 +99,38 @@
   border: 1px solid rgba(99, 102, 241, 0.25);
   font-weight: 600;
 }
+
+@media (max-width: 640px) {
+  .navbar-content {
+    padding: 0 var(--space-3);
+  }
+
+  .brand-tagline {
+    display: none;
+  }
+
+  .brand-title {
+    font-size: 1.05rem;
+  }
+
+  .brand-logo-badge {
+    width: 30px;
+    height: 30px;
+  }
+
+  .nav-item-btn {
+    padding: 5px 8px;
+    font-size: 0.78rem;
+    gap: 4px;
+  }
+}
+
+@media (max-width: 380px) {
+  .nav-item-btn span {
+    font-size: 0.74rem;
+  }
+
+  .nav-item-btn svg {
+    display: none;
+  }
+}

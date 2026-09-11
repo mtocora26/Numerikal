@@ -15,23 +15,23 @@ export class SecantMethod implements NumericalMethod {
   public readonly category = 'roots';
   public readonly description = 
     'Aproxima la derivada de Newton-Raphson mediante diferencias finitas usando dos puntos iniciales, sin necesidad de calcular la derivada analítica.';
-  public readonly latexFormula = 'x_{i+1} = x_i - \\frac{f(x_i)(x_i - x_{i-1})}{f(x_i) - f(x_{i-1})}';
+  public readonly latexFormula = 'x_{i+1} = \\frac{f(x_i)x_{i-1} - f(x_{i-1})x_i}{f(x_i) - f(x_{i-1})}';
 
   public readonly parameters: MethodParameterDef[] = [
     {
       name: 'xi',
-      label: 'Primer punto (xi)',
-      latexLabel: 'x_i',
-      description: 'Primera estimación inicial',
+      label: 'Punto anterior (x_{i-1})',
+      latexLabel: 'x_{i-1}',
+      description: 'Estimación anterior del método',
       defaultValue: 0,
       step: 0.1,
       placeholder: 'Ej. 0',
     },
     {
       name: 'xs',
-      label: 'Segundo punto (xs)',
-      latexLabel: 'x_s',
-      description: 'Segunda estimación inicial',
+      label: 'Punto actual (x_i)',
+      latexLabel: 'x_i',
+      description: 'Estimación actual del método',
       defaultValue: 1,
       step: 0.1,
       placeholder: 'Ej. 1',
@@ -40,11 +40,11 @@ export class SecantMethod implements NumericalMethod {
 
   public readonly iterationColumns: IterationColumn[] = [
     { key: 'iteration', label: 'Iteración', latexLabel: 'i', format: 'integer' },
-    { key: 'xPrev', label: 'x_{i-1}', latexLabel: 'x_{i-1}', format: 'number', precision: 6 },
     { key: 'xCurr', label: 'x_i', latexLabel: 'x_i', format: 'number', precision: 6 },
+    { key: 'xPrev', label: 'x_{i-1}', latexLabel: 'x_{i-1}', format: 'number', precision: 6 },
+    { key: 'xNext', label: 'x_{i+1}', latexLabel: 'x_{i+1}', format: 'number', precision: 6 },
     { key: 'fxPrev', label: 'f(x_{i-1})', latexLabel: 'f(x_{i-1})', format: 'number', precision: 6 },
     { key: 'fxCurr', label: 'f(x_i)', latexLabel: 'f(x_i)', format: 'number', precision: 6 },
-    { key: 'xNext', label: 'x_{i+1}', latexLabel: 'x_{i+1}', format: 'number', precision: 6 },
     { key: 'error', label: 'Error', latexLabel: 'E', format: 'scientific', precision: 6 },
   ];
 
@@ -101,7 +101,7 @@ export class SecantMethod implements NumericalMethod {
         break;
       }
 
-      const xNext = xCurr - (fxCurr * (xCurr - xPrev)) / denom;
+      const xNext = (fxCurr * xPrev - fxPrev * xCurr) / (fxCurr - fxPrev);
       currentError = ErrorCalculator.calculate(xNext, xCurr, errorType);
 
       const iterData: IterationData = {
@@ -118,9 +118,9 @@ export class SecantMethod implements NumericalMethod {
       if (iter <= 3 || iter === maxIterations || Math.abs(f(xNext)) < 1e-12 || ErrorCalculator.isWithinTolerance(currentError, tolerance, errorType)) {
         explanations.push({
           stepNumber: iter,
-          title: `Iteración ${iter}: Secante por (${xPrev.toFixed(4)}, ${fxPrev.toFixed(4)}) y (${xCurr.toFixed(4)}, ${fxCurr.toFixed(4)})`,
-          description: `Calculamos la recta secante e intersectamos con el eje X: x_{${iter+1}} = ${xNext.toFixed(6)}.`,
-          latexFormula: `x_{${iter+1}} = ${xCurr.toFixed(4)} - \\frac{(${fxCurr.toFixed(4)})(${xCurr.toFixed(4)} - ${xPrev.toFixed(4)})}{${fxCurr.toFixed(4)} - (${fxPrev.toFixed(4)})} = ${xNext.toFixed(6)}`,
+          title: `Iteración ${iter}: usando x_i = ${xCurr.toFixed(4)} y x_{i-1} = ${xPrev.toFixed(4)}`,
+          description: `Aplicamos la convención del profesor: el valor anterior pasa a ser el actual y el nuevo valor se usa como el siguiente anterior. x_{${iter+1}} = ${xNext.toFixed(6)}.`,
+          latexFormula: `x_{${iter+1}} = \\frac{(${fxCurr.toFixed(4)})(${xPrev.toFixed(4)}) - (${fxPrev.toFixed(4)})(${xCurr.toFixed(4)})}{${fxCurr.toFixed(4)} - ${fxPrev.toFixed(4)}} = ${xNext.toFixed(6)}`,
           dataSnapshot: {
             'x_{i-1}': xPrev,
             'x_i': xCurr,
@@ -168,12 +168,13 @@ export class SecantMethod implements NumericalMethod {
       columns: this.iterationColumns,
       explanations,
       educationalInsights: {
-        methodSummary: 'La Secante evita derivar analíticamente aproximando la pendiente mediante la diferencia de las dos evaluaciones previas.',
-        keyFormula: 'x_{i+1} = x_i - \\frac{f(x_i)(x_i - x_{i-1})}{f(x_i) - f(x_{i-1})}',
-        convergenceCondition: '\\text{Orden de convergencia superlineal: } \\alpha \\approx 1.618 \\text{ (Número Áureo)}',
+        methodSummary: 'El método de la Secante aproxima la derivada mediante la pendiente de la recta secante entre $x_{i-1}$ y $x_i$, siguiendo la convención de actualización de índices vista en clase.',
+        keyFormula: 'x_{i+1} = \\frac{f(x_i)x_{i-1} - f(x_{i-1})x_i}{f(x_i) - f(x_{i-1})}',
+        convergenceCondition: '\\alpha \\approx 1.618 \\quad \\text{(Convergencia superlineal)}',
         remarks: [
-          'No requiere que f(x₀) y f(x₁) tengan signos opuestos (es un método abierto).',
-          'Convergencia más veloz que la bisección y no requiere cálculo de derivadas.',
+          'Método abierto sin cálculo analítico de derivadas: no requiere diferenciar la función, sino únicamente evaluarla en los dos puntos previos.',
+          'Convención de actualización de clase: en cada paso, el punto $x_{i-1}$ pasa a ser el actual $x_i$, y el nuevo valor calculado $x_{i+1}$ toma el lugar de $x_{i-1}$ para la siguiente iteración.',
+          'Velocidad superlineal: su orden de convergencia es aproximadamente $\\alpha = 1.618$ (número áureo), siendo más rápido que la bisección.',
         ],
       },
       rootEvaluation: f(xCurr),
