@@ -177,6 +177,7 @@ export class NewtonRaphsonMethod implements NumericalMethod {
           'Cálculo de derivadas: requiere evaluar tanto la función $f(x)$ como su primera derivada $f\'(x)$ en cada paso iterativo.',
         ],
       },
+      derivativeFormulas: parsed.derivativeLatex ? { first: parsed.derivativeLatex } : undefined,
       rootEvaluation: f(currentX),
     };
   }

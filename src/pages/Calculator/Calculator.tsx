@@ -10,7 +10,6 @@ import { IterationTable } from '../../components/IterationTable/IterationTable';
 import { FunctionGraph } from '../../components/FunctionGraph/FunctionGraph';
 import { EducationalExplanation } from '../../components/EducationalExplanation/EducationalExplanation';
 import { SessionHistory, type HistoryItem } from '../../components/SessionHistory/SessionHistory';
-import { DerivativeCalculator } from './DerivativeCalculator';
 import confetti from 'canvas-confetti';
 import { Play, RotateCcw, AlertTriangle, LineChart, Table, BookOpen, Zap } from 'lucide-react';
 import './Calculator.css';
@@ -21,8 +20,6 @@ interface CalculatorProps {
 
 export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisection' }) => {
   const methods = MethodFactory.getAllMethods();
-  const [calculatorSession, setCalculatorSession] = useState<'roots' | 'derivatives'>('roots');
-
   // State
   const [selectedMethodId, setSelectedMethodId] = useState<string>(initialMethodId);
   const [expression, setExpression] = useState<string>('x^3 - 4*x - 1');
@@ -78,7 +75,7 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
         particleCount: 40,
         spread: 60,
         origin: { y: 0.8 },
-        colors: ['#6366f1', '#22d3ee', '#10b981'],
+        colors: ['#0D683A', '#4DB54A', '#F7EA0A'],
       });
 
       // Save calculation to session history
@@ -154,21 +151,21 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
         </div>
       </div>
 
-      <div className="calculator-session-switcher" role="tablist" aria-label="Tipo de calculadora">
-        <button type="button" role="tab" aria-selected={calculatorSession === 'roots'} className={`session-tab ${calculatorSession === 'roots' ? 'active' : ''}`} onClick={() => setCalculatorSession('roots')}>
-          <Zap size={16} />
-          <span>Resolver raíces</span>
-        </button>
-        <button type="button" role="tab" aria-selected={calculatorSession === 'derivatives'} className={`session-tab ${calculatorSession === 'derivatives' ? 'active' : ''}`} onClick={() => setCalculatorSession('derivatives')}>
-          <span className="session-tab-symbol">f&apos;</span>
-          <span>Calcular derivadas</span>
-        </button>
-      </div>
-
-      {calculatorSession === 'derivatives' && <DerivativeCalculator />}
+      <section className="methods-guide" aria-label="Pasos para resolver una ecuación">
+        <div className="methods-guide-heading">
+          <span className="methods-guide-kicker">Ruta de trabajo</span>
+          <span className="methods-guide-hint">Sigue estos pasos</span>
+        </div>
+        <ol className="methods-guide-list">
+          <li><span>1</span><strong>Selecciona</strong><small>un método</small></li>
+          <li><span>2</span><strong>Escribe</strong><small>la función</small></li>
+          <li><span>3</span><strong>Configura</strong><small>los parámetros</small></li>
+          <li><span>4</span><strong>Calcula</strong><small>y revisa el resultado</small></li>
+        </ol>
+      </section>
 
       {/* Validation Warnings / Error Banner */}
-      {calculatorSession === 'roots' && (executionError || (validation && !validation.isValid)) && (
+      {(executionError || (validation && !validation.isValid)) && (
         <div className="workspace-alert alert-error">
           <AlertTriangle size={18} className="alert-icon" />
           <div className="alert-text">
@@ -178,7 +175,7 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
         </div>
       )}
 
-      {calculatorSession === 'roots' && validation && validation.warnings && validation.warnings.length > 0 && (
+      {validation && validation.warnings && validation.warnings.length > 0 && (
         <div className="workspace-alert alert-warning">
           <AlertTriangle size={18} className="alert-icon" />
           <div className="alert-text">
@@ -189,7 +186,7 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
       )}
 
       {/* Two Column Layout */}
-      {calculatorSession === 'roots' && <div className="workspace-grid">
+      <div className="workspace-grid">
         {/* Left Column: Form & Configuration */}
         <div className="workspace-left-pane">
           {/* Action Buttons - TOP PRIORITY */}
@@ -353,7 +350,7 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
             </div>
           )}
         </div>
-      </div>}
+      </div>
     </div>
   );
 };

@@ -80,6 +80,15 @@ export const MathInput: React.FC<MathInputProps> = ({
     }
   };
 
+  const handleKeyboardToggle = () => {
+    const nextShowKeyboard = !showKeyboard;
+    setShowKeyboard(nextShowKeyboard);
+
+    if (nextShowKeyboard) {
+      inputRef.current?.blur();
+    }
+  };
+
   return (
     <div className={`math-input-container ${className}`}>
       <div className="math-input-header">
@@ -90,8 +99,9 @@ export const MathInput: React.FC<MathInputProps> = ({
           <button
             type="button"
             className={`keyboard-toggle-btn ${showKeyboard ? 'active' : ''}`}
-            onClick={() => setShowKeyboard(!showKeyboard)}
+            onClick={handleKeyboardToggle}
             title="Abrir teclado matemático"
+            aria-expanded={showKeyboard}
           >
             <Keyboard size={16} />
             <span>Teclado</span>
@@ -133,6 +143,8 @@ export const MathInput: React.FC<MathInputProps> = ({
           className={`raw-math-input ${parsed.isValid ? 'input-valid' : value ? 'input-invalid' : ''}`}
           autoComplete="off"
           spellCheck={false}
+          readOnly={showKeyboard}
+          inputMode={showKeyboard ? 'none' : 'text'}
         />
         {value && (
           <button

@@ -8,6 +8,7 @@ export interface ParsedExpression {
   evaluate: (x: number) => number;
   derivative?: (x: number) => number;
   derivativeLatex?: string;
+  secondDerivativeLatex?: string;
 }
 
 export class ExpressionParser {
@@ -113,11 +114,18 @@ export class ExpressionParser {
       // Attempt symbolic derivative computation
       let derivFn: ((x: number) => number) | undefined;
       let derivLatex: string | undefined;
+      let secondDerivLatex: string | undefined;
 
       try {
         const derivNode = derivative(this.normalizeForDifferentiation(cleanStr), 'x');
         const compiledDeriv = derivNode.compile();
         derivLatex = derivNode.toTex({ parenthesis: 'keep', implicit: 'hide' });
+        try {
+          const secondDerivNode = derivative(derivNode, 'x');
+          secondDerivLatex = secondDerivNode.toTex({ parenthesis: 'keep', implicit: 'hide' });
+        } catch {
+          secondDerivLatex = undefined;
+        }
         derivFn = (x: number): number => {
           try {
             const val = compiledDeriv.evaluate({ x, e: Math.E, pi: Math.PI });
@@ -137,6 +145,7 @@ export class ExpressionParser {
         evaluate,
         derivative: derivFn,
         derivativeLatex: derivLatex,
+        secondDerivativeLatex: secondDerivLatex,
       };
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Sintaxis de expresión matemática no válida';

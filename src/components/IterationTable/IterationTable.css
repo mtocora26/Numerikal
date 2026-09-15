@@ -31,14 +31,14 @@
   font-family: var(--font-brand);
   font-size: 1rem;
   font-weight: 700;
-  color: var(--slate-100);
+  color: var(--slate-700);
 }
 
 .row-count-badge {
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--slate-400);
-  background: rgba(30, 41, 59, 0.7);
+  color: var(--slate-500);
+  background: var(--bg-subtle);
   padding: 2px 8px;
   border-radius: var(--radius-full);
   display: inline-flex;
@@ -52,8 +52,8 @@
   gap: 6px;
   font-size: 0.8rem;
   font-weight: 500;
-  color: var(--slate-300);
-  background: rgba(30, 41, 59, 0.6);
+  color: var(--slate-600);
+  background: #ffffff;
   border: 1px solid var(--border-subtle);
   padding: 5px 12px;
   border-radius: var(--radius-md);
@@ -61,9 +61,9 @@
 }
 
 .copy-table-btn:hover {
-  background: rgba(99, 102, 241, 0.15);
+  background: var(--primary-50);
   border-color: var(--primary-400);
-  color: #ffffff;
+  color: var(--primary-900);
 }
 
 .text-success {
@@ -75,7 +75,7 @@
   overflow-x: auto;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
-  background: rgba(13, 19, 34, 0.6);
+  background: #ffffff;
 }
 
 .numerical-table {
@@ -87,10 +87,10 @@
 }
 
 .table-th {
-  background: rgba(15, 23, 42, 0.9);
+  background: var(--primary-50);
   padding: 10px 14px;
   font-weight: 600;
-  color: var(--slate-300);
+  color: var(--slate-600);
   border-bottom: 1px solid var(--border-medium);
   white-space: nowrap;
 }
@@ -110,7 +110,7 @@
 
 .th-latex {
   font-size: 0.9rem;
-  color: var(--primary-300);
+  color: var(--primary-900);
 }
 
 .table-row {
@@ -119,11 +119,11 @@
 }
 
 .table-row:hover {
-  background: rgba(99, 102, 241, 0.06);
+  background: var(--primary-50);
 }
 
 .table-row.row-highlight-final {
-  background: rgba(16, 185, 129, 0.08);
+  background: #eff9e9;
   border-bottom: 2px solid var(--success-500);
   font-weight: 600;
 }
@@ -131,12 +131,12 @@
 .table-td {
   padding: 10px 14px;
   font-family: var(--font-mono);
-  color: var(--slate-200);
+  color: var(--slate-700);
   white-space: nowrap;
 }
 
 .td-iter {
-  color: var(--primary-400);
+  color: var(--primary-900);
   font-weight: 700;
 }
 
@@ -149,17 +149,17 @@
 }
 
 .table-scroll-container::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.6);
+  background: var(--slate-100);
   border-radius: var(--radius-full);
 }
 
 .table-scroll-container::-webkit-scrollbar-thumb {
-  background: rgba(99, 102, 241, 0.3);
+  background: var(--primary-200);
   border-radius: var(--radius-full);
 }
 
 .table-scroll-container::-webkit-scrollbar-thumb:hover {
-  background: rgba(99, 102, 241, 0.5);
+  background: var(--primary-400);
 }
 
 @media (max-width: 640px) {

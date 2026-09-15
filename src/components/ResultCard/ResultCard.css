@@ -13,14 +13,14 @@
 
 .result-card-container.converged {
   border-color: rgba(16, 185, 129, 0.35);
-  background: radial-gradient(ellipse at top right, rgba(16, 185, 129, 0.08) 0%, rgba(17, 24, 39, 0.8) 100%);
-  box-shadow: 0 0 30px rgba(16, 185, 129, 0.12);
+  background: linear-gradient(135deg, #ffffff 0%, #eff9e9 100%);
+  box-shadow: 0 0 30px rgba(54, 146, 62, 0.12);
 }
 
 .result-card-container.unconverged {
   border-color: rgba(245, 158, 11, 0.35);
-  background: radial-gradient(ellipse at top right, rgba(245, 158, 11, 0.08) 0%, rgba(17, 24, 39, 0.8) 100%);
-  box-shadow: 0 0 30px rgba(245, 158, 11, 0.12);
+  background: linear-gradient(135deg, #ffffff 0%, #fffde0 100%);
+  box-shadow: 0 0 30px rgba(247, 234, 10, 0.18);
 }
 
 .result-status-header {
@@ -65,8 +65,8 @@
 
 .method-pill {
   font-size: 0.75rem;
-  color: var(--slate-300);
-  background: rgba(30, 41, 59, 0.7);
+  color: var(--slate-600);
+  background: var(--bg-subtle);
   border: 1px solid var(--border-subtle);
   padding: 4px 10px;
   border-radius: var(--radius-full);
@@ -88,7 +88,7 @@
 
 /* Main Root Display Box */
 .main-root-box {
-  background: rgba(13, 19, 34, 0.8);
+  background: #ffffff;
   border: 1px solid var(--border-medium);
   border-radius: var(--radius-lg);
   padding: var(--space-4) var(--space-6);
@@ -116,8 +116,8 @@
 .root-formula-symbol {
   font-family: var(--font-mono);
   font-size: 0.85rem;
-  color: var(--primary-300);
-  background: rgba(99, 102, 241, 0.15);
+  color: var(--primary-900);
+  background: var(--primary-50);
   padding: 1px 6px;
   border-radius: 4px;
 }
@@ -130,9 +130,9 @@
   font-family: var(--font-brand);
   font-size: clamp(1.8rem, 3.5vw, 2.5rem);
   font-weight: 800;
-  color: #ffffff;
+  color: var(--primary-900);
   letter-spacing: -0.02em;
-  text-shadow: 0 0 25px rgba(99, 102, 241, 0.35);
+  text-shadow: 0 0 25px rgba(54, 146, 62, 0.18);
 }
 
 .root-evaluation-row {
@@ -142,6 +142,58 @@
   font-size: 0.85rem;
   color: var(--slate-400);
   margin-top: 4px;
+}
+
+.derivative-formulas-result {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--primary-50);
+  border: 1px solid var(--primary-200);
+  border-left: 4px solid var(--primary-500);
+  border-radius: var(--radius-md);
+}
+
+.derivative-formulas-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.derivative-formulas-kicker {
+  color: var(--primary-900);
+  font-family: var(--font-brand);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.derivative-formulas-method {
+  color: var(--slate-500);
+  font-size: 0.75rem;
+}
+
+.derivative-formula-row-result {
+  display: grid;
+  grid-template-columns: minmax(130px, 0.35fr) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--primary-200);
+  overflow-x: auto;
+}
+
+.derivative-formula-label {
+  color: var(--slate-600);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.derivative-formula-row-result .math-view {
+  color: var(--primary-900);
+  white-space: nowrap;
 }
 
 .eval-label {
@@ -157,7 +209,7 @@
 }
 
 .metric-box {
-  background: rgba(13, 19, 34, 0.6);
+  background: var(--bg-subtle);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   padding: var(--space-3);
@@ -182,14 +234,14 @@
   font-family: var(--font-mono);
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--slate-100);
+  color: var(--slate-700);
 }
 
 .convergence-diagnostic-box {
   padding: var(--space-3);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  background: rgba(13, 19, 34, 0.6);
+  background: #ffffff;
 }
 
 .diagnostic-positive { border-color: var(--success-border); }
@@ -204,7 +256,7 @@
 }
 
 .diagnostic-heading {
-  color: var(--slate-300);
+  color: var(--slate-600);
   font-size: 0.8rem;
 }
 
@@ -220,7 +272,7 @@
 
 /* Convergence Reason */
 .convergence-reason-box {
-  background: rgba(13, 19, 34, 0.5);
+  background: var(--bg-subtle);
   border-left: 3px solid var(--primary-500);
   border-radius: 0 var(--radius-md) var(--radius-md) 0;
   padding: var(--space-2) var(--space-3);
@@ -229,7 +281,7 @@
 
 .reason-title {
   font-weight: 600;
-  color: var(--slate-300);
+  color: var(--slate-600);
   display: block;
   margin-bottom: 2px;
 }
@@ -260,5 +312,10 @@
   .result-status-header {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .derivative-formula-row-result {
+    grid-template-columns: 1fr;
+    gap: var(--space-1);
   }
 }

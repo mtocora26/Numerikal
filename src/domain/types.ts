@@ -48,6 +48,10 @@ export interface MethodExecutionResult {
     remarks: string[];
   };
   rootEvaluation: number; // f(xr)
+  derivativeFormulas?: {
+    first: string;
+    second?: string;
+  };
   convergenceDiagnostics?: {
     label: string;
     value: number;

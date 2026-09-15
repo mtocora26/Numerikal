@@ -41,7 +41,7 @@ export const FunctionGraph: React.FC<FunctionGraphProps> = ({
     canvas.height = height * dpr;
     ctx.scale(dpr, dpr);
 
-    ctx.fillStyle = '#0a0f1d';
+    ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, width, height);
 
     let xMin = -4;
@@ -104,7 +104,7 @@ export const FunctionGraph: React.FC<FunctionGraphProps> = ({
     const toScreenY = (y: number) => pad.top + (1 - (y - yMin) / (yMax - yMin)) * plotH;
 
     // Grid lines
-    ctx.strokeStyle = 'rgba(148, 163, 184, 0.07)';
+    ctx.strokeStyle = 'rgba(54, 146, 62, 0.12)';
     ctx.lineWidth = 1;
     const xTicks = 8;
     const yTicks = 6;
@@ -126,7 +126,7 @@ export const FunctionGraph: React.FC<FunctionGraphProps> = ({
     }
 
     // Axes
-    ctx.strokeStyle = 'rgba(148, 163, 184, 0.25)';
+    ctx.strokeStyle = 'rgba(51, 51, 51, 0.38)';
     ctx.lineWidth = 1.5;
 
     if (yMin <= 0 && yMax >= 0) {
@@ -146,7 +146,7 @@ export const FunctionGraph: React.FC<FunctionGraphProps> = ({
     }
 
     // Axis Tick Labels
-    ctx.fillStyle = 'rgba(148, 163, 184, 0.6)';
+    ctx.fillStyle = 'rgba(51, 51, 51, 0.7)';
     ctx.font = '11px JetBrains Mono, monospace';
     ctx.textAlign = 'center';
 
@@ -165,7 +165,7 @@ export const FunctionGraph: React.FC<FunctionGraphProps> = ({
 
     // Curve f(x)
     if (points.length > 1) {
-      ctx.strokeStyle = '#818cf8';
+      ctx.strokeStyle = '#0d683a';
       ctx.lineWidth = 2.5;
       ctx.beginPath();
       let started = false;
@@ -192,7 +192,7 @@ export const FunctionGraph: React.FC<FunctionGraphProps> = ({
         const first = iters[0];
         const aX = toScreenX(Number(first.xi));
         const bX = toScreenX(Number(first.xs));
-        ctx.fillStyle = 'rgba(99, 102, 241, 0.08)';
+        ctx.fillStyle = 'rgba(160, 213, 127, 0.22)';
         ctx.fillRect(aX, pad.top, bX - aX, plotH);
 
         iters.slice(-3).forEach((it, idx) => {
@@ -202,7 +202,7 @@ export const FunctionGraph: React.FC<FunctionGraphProps> = ({
           const sy = toScreenY(fxr);
           const y0 = toScreenY(0);
 
-          ctx.strokeStyle = idx === iters.slice(-3).length - 1 ? '#34d399' : '#fbbf24';
+          ctx.strokeStyle = idx === iters.slice(-3).length - 1 ? '#f7ea0a' : '#4db54a';
           ctx.lineWidth = 1.5;
           ctx.setLineDash([4, 4]);
           ctx.beginPath();
@@ -218,7 +218,7 @@ export const FunctionGraph: React.FC<FunctionGraphProps> = ({
         const bX = toScreenX(Number(last.xs));
         const bY = toScreenY(Number(last.fxs));
 
-        ctx.strokeStyle = 'rgba(34, 211, 238, 0.8)';
+        ctx.strokeStyle = 'rgba(13, 104, 58, 0.75)';
         ctx.lineWidth = 1.8;
         ctx.setLineDash([6, 3]);
         ctx.beginPath();
@@ -234,18 +234,18 @@ export const FunctionGraph: React.FC<FunctionGraphProps> = ({
 
       ctx.beginPath();
       ctx.arc(rootX, rootY, 9, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(16, 185, 129, 0.3)';
+      ctx.fillStyle = 'rgba(247, 234, 10, 0.4)';
       ctx.fill();
 
       ctx.beginPath();
       ctx.arc(rootX, rootY, 4.5, 0, Math.PI * 2);
-      ctx.fillStyle = '#10b981';
+      ctx.fillStyle = '#f7ea0a';
       ctx.fill();
       ctx.strokeStyle = '#ffffff';
       ctx.lineWidth = 1.5;
       ctx.stroke();
 
-      ctx.fillStyle = '#34d399';
+      ctx.fillStyle = '#0d683a';
       ctx.font = 'bold 12px Space Grotesk, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(`xr ≈ ${result.approximateRoot.toFixed(4)}`, rootX, rootY - 14);

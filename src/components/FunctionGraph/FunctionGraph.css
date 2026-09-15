@@ -24,14 +24,14 @@
 }
 
 .graph-title-icon {
-  color: var(--accent-400);
+  color: var(--primary-900);
 }
 
 .graph-title {
   font-family: var(--font-brand);
   font-size: 1rem;
   font-weight: 700;
-  color: var(--slate-100);
+  color: var(--slate-700);
 }
 
 .graph-controls {
@@ -47,16 +47,16 @@
   width: 28px;
   height: 28px;
   border-radius: var(--radius-sm);
-  background: rgba(30, 41, 59, 0.7);
+  background: #ffffff;
   border: 1px solid var(--border-subtle);
-  color: var(--slate-300);
+  color: var(--slate-600);
   transition: all var(--transition-fast);
 }
 
 .graph-btn:hover {
-  background: rgba(99, 102, 241, 0.2);
+  background: var(--primary-50);
   border-color: var(--primary-400);
-  color: #ffffff;
+  color: var(--primary-900);
 }
 
 .canvas-wrapper {
@@ -65,7 +65,7 @@
   height: 380px;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-medium);
 }
 
 .numerical-canvas {
@@ -97,15 +97,15 @@
 }
 
 .dot-function {
-  background: #818cf8;
-  box-shadow: 0 0 6px rgba(129, 140, 248, 0.6);
+  background: #0d683a;
+  box-shadow: 0 0 6px rgba(13, 104, 58, 0.35);
 }
 
 .dot-root {
-  background: #10b981;
-  box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+  background: #f7ea0a;
+  box-shadow: 0 0 6px rgba(247, 234, 10, 0.65);
 }
 
 .dot-iteration {
-  background: #fbbf24;
+  background: #4db54a;
 }

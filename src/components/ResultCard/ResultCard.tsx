@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import type { MethodExecutionResult } from '../../domain/types';
 import { MathView } from '../MathView/MathView';
+import { ExpressionParser } from '../../services/ExpressionParser';
 import { CheckCircle, AlertTriangle, Clock, Zap, Target } from 'lucide-react';
 import './ResultCard.css';
 
@@ -11,6 +12,21 @@ interface ResultCardProps {
 
 export const ResultCard: React.FC<ResultCardProps> = ({ result, className = '' }) => {
   const isConverged = result.converged;
+  const derivativeFormulas = useMemo(() => {
+    if (result.methodId !== 'newton-raphson' && result.methodId !== 'modified-newton-raphson') {
+      return undefined;
+    }
+
+    const parsed = ExpressionParser.parse(result.expression);
+    if (!parsed.derivativeLatex) return result.derivativeFormulas;
+
+    return {
+      first: parsed.derivativeLatex,
+      second: result.methodId === 'modified-newton-raphson'
+        ? parsed.secondDerivativeLatex
+        : undefined,
+    };
+  }, [result]);
 
   return (
     <div className={`result-card-container ${isConverged ? 'converged' : 'unconverged'} ${className}`}>
@@ -58,6 +74,27 @@ export const ResultCard: React.FC<ResultCardProps> = ({ result, className = '' }
           />
         </div>
       </div>
+
+      {derivativeFormulas && (
+        <div className="derivative-formulas-result">
+          <div className="derivative-formulas-heading">
+            <span className="derivative-formulas-kicker">Simplificación algebraica de las derivadas</span>
+            <span className="derivative-formulas-method">
+              {result.methodId === 'modified-newton-raphson' ? 'Newton-Raphson modificado' : 'Newton-Raphson'}
+            </span>
+          </div>
+          <div className="derivative-formula-row-result">
+            <span className="derivative-formula-label">Primera derivada</span>
+            <MathView math={`f'(x) = ${derivativeFormulas.first}`} />
+          </div>
+          {derivativeFormulas.second && (
+            <div className="derivative-formula-row-result">
+              <span className="derivative-formula-label">Segunda derivada</span>
+              <MathView math={`f''(x) = ${derivativeFormulas.second}`} />
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Metrics Row */}
       <div className="result-metrics-grid">

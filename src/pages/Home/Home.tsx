@@ -1,7 +1,6 @@
 import React from 'react';
-import { MethodFactory } from '../../factories/MethodFactory';
-import { MathView } from '../../components/MathView/MathView';
-import { ArrowRight, Layers, Eye, BookCheck, Sparkles, Compass, Divide, Minimize, Zap, TrendingUp, RotateCcw } from 'lucide-react';
+import { ArrowRight, Layers, Eye, BookCheck, Sparkles } from 'lucide-react';
+import universityLogo from '../../assets/UNICESAR 2024.png';
 import './Home.css';
 
 interface HomeProps {
@@ -9,27 +8,43 @@ interface HomeProps {
 }
 
 export const Home: React.FC<HomeProps> = ({ onSelectMethodAndOpenCalc }) => {
-  const methods = MethodFactory.getAllMethods();
-
   return (
     <div className="home-container">
+      <section className="institutional-header" aria-label="Información institucional del proyecto">
+        <div className="institutional-logo-frame">
+          <img
+            src={universityLogo}
+            alt="Universidad Popular del Cesar, Seccional Aguachica"
+            className="institutional-logo"
+          />
+        </div>
+        <div className="institutional-details">
+          <span className="institutional-kicker">Proyecto académico</span>
+          <h1>Análisis numérico</h1>
+          <p>Plataforma interactiva para el estudio de métodos numéricos.</p>
+          <div className="institutional-credits">
+            <span><strong>Docente:</strong> José Javier Coronel</span>
+            <span><strong>Estudiante:</strong> Manuel David Castro Tocora</span>
+          </div>
+        </div>
+      </section>
+
       {/* Hero Section */}
       <section className="hero-section">
         <div className="hero-badge">
           <Sparkles size={13} />
-          <span>Espacio de Trabajo para Métodos Numéricos</span>
+          <span>Universidad Popular del Cesar · Seccional Aguachica</span>
         </div>
 
         <h1 className="hero-title">
-          Calcula, visualiza y comprende.
+          Métodos numéricos
           <br />
-          <span className="hero-gradient-text">Sin complicaciones.</span>
+          <span className="hero-gradient-text">de forma clara y visual.</span>
         </h1>
 
         <p className="hero-subtitle">
-          Numerical no es una calculadora genérica: es un entorno didáctico interactivo donde puedes
-          ingresar tus funciones, observar cada iteración matemática, analizar gráficamente la convergencia
-          y dominar el análisis numérico paso a paso.
+          Numerikal es un entorno didáctico para ingresar funciones, resolver ecuaciones no lineales,
+          observar cada iteración matemática y analizar gráficamente la convergencia de distintos métodos.
         </p>
 
         <div className="hero-actions-row">
@@ -51,7 +66,7 @@ export const Home: React.FC<HomeProps> = ({ onSelectMethodAndOpenCalc }) => {
             </div>
             <h3 className="pillar-title">1. Motor Numérico Puro</h3>
             <p className="pillar-desc">
-              Arquitectura desacoplada en TypeScript con Strategy y Factory Pattern. Cálculos transparentes, rápidos y precisos.
+              Procedimientos claros para estudiar el comportamiento de cada método y sus criterios de convergencia.
             </p>
           </div>
 
@@ -61,7 +76,7 @@ export const Home: React.FC<HomeProps> = ({ onSelectMethodAndOpenCalc }) => {
             </div>
             <h3 className="pillar-title">2. Visualización Gráfica</h3>
             <p className="pillar-desc">
-              Gráficas en Canvas de alta resolución para visualizar el comportamiento de la función, intervalos, secantes y tangentes.
+              Representación gráfica de funciones, intervalos, secantes y aproximaciones de la raíz.
             </p>
           </div>
 
@@ -71,68 +86,23 @@ export const Home: React.FC<HomeProps> = ({ onSelectMethodAndOpenCalc }) => {
             </div>
             <h3 className="pillar-title">3. Enfoque Educativo</h3>
             <p className="pillar-desc">
-              Explicaciones didácticas de cada iteración, fórmulas paso a paso y validación de condiciones de convergencia (Bolzano, Fourier).
+              Fórmulas, iteraciones y conceptos fundamentales explicados paso a paso para apoyar el aprendizaje.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Available Methods Section */}
-      <section className="methods-catalog-section">
-        <div className="section-header-block">
-          <div className="section-badge">
-            <Compass size={14} /> Métodos Numéricos Disponibles
-          </div>
-          <h2 className="section-title">Encuentra raíces de ecuaciones no lineales</h2>
-          <p className="section-desc">
-            Selecciona cualquiera de los métodos implementados para abrir inmediatamente el espacio de cálculo interactivo.
-          </p>
-        </div>
-
-        <div className="catalog-grid">
-          {methods.map((method) => {
-            const getIcon = (iconName: string) => {
-              switch (iconName) {
-                case 'divide': return <Divide size={24} />;
-                case 'minimize': return <Minimize size={24} />;
-                case 'zap': return <Zap size={24} />;
-                case 'trending-up': return <TrendingUp size={24} />;
-                case 'repeat': return <RotateCcw size={24} />;
-                case 'layers': return <Layers size={24} />;
-                default: return <Layers size={24} />;
-              }
-            };
-
-            return (
-              <div
-                key={method.id}
-                className="catalog-method-card"
-                onClick={() => onSelectMethodAndOpenCalc(method.id)}
-              >
-                <div className="card-top-row">
-                  <div className="card-icon">{getIcon(method.icon)}</div>
-                  <span className="card-tag">{method.tag}</span>
-                </div>
-
-                <h3 className="card-title">{method.name}</h3>
-                <p className="card-desc">{method.description}</p>
-
-                <div className="card-formula-box">
-                  <span className="formula-tag">Fórmula:</span>
-                  <MathView math={method.latexFormula} />
-                </div>
-
-                <div className="card-footer-row">
-                  <span className="convergence-note">{method.recommendedConvergence}</span>
-                  <button type="button" className="card-explore-btn">
-                    <span>Resolver</span>
-                    <ArrowRight size={14} />
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+      <section className="home-next-step" aria-label="Siguiente paso">
+        <span className="home-next-step-label">¿Listo para comenzar?</span>
+        <p>Dirígete a Métodos para configurar una función y estudiar su solución paso a paso.</p>
+        <button
+          type="button"
+          className="btn-secondary"
+          onClick={() => onSelectMethodAndOpenCalc('bisection')}
+        >
+          Ir a Métodos
+          <ArrowRight size={16} />
+        </button>
       </section>
     </div>
   );

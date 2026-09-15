@@ -5,7 +5,7 @@ import { Calculator } from './pages/Calculator/Calculator';
 import { Learn } from './pages/Learn/Learn';
 
 export function App() {
-  const [currentView, setCurrentView] = useState<'home' | 'calculator' | 'learn'>('calculator');
+  const [currentView, setCurrentView] = useState<'home' | 'calculator' | 'learn'>('home');
   const [selectedMethodId, setSelectedMethodId] = useState<string>('bisection');
 
   const handleOpenMethodInCalculator = (methodId: string) => {

@@ -1,5 +1,6 @@
 import React from 'react';
-import { Sigma, Compass, Calculator, GraduationCap } from 'lucide-react';
+import { Compass, Calculator, GraduationCap } from 'lucide-react';
+import universitySymbol from '../../assets/SÍMBOLO UNICESAR 2024.png';
 import './Navbar.css';
 
 interface NavbarProps {
@@ -13,7 +14,11 @@ export const Navbar: React.FC<NavbarProps> = ({ activeView, onNavigate }) => {
       <div className="navbar-content">
         <div className="navbar-brand" onClick={() => onNavigate('home')}>
           <div className="brand-logo-badge">
-            <Sigma size={20} className="brand-sigma-icon" />
+            <img
+              src={universitySymbol}
+              alt="Símbolo de la Universidad Popular del Cesar"
+              className="brand-university-symbol"
+            />
           </div>
           <div className="brand-text-group">
             <span className="brand-title">Numerikal</span>
@@ -37,7 +42,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeView, onNavigate }) => {
             onClick={() => onNavigate('calculator')}
           >
             <Calculator size={16} />
-            <span>Calculadora</span>
+            <span>Métodos</span>
           </button>
 
           <button
@@ -46,7 +51,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeView, onNavigate }) => {
             onClick={() => onNavigate('learn')}
           >
             <GraduationCap size={16} />
-            <span>Aprende</span>
+            <span>Teoría</span>
           </button>
         </nav>
       </div>

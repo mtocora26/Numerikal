@@ -187,6 +187,9 @@ export class ModifiedNewtonRaphsonMethod implements NumericalMethod {
           'Comportamiento en raíces simples: también converge cuadráticamente en raíces simples ($m = 1$), con un costo computacional adicional por evaluar $f\'\'(x)$.',
         ],
       },
+      derivativeFormulas: parsed.derivativeLatex
+        ? { first: parsed.derivativeLatex, second: parsed.secondDerivativeLatex }
+        : undefined,
       rootEvaluation: f(currentX),
     };
   }

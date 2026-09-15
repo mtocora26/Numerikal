@@ -4,9 +4,9 @@
   left: 0;
   right: 0;
   height: 64px;
-  background: rgba(8, 12, 22, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border-subtle);
   z-index: 100;
   display: flex;
@@ -35,15 +35,17 @@
   width: 36px;
   height: 36px;
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, var(--primary-600), var(--accent-500));
+  background: var(--primary-900);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 4px 12px rgba(13, 104, 58, 0.2);
 }
 
-.brand-sigma-icon {
-  color: #ffffff;
+.brand-university-symbol {
+  width: 25px;
+  height: 25px;
+  object-fit: contain;
 }
 
 .brand-text-group {
@@ -56,17 +58,14 @@
   font-size: 1.2rem;
   font-weight: 800;
   letter-spacing: -0.03em;
-  background: linear-gradient(135deg, #ffffff 0%, var(--primary-200) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--primary-900);
 }
 
 .brand-tagline {
   font-size: 0.65rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--slate-400);
+  color: var(--slate-500);
   font-weight: 600;
 }
 
@@ -82,21 +81,21 @@
   gap: 6px;
   font-size: 0.85rem;
   font-weight: 500;
-  color: var(--slate-300);
+  color: var(--slate-600);
   padding: 6px 14px;
   border-radius: var(--radius-md);
   transition: all var(--transition-fast);
 }
 
 .nav-item-btn:hover {
-  color: #ffffff;
-  background: var(--bg-glass);
+  color: var(--primary-900);
+  background: var(--primary-50);
 }
 
 .nav-item-btn.active {
-  color: var(--primary-300);
-  background: rgba(99, 102, 241, 0.12);
-  border: 1px solid rgba(99, 102, 241, 0.25);
+  color: var(--primary-900);
+  background: var(--primary-50);
+  border: 1px solid var(--primary-200);
   font-weight: 600;
 }
 
