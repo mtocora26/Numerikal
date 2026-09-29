@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh issue *)",
+      "Bash(curl -s \"https://api.github.com/repos/mtocora26/Numerikal/issues?state=open&per_page=50\")",
+      "Bash(python -c ' *)",
+      "PowerShell(cd \"E:\\\\Projects\\\\university\\\\Numerikal\"; $env:Path = [Environment]::GetEnvironmentVariable\\('Path','Machine'\\) + ';' + [Environment]::GetEnvironmentVariable\\('Path','User'\\); \\(Get-Command gh\\).Source; gh auth status; git diff)",
+      "PowerShell(cd \"E:\\\\Projects\\\\university\\\\Numerikal\"; $env:Path = [Environment]::GetEnvironmentVariable\\('Path','Machine'\\) + ';' + [Environment]::GetEnvironmentVariable\\('Path','User'\\); gh issue develop 5 --checkout; git branch --show-current)",
+      "PowerShell(cd \"E:\\\\Projects\\\\university\\\\Numerikal\"; $env:Path = [Environment]::GetEnvironmentVariable\\('Path','Machine'\\) + ';' + [Environment]::GetEnvironmentVariable\\('Path','User'\\); gh issue develop 6 --base main --checkout; git branch --show-current; git log --oneline -1)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" https://cdn.jsdelivr.net/npm/katex@0.18.5/dist/katex.min.css)",
+      "Bash(node -e \"console.log\\(require\\('katex/package.json'\\).version\\)\")",
+      "Read(//c/Program Files \\\\\\(x86\\\\\\)/Microsoft/Edge/Application/**)",
+      "Read(//c/Users/Usuario/AppData/Local/**)",
+      "Bash(npm init *)",
+      "Bash(npm i *)"
+    ]
+  }
+}
