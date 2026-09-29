@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/Usuario/.claude/projects/e--Projects-university-Numerikal/memory/**)",
+      "Bash(echo \"- [Issue branch workflow]\\(issue-branch-workflow.md\\) — one gh-linked branch per issue; gh only in PowerShell; commit via -F\")",
+      "PowerShell($env:Path = [Environment]::GetEnvironmentVariable\\('Path','Machine'\\) + ';' + [Environment]::GetEnvironmentVariable\\('Path','User'\\); gh issue create --repo mtocora26/Numerikal --title \"Fix default bracket for closed methods\" --label bug --assignee mtocora26 --body-file \"C:\\\\Users\\\\Usuario\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\e--Projects-university-Numerikal\\\\96eab16e-caf9-4c94-94c5-8e780df81f43\\\\scratchpad\\\\issue-defaults.md\")",
+      "Bash(cp __TRACKED_VAR__/learn-before.png docs/reportes/img/teoria-antes.png)",
+      "Bash(cp __TRACKED_VAR__/learn-after.png docs/reportes/img/teoria-despues.png)",
+      "Bash(cp __TRACKED_VAR__/calc-after.png docs/reportes/img/tabla-despues.png)"
+    ]
+  }
+}
