@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MethodFactory } from '../../factories/MethodFactory';
 import { useExpressionParser } from '../../hooks/useExpressionParser';
 import { useNumericalSolver } from '../../hooks/useNumericalSolver';
@@ -10,6 +10,8 @@ import { IterationTable } from '../../components/IterationTable/IterationTable';
 import { FunctionGraph } from '../../components/FunctionGraph/FunctionGraph';
 import { EducationalExplanation } from '../../components/EducationalExplanation/EducationalExplanation';
 import { SessionHistory, type HistoryItem } from '../../components/SessionHistory/SessionHistory';
+import { MathView } from '../../components/MathView/MathView';
+import { ExpressionParser } from '../../services/ExpressionParser';
 import confetti from 'canvas-confetti';
 import { Play, RotateCcw, AlertTriangle, LineChart, Table, BookOpen, Zap } from 'lucide-react';
 import './Calculator.css';
@@ -30,6 +32,7 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
   const [activeTab, setActiveTab] = useState<'graph' | 'table' | 'educational'>('table');
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [activeHistoryId, setActiveHistoryId] = useState<string | null>(null);
+  const resultsRef = useRef<HTMLElement>(null);
 
   // Custom Hooks
   const parsedExpression = useExpressionParser(expression);
@@ -107,6 +110,13 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
         return updated;
       });
       setActiveHistoryId(newItem.id);
+
+      // In the single-column layout the solution sits below the form, so bring it into view
+      if (window.matchMedia('(max-width: 1080px)').matches) {
+        requestAnimationFrame(() => {
+          resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      }
     }
   };
 
@@ -135,6 +145,10 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
     reset();
   };
 
+  const selectedMethodMeta = methods.find((method) => method.id === selectedMethodId);
+  const hasValidationError = Boolean(executionError || (validation && !validation.isValid));
+  const hasWarnings = Boolean(validation?.warnings && validation.warnings.length > 0);
+
   return (
     <div className="calculator-workspace">
       {/* Workspace Header */}
@@ -146,74 +160,59 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
           </div>
           <h1 className="workspace-title">Resolución y Análisis Numérico</h1>
           <p className="workspace-subtitle">
-            Configura tu problema matemático, calcula iteraciones con precisión y explora la convergencia.
+            Elige un método, escribe tu ejercicio y obtén la solución con su tabla, gráfica y explicación.
           </p>
         </div>
       </div>
 
-      <section className="methods-guide" aria-label="Pasos para resolver una ecuación">
-        <div className="methods-guide-heading">
-          <span className="methods-guide-kicker">Ruta de trabajo</span>
-          <span className="methods-guide-hint">Sigue estos pasos</span>
-        </div>
-        <ol className="methods-guide-list">
-          <li><span>1</span><strong>Selecciona</strong><small>un método</small></li>
-          <li><span>2</span><strong>Escribe</strong><small>la función</small></li>
-          <li><span>3</span><strong>Configura</strong><small>los parámetros</small></li>
-          <li><span>4</span><strong>Calcula</strong><small>y revisa el resultado</small></li>
-        </ol>
-      </section>
-
-      {/* Validation Warnings / Error Banner */}
-      {(executionError || (validation && !validation.isValid)) && (
-        <div className="workspace-alert alert-error">
-          <AlertTriangle size={18} className="alert-icon" />
-          <div className="alert-text">
-            <strong>Error de validación matemática:</strong>
-            <p>{executionError || (validation?.errors || []).join(' ')}</p>
-          </div>
-        </div>
-      )}
-
-      {validation && validation.warnings && validation.warnings.length > 0 && (
-        <div className="workspace-alert alert-warning">
-          <AlertTriangle size={18} className="alert-icon" />
-          <div className="alert-text">
-            <strong>Advertencia de convergencia:</strong>
-            <p>{validation.warnings.join(' ')}</p>
-          </div>
-        </div>
-      )}
-
       {/* Two Column Layout */}
       <div className="workspace-grid">
-        {/* Left Column: Form & Configuration */}
-        <div className="workspace-left-pane">
-          {/* Action Buttons - TOP PRIORITY */}
-          <div className="actions-row top-actions">
-            <button
-              type="button"
-              className="btn-primary calculate-main-btn"
-              onClick={handleCalculate}
-              disabled={isCalculating || !parsedExpression.isValid}
+        {/* Left Column: Exercise (method, function, parameters, solve) */}
+        <section className="workspace-left-pane" aria-label="Ejercicio">
+          {/* Step 1: Method */}
+          <div className="pane-section glass-panel method-panel">
+            <label className="workspace-step-label" htmlFor="method-select">
+              <span className="workspace-step-number">1</span>
+              Selecciona el método
+            </label>
+            <select
+              id="method-select"
+              value={selectedMethodId}
+              onChange={(e) => {
+                setSelectedMethodId(e.target.value);
+                reset();
+              }}
+              className="method-dropdown"
             >
-              <Play size={18} />
-              <span>{isCalculating ? 'Calculando...' : 'Calcular Solución'}</span>
-            </button>
+              {methods.map((method) => (
+                <option key={method.id} value={method.id}>
+                  {method.name}
+                </option>
+              ))}
+            </select>
 
-            <button
-              type="button"
-              className="btn-secondary reset-btn"
-              onClick={handleResetAll}
-              title="Restablecer cálculos"
-            >
-              <RotateCcw size={16} />
-              <span>Limpiar</span>
-            </button>
+            {selectedMethodMeta && (
+              <div className="method-summary">
+                <div className="method-summary-tags">
+                  <span className="method-badge-compact">{selectedMethodMeta.tag}</span>
+                  <span className="method-summary-difficulty">{selectedMethodMeta.difficulty}</span>
+                </div>
+                <p className="method-summary-description">
+                  {selectedMethodMeta.description}
+                </p>
+                <div className="method-summary-formula">
+                  <MathView math={selectedMethodMeta.latexFormula} />
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* MathInput - Function Input */}
+          {/* Step 2: Function Input */}
           <div className="pane-section glass-panel">
+            <div className="workspace-step-label">
+              <span className="workspace-step-number">2</span>
+              Escribe el ejercicio
+            </div>
             <MathInput
               value={expression}
               onChange={setExpression}
@@ -229,11 +228,11 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
             )}
           </div>
 
-          {/* Execution Parameters - HIGH PRIORITY */}
+          {/* Step 3: Execution Parameters */}
           <div className="pane-section glass-panel execution-params-section">
-            <div className="execution-params-header">
-              <h3 className="execution-params-title">Parámetros de Ejecución</h3>
-              <span className="method-badge-compact">{currentMethod.name}</span>
+            <div className="workspace-step-label">
+              <span className="workspace-step-number">3</span>
+              Configura los parámetros
             </div>
 
             <ParameterForm
@@ -251,41 +250,64 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
             />
           </div>
 
-          {/* Method Selector - Simple Dropdown */}
-          <div className="pane-section glass-panel">
-            <label className="selector-section-label">Cambiar Método</label>
-            <select
-              value={selectedMethodId}
-              onChange={(e) => {
-                setSelectedMethodId(e.target.value);
-                reset();
-              }}
-              className="method-dropdown"
+          {/* Validation Warnings / Error Banner (next to the solve button) */}
+          {hasValidationError && (
+            <div className="workspace-alert alert-error" role="alert">
+              <AlertTriangle size={18} className="alert-icon" />
+              <div className="alert-text">
+                <strong>Error de validación matemática:</strong>
+                <p>{executionError || (validation?.errors || []).join(' ')}</p>
+              </div>
+            </div>
+          )}
+
+          {hasWarnings && (
+            <div className="workspace-alert alert-warning">
+              <AlertTriangle size={18} className="alert-icon" />
+              <div className="alert-text">
+                <strong>Advertencia de convergencia:</strong>
+                <p>{validation?.warnings.join(' ')}</p>
+              </div>
+            </div>
+          )}
+
+          {/* Step 4: Solve (sticky so it stays visible while editing) */}
+          <div className="actions-row solve-actions">
+            <button
+              type="button"
+              className="btn-primary calculate-main-btn"
+              onClick={handleCalculate}
+              disabled={isCalculating || !parsedExpression.isValid}
             >
-              {methods.map((method) => (
-                <option key={method.id} value={method.id}>
-                  {method.name}
-                </option>
-              ))}
-            </select>
+              <Play size={18} />
+              <span>{isCalculating ? 'Calculando...' : 'Calcular Solución'}</span>
+            </button>
+
+            <button
+              type="button"
+              className="btn-secondary reset-btn"
+              onClick={handleResetAll}
+              title="Restablecer cálculos"
+              aria-label="Limpiar"
+            >
+              <RotateCcw size={16} />
+              <span>Limpiar</span>
+            </button>
           </div>
+        </section>
 
-          {/* Session History Component */}
-          <SessionHistory
-            history={history}
-            activeHistoryId={activeHistoryId}
-            onSelectHistoryItem={handleSelectHistoryItem}
-            onClearHistory={handleClearHistory}
-          />
-        </div>
-
-        {/* Right Column: Dynamic Results, Graphs, Tables & Insights */}
-        <div className="workspace-right-pane">
+        {/* Right Column: Solution, Graphs, Tables & Insights */}
+        <section className="workspace-right-pane" aria-label="Solución" ref={resultsRef}>
           {result ? (
             <div className="results-container">
+              {/* Exercise being solved, so the solution stays tied to its input */}
+              <div className="solved-exercise-strip">
+                <span className="solved-exercise-label">Solución del ejercicio</span>
+                <MathView math={`${result.methodId === 'fixed-point' ? 'g(x)' : 'f(x)'} = ${ExpressionParser.parse(result.expression).latex || result.expression}`} />
+              </div>
+
               {/* Result Summary Card */}
               <ResultCard result={result} />
-
               {/* View Switcher Tabs */}
               <div className="results-tabs-nav">
                 <button
@@ -336,20 +358,28 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
             </div>
           ) : (
             <div className="placeholder-container glass-panel">
-              <FunctionGraph result={null} expression={expression} />
-
               <div className="placeholder-callout">
                 <div className="placeholder-icon-box">
                   <Play size={24} className="placeholder-icon" />
                 </div>
                 <h4 className="placeholder-title">Listo para Resolver</h4>
                 <p className="placeholder-text">
-                  Haz clic en <strong>"Calcular Solución"</strong> para ejecutar el método seleccionado, generar la tabla de convergencia completa y visualizar paso a paso la raíz.
+                  Haz clic en <strong>"Calcular Solución"</strong> para ejecutar el método seleccionado. Aquí aparecerán la raíz, la tabla de iteraciones, la gráfica y la explicación paso a paso.
                 </p>
               </div>
+
+              <FunctionGraph result={null} expression={expression} />
             </div>
           )}
-        </div>
+
+          {/* Session History Component */}
+          <SessionHistory
+            history={history}
+            activeHistoryId={activeHistoryId}
+            onSelectHistoryItem={handleSelectHistoryItem}
+            onClearHistory={handleClearHistory}
+          />
+        </section>
       </div>
     </div>
   );
