@@ -101,10 +101,10 @@
   gap: 2px;
 }
 
+/* No uppercase: labels contain variables such as f(xi) whose case is meaningful */
 .th-label {
   font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.02em;
   color: var(--slate-400);
 }
 

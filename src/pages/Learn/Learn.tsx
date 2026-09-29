@@ -111,7 +111,7 @@ export const Learn: React.FC = () => {
                 </div>
                 <p className="method-definition"><strong>¿Qué es?</strong> {guidance.definition}</p>
                 <div className="method-formula">
-                  <span>Fórmula</span>
+                  <span className="method-formula-label">Fórmula</span>
                   <MathView math={method.latexFormula} block />
                 </div>
                 <div className="method-guidance-row">

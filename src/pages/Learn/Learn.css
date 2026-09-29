@@ -202,7 +202,8 @@
   border-radius: var(--radius-md);
 }
 
-.method-formula > span {
+/* Scoped to the label: MathView is also a direct <span> child and must keep its letter case */
+.method-formula-label {
   display: block;
   margin-bottom: var(--space-2);
   color: var(--primary-900);
