@@ -47,7 +47,7 @@ export const Learn: React.FC = () => {
           <BookOpen size={14} />
           <span>Guía de estudio</span>
         </div>
-        <h1 className="learn-title">Teoría: solución de ecuaciones no lineales</h1>
+        <h1 className="learn-title">Solución de Ecuaciones No Lineales</h1>
         <p className="learn-subtitle">
           Aprende qué hace cada método, qué fórmula utiliza y qué debes revisar antes de ejecutar una solución.
         </p>

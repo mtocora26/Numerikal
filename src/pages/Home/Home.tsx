@@ -19,8 +19,8 @@ export const Home: React.FC<HomeProps> = ({ onSelectMethodAndOpenCalc }) => {
           />
         </div>
         <div className="institutional-details">
-          <span className="institutional-kicker">Proyecto académico</span>
-          <h1>Análisis numérico</h1>
+          <span className="institutional-kicker">Proyecto de Aula</span>
+          <h1>Análisis Numérico</h1>
           <p>Plataforma interactiva para el estudio de métodos numéricos.</p>
           <div className="institutional-credits">
             <span><strong>Docente:</strong> José Javier Coronel</span>
@@ -37,7 +37,7 @@ export const Home: React.FC<HomeProps> = ({ onSelectMethodAndOpenCalc }) => {
         </div>
 
         <h1 className="hero-title">
-          Métodos numéricos
+          Métodos Numéricos
           <br />
           <span className="hero-gradient-text">de forma clara y visual.</span>
         </h1>
