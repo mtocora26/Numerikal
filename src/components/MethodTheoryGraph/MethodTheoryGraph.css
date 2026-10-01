@@ -1,0 +1,100 @@
+.method-theory-graph {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: var(--space-3);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.theory-graph-example {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  overflow-x: auto;
+}
+
+.theory-graph-label {
+  color: var(--primary-900);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.theory-graph-example .math-view {
+  color: var(--slate-700);
+  font-size: 0.92rem;
+  white-space: nowrap;
+}
+
+.theory-graph-canvas-wrapper {
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.theory-graph-canvas {
+  display: block;
+  width: 100%;
+  height: 280px;
+}
+
+.theory-graph-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--slate-600);
+  font-size: 0.75rem;
+}
+
+.theory-graph-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.theory-legend-swatch {
+  display: inline-block;
+  width: 16px;
+  height: 0;
+  border-top: 3px solid var(--swatch-color);
+  border-radius: 2px;
+}
+
+.theory-legend-swatch.dashed {
+  border-top-style: dashed;
+}
+
+.theory-graph-caption {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  color: var(--slate-600);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.theory-graph-root strong {
+  color: var(--primary-900);
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+}
+
+.theory-graph-reference {
+  color: var(--slate-500);
+  font-size: 0.75rem;
+  font-style: italic;
+}
+
+@media (max-width: 560px) {
+  .theory-graph-canvas {
+    height: 230px;
+  }
+}

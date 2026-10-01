@@ -2,6 +2,7 @@ import React from 'react';
 import { BookOpen, CheckCircle2, Compass, Lightbulb, PlayCircle } from 'lucide-react';
 import { MethodFactory } from '../../factories/MethodFactory';
 import { MathView } from '../../components/MathView/MathView';
+import { MethodTheoryGraph } from '../../components/MethodTheoryGraph/MethodTheoryGraph';
 import './Learn.css';
 
 const methodGuidance: Record<string, { definition: string; use: string; checks: string }> = {
@@ -114,6 +115,7 @@ export const Learn: React.FC = () => {
                   <span className="method-formula-label">Fórmula</span>
                   <MathView math={method.latexFormula} block />
                 </div>
+                <MethodTheoryGraph methodId={method.id} />
                 <div className="method-guidance-row">
                   <div><strong>¿Cuándo usarlo?</strong><p>{guidance.use}</p></div>
                   <div><strong>¿Qué revisar?</strong><p>{guidance.checks}</p></div>

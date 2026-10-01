@@ -2,6 +2,20 @@ import React, { useRef, useEffect, useState, useCallback } from 'react';
 import type { MethodExecutionResult } from '../../domain/types';
 import { ExpressionParser } from '../../services/ExpressionParser';
 import { LineChart, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
+import {
+  GRAPH_COLORS,
+  computeYRange,
+  createViewport,
+  drawAxes,
+  drawCurve,
+  drawGrid,
+  drawLabel,
+  drawPoint,
+  drawSegment,
+  drawTickLabels,
+  prepareCanvas,
+  sampleFunction,
+} from './graphEngine';
 import './FunctionGraph.css';
 
 interface FunctionGraphProps {
@@ -30,19 +44,9 @@ export const FunctionGraph: React.FC<FunctionGraphProps> = ({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const width = canvas.clientWidth || 700;
-    const height = canvas.clientHeight || 420;
-    const dpr = window.devicePixelRatio || 1;
-
-    canvas.width = width * dpr;
-    canvas.height = height * dpr;
-    ctx.scale(dpr, dpr);
-
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, width, height);
+    const prepared = prepareCanvas(canvas);
+    if (!prepared) return;
+    const { ctx, width, height } = prepared;
 
     let xMin = -4;
     let xMax = 4;
@@ -72,118 +76,14 @@ export const FunctionGraph: React.FC<FunctionGraphProps> = ({
     const parsed = ExpressionParser.parse(expression);
     const f = parsed.isValid ? parsed.evaluate : (x: number) => x;
 
-    const samples = 400;
-    const points: { x: number; y: number }[] = [];
-    let yMin = Infinity;
-    let yMax = -Infinity;
+    const points = sampleFunction(f, xMin, xMax);
+    const vp = createViewport(ctx, width, height, [xMin, xMax], computeYRange(points));
+    const { toScreenX, pad, plotH } = vp;
 
-    for (let i = 0; i <= samples; i++) {
-      const x = xMin + ((xMax - xMin) * i) / samples;
-      const y = f(x);
-      if (Number.isFinite(y)) {
-        points.push({ x, y });
-        if (y < yMin) yMin = y;
-        if (y > yMax) yMax = y;
-      }
-    }
-
-    if (!Number.isFinite(yMin) || !Number.isFinite(yMax) || yMin === yMax) {
-      yMin = -5;
-      yMax = 5;
-    }
-
-    const yPad = Math.max((yMax - yMin) * 0.2, 1);
-    yMin -= yPad;
-    yMax += yPad;
-
-    const pad = { left: 55, right: 25, top: 25, bottom: 45 };
-    const plotW = width - pad.left - pad.right;
-    const plotH = height - pad.top - pad.bottom;
-
-    const toScreenX = (x: number) => pad.left + ((x - xMin) / (xMax - xMin)) * plotW;
-    const toScreenY = (y: number) => pad.top + (1 - (y - yMin) / (yMax - yMin)) * plotH;
-
-    // Grid lines
-    ctx.strokeStyle = 'rgba(54, 146, 62, 0.12)';
-    ctx.lineWidth = 1;
-    const xTicks = 8;
-    const yTicks = 6;
-
-    for (let i = 0; i <= xTicks; i++) {
-      const gx = toScreenX(xMin + ((xMax - xMin) * i) / xTicks);
-      ctx.beginPath();
-      ctx.moveTo(gx, pad.top);
-      ctx.lineTo(gx, height - pad.bottom);
-      ctx.stroke();
-    }
-
-    for (let i = 0; i <= yTicks; i++) {
-      const gy = toScreenY(yMin + ((yMax - yMin) * i) / yTicks);
-      ctx.beginPath();
-      ctx.moveTo(pad.left, gy);
-      ctx.lineTo(width - pad.right, gy);
-      ctx.stroke();
-    }
-
-    // Axes
-    ctx.strokeStyle = 'rgba(51, 51, 51, 0.38)';
-    ctx.lineWidth = 1.5;
-
-    if (yMin <= 0 && yMax >= 0) {
-      const y0 = toScreenY(0);
-      ctx.beginPath();
-      ctx.moveTo(pad.left, y0);
-      ctx.lineTo(width - pad.right, y0);
-      ctx.stroke();
-    }
-
-    if (xMin <= 0 && xMax >= 0) {
-      const x0 = toScreenX(0);
-      ctx.beginPath();
-      ctx.moveTo(x0, pad.top);
-      ctx.lineTo(x0, height - pad.bottom);
-      ctx.stroke();
-    }
-
-    // Axis Tick Labels
-    ctx.fillStyle = 'rgba(51, 51, 51, 0.7)';
-    ctx.font = '11px JetBrains Mono, monospace';
-    ctx.textAlign = 'center';
-
-    for (let i = 0; i <= xTicks; i++) {
-      const val = xMin + ((xMax - xMin) * i) / xTicks;
-      const sx = toScreenX(val);
-      ctx.fillText(val.toFixed(2), sx, height - pad.bottom + 16);
-    }
-
-    ctx.textAlign = 'right';
-    for (let i = 0; i <= yTicks; i++) {
-      const val = yMin + ((yMax - yMin) * i) / yTicks;
-      const sy = toScreenY(val);
-      ctx.fillText(val.toFixed(2), pad.left - 8, sy + 4);
-    }
-
-    // Curve f(x)
-    if (points.length > 1) {
-      ctx.strokeStyle = '#0d683a';
-      ctx.lineWidth = 2.5;
-      ctx.beginPath();
-      let started = false;
-
-      points.forEach((p) => {
-        const sx = toScreenX(p.x);
-        const sy = toScreenY(p.y);
-        if (Number.isFinite(sx) && Number.isFinite(sy)) {
-          if (!started) {
-            ctx.moveTo(sx, sy);
-            started = true;
-          } else {
-            ctx.lineTo(sx, sy);
-          }
-        }
-      });
-      ctx.stroke();
-    }
+    drawGrid(vp);
+    drawAxes(vp);
+    drawTickLabels(vp);
+    drawCurve(vp, points);
 
     if (result && result.iterations.length > 0) {
       const iters = result.iterations;
@@ -192,63 +92,31 @@ export const FunctionGraph: React.FC<FunctionGraphProps> = ({
         const first = iters[0];
         const aX = toScreenX(Number(first.xi));
         const bX = toScreenX(Number(first.xs));
-        ctx.fillStyle = 'rgba(160, 213, 127, 0.22)';
+        ctx.fillStyle = GRAPH_COLORS.interval;
         ctx.fillRect(aX, pad.top, bX - aX, plotH);
 
-        iters.slice(-3).forEach((it, idx) => {
+        const lastIters = iters.slice(-3);
+        lastIters.forEach((it, idx) => {
           const xr = Number(it.xr);
-          const fxr = Number(it.fxr);
-          const sx = toScreenX(xr);
-          const sy = toScreenY(fxr);
-          const y0 = toScreenY(0);
-
-          ctx.strokeStyle = idx === iters.slice(-3).length - 1 ? '#f7ea0a' : '#4db54a';
-          ctx.lineWidth = 1.5;
-          ctx.setLineDash([4, 4]);
-          ctx.beginPath();
-          ctx.moveTo(sx, y0);
-          ctx.lineTo(sx, sy);
-          ctx.stroke();
-          ctx.setLineDash([]);
+          drawSegment(vp, { x: xr, y: 0 }, { x: xr, y: Number(it.fxr) }, {
+            color: idx === lastIters.length - 1 ? GRAPH_COLORS.root : GRAPH_COLORS.iteration,
+            dash: [4, 4],
+          });
         });
       } else if (result.methodId === 'false-position') {
         const last = iters[iters.length - 1];
-        const aX = toScreenX(Number(last.xi));
-        const aY = toScreenY(Number(last.fxi));
-        const bX = toScreenX(Number(last.xs));
-        const bY = toScreenY(Number(last.fxs));
-
-        ctx.strokeStyle = 'rgba(13, 104, 58, 0.75)';
-        ctx.lineWidth = 1.8;
-        ctx.setLineDash([6, 3]);
-        ctx.beginPath();
-        ctx.moveTo(aX, aY);
-        ctx.lineTo(bX, bY);
-        ctx.stroke();
-        ctx.setLineDash([]);
+        drawSegment(
+          vp,
+          { x: Number(last.xi), y: Number(last.fxi) },
+          { x: Number(last.xs), y: Number(last.fxs) },
+          { lineWidth: 1.8, dash: [6, 3] }
+        );
       }
 
       // Root Point with glow
-      const rootX = toScreenX(result.approximateRoot);
-      const rootY = toScreenY(0);
-
-      ctx.beginPath();
-      ctx.arc(rootX, rootY, 9, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(247, 234, 10, 0.4)';
-      ctx.fill();
-
-      ctx.beginPath();
-      ctx.arc(rootX, rootY, 4.5, 0, Math.PI * 2);
-      ctx.fillStyle = '#f7ea0a';
-      ctx.fill();
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-
-      ctx.fillStyle = '#0d683a';
-      ctx.font = 'bold 12px Space Grotesk, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(`xr ≈ ${result.approximateRoot.toFixed(4)}`, rootX, rootY - 14);
+      const rootPoint = { x: result.approximateRoot, y: 0 };
+      drawPoint(vp, rootPoint, { glow: true });
+      drawLabel(vp, `xr ≈ ${result.approximateRoot.toFixed(4)}`, rootPoint, { dy: -14 });
     }
   }, [result, expression, defaultDomain, zoomLevel, offset]);
 
