@@ -9,7 +9,7 @@ import { ModifiedNewtonRaphsonMethod } from '../domain/methods/ModifiedNewtonRap
 export interface MethodMetadata {
   id: string;
   name: string;
-  category: 'roots' | 'systems' | 'interpolation' | 'calculus';
+  category: 'roots' | 'systems' | 'interpolation' | 'regression' | 'calculus';
   description: string;
   latexFormula: string;
   icon: string;
@@ -109,6 +109,23 @@ export class MethodFactory {
         tag: 'Abierto • Raíces Múltiples',
         difficulty: 'Avanzado',
         recommendedConvergence: 'Convergencia cuadrática en raíces múltiples',
+      },
+    ];
+  }
+
+  /** Métodos de regresión y ajuste de curvas (no usan f(x), sino una tabla de datos). */
+  public static getRegressionMethods(): MethodMetadata[] {
+    return [
+      {
+        id: 'polynomial-regression',
+        name: 'Regresión Polinomial',
+        category: 'regression',
+        description: 'Ajusta un polinomio de grado m a un conjunto de datos minimizando la suma de los cuadrados de los residuos.',
+        latexFormula: 'y = a_0 + a_1 x + a_2 x^2 + \\cdots + a_m x^m',
+        icon: 'trending-up',
+        tag: 'Mínimos Cuadrados • Ajuste',
+        difficulty: 'Intermedio',
+        recommendedConvergence: 'R² cercano a 1 indica un buen ajuste',
       },
     ];
   }

@@ -9,7 +9,7 @@ import type { IterationColumn } from './Iteration';
 export interface NumericalMethod {
   readonly id: string;
   readonly name: string;
-  readonly category: 'roots' | 'systems' | 'interpolation' | 'calculus';
+  readonly category: 'roots' | 'systems' | 'interpolation' | 'regression' | 'calculus';
   readonly description: string;
   readonly latexFormula: string;
   readonly parameters: MethodParameterDef[];
