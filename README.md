@@ -87,7 +87,6 @@ Cada carpeta de `src` tiene una responsabilidad definida. La guía para decidir 
 
 - Página de ayuda con ejemplos de entradas válidas y errores comunes.
 - Revisión de la experiencia de uso en pantallas pequeñas y mensajes de error.
-- Pruebas para la regresión polinomial.
 - Otros modelos de regresión (exponencial, potencial, logarítmica).
 
 Las tareas pendientes se registran como [issues](https://github.com/mtocora26/Numerikal/issues) del repositorio.
