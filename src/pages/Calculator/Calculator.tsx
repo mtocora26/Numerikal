@@ -20,12 +20,16 @@ interface CalculatorProps {
   initialMethodId?: string;
 }
 
+// Ejemplo por defecto: raíz x ≈ 2.1149 en [2, 3]. Punto Fijo necesita la ecuación despejada x = g(x).
+const DEFAULT_EXPRESSION = 'x^3 - 4*x - 1';
+const DEFAULT_FIXED_POINT_EXPRESSION = 'cbrt(4*x + 1)';
+
 export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisection' }) => {
   const methods = MethodFactory.getAllMethods();
   // State
   const [selectedMethodId, setSelectedMethodId] = useState<string>(initialMethodId);
-  const [expression, setExpression] = useState<string>('x^3 - 4*x - 1');
-  const [paramValues, setParamValues] = useState<Record<string, number>>({ xi: 1, xs: 2, x0: 1.5, x1: 2 });
+  const [expression, setExpression] = useState<string>(DEFAULT_EXPRESSION);
+  const [paramValues, setParamValues] = useState<Record<string, number>>({ xi: 2, xs: 3 });
   const [tolerance, setTolerance] = useState<number>(0.0001);
   const [maxIterations, setMaxIterations] = useState<number>(30);
   const [errorType, setErrorType] = useState<ErrorType>('relative');
@@ -179,7 +183,14 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
               id="method-select"
               value={selectedMethodId}
               onChange={(e) => {
-                setSelectedMethodId(e.target.value);
+                const nextId = e.target.value;
+                // Si el usuario no ha cambiado el ejemplo, se cambia por el que corresponde al método
+                if (nextId === 'fixed-point' && expression === DEFAULT_EXPRESSION) {
+                  setExpression(DEFAULT_FIXED_POINT_EXPRESSION);
+                } else if (selectedMethodId === 'fixed-point' && nextId !== 'fixed-point' && expression === DEFAULT_FIXED_POINT_EXPRESSION) {
+                  setExpression(DEFAULT_EXPRESSION);
+                }
+                setSelectedMethodId(nextId);
                 reset();
               }}
               className="method-dropdown"

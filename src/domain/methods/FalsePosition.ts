@@ -23,18 +23,18 @@ export class FalsePositionMethod implements NumericalMethod {
       label: 'Límite inferior (xi)',
       latexLabel: 'x_i',
       description: 'Extremo izquierdo del intervalo inicial',
-      defaultValue: 1,
+      defaultValue: 2,
       step: 0.1,
-      placeholder: 'Ej. 1',
+      placeholder: 'Ej. 2',
     },
     {
       name: 'xs',
       label: 'Límite superior (xs)',
       latexLabel: 'x_s',
       description: 'Extremo derecho del intervalo inicial',
-      defaultValue: 2,
+      defaultValue: 3,
       step: 0.1,
-      placeholder: 'Ej. 2',
+      placeholder: 'Ej. 3',
     },
   ];
 
