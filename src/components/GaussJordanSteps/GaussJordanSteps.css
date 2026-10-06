@@ -1,0 +1,114 @@
+.gauss-steps-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-5);
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+}
+
+.gauss-steps-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.gauss-steps-header h4 {
+  color: var(--slate-700);
+  font-family: var(--font-brand);
+  font-size: 1rem;
+}
+
+.gauss-steps-icon {
+  color: var(--primary-900);
+}
+
+.gauss-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.gauss-block h5 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--primary-900);
+  font-family: var(--font-brand);
+  font-size: 0.9rem;
+}
+
+.gauss-block p {
+  color: var(--slate-500);
+  font-size: var(--text-sm);
+  line-height: 1.55;
+}
+
+.gauss-formula-box {
+  overflow-x: auto;
+  padding: var(--space-3);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.gauss-formula-box.emphasized {
+  background: var(--primary-50);
+  border-color: var(--primary-300);
+}
+
+.gauss-steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.gauss-step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.gauss-step-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.gauss-step-heading strong {
+  color: var(--slate-700);
+  font-size: var(--text-sm);
+}
+
+.gauss-step-heading p {
+  margin-top: 2px;
+  font-size: 0.8rem;
+}
+
+.gauss-step-number {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  color: var(--primary-900);
+  background: var(--primary-100);
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.gauss-solution-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: var(--space-2);
+}
+
+.gauss-solution-item {
+  padding: var(--space-2) var(--space-3);
+  background: #ffffff;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+}

@@ -11,19 +11,28 @@ import { FunctionGraph } from '../../components/FunctionGraph/FunctionGraph';
 import { EducationalExplanation } from '../../components/EducationalExplanation/EducationalExplanation';
 import { SessionHistory, type HistoryItem } from '../../components/SessionHistory/SessionHistory';
 import { MathView } from '../../components/MathView/MathView';
+import { RegressionCalculator } from './RegressionCalculator';
 import { ExpressionParser } from '../../services/ExpressionParser';
 import confetti from 'canvas-confetti';
-import { Play, RotateCcw, AlertTriangle, LineChart, Table, BookOpen, Zap } from 'lucide-react';
+import { Play, RotateCcw, AlertTriangle, LineChart, Table, BookOpen, Zap, Sigma } from 'lucide-react';
 import './Calculator.css';
 
 interface CalculatorProps {
   initialMethodId?: string;
 }
 
+type MethodFamily = 'roots' | 'regression';
+
+const isRegressionMethod = (methodId: string): boolean =>
+  MethodFactory.getRegressionMethods().some((method) => method.id === methodId);
+
 export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisection' }) => {
   const methods = MethodFactory.getAllMethods();
   // State
-  const [selectedMethodId, setSelectedMethodId] = useState<string>(initialMethodId);
+  const [family, setFamily] = useState<MethodFamily>(isRegressionMethod(initialMethodId) ? 'regression' : 'roots');
+  const [selectedMethodId, setSelectedMethodId] = useState<string>(
+    isRegressionMethod(initialMethodId) ? 'bisection' : initialMethodId
+  );
   const [expression, setExpression] = useState<string>('x^3 - 4*x - 1');
   const [paramValues, setParamValues] = useState<Record<string, number>>({ xi: 1, xs: 2, x0: 1.5, x1: 2 });
   const [tolerance, setTolerance] = useState<number>(0.0001);
@@ -54,7 +63,11 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
   }, []);
 
   useEffect(() => {
-    if (initialMethodId) {
+    if (!initialMethodId) return;
+    if (isRegressionMethod(initialMethodId)) {
+      setFamily('regression');
+    } else {
+      setFamily('roots');
       setSelectedMethodId(initialMethodId);
     }
   }, [initialMethodId]);
@@ -149,6 +162,8 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
   const hasValidationError = Boolean(executionError || (validation && !validation.isValid));
   const hasWarnings = Boolean(validation?.warnings && validation.warnings.length > 0);
 
+  const isRegression = family === 'regression';
+
   return (
     <div className="calculator-workspace">
       {/* Workspace Header */}
@@ -158,13 +173,45 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
             <Zap size={13} />
             <span>Espacio de Trabajo Interactivo</span>
           </div>
-          <h1 className="workspace-title">Resolución y Análisis Numérico</h1>
+          <h1 className="workspace-title">
+            {isRegression ? 'Regresión y Ajuste de Curvas' : 'Resolución y Análisis Numérico'}
+          </h1>
           <p className="workspace-subtitle">
-            Elige un método, escribe tu ejercicio y obtén la solución con su tabla, gráfica y explicación.
+            {isRegression
+              ? 'Ingresa tus datos, elige el grado del polinomio y obtén el ajuste por mínimos cuadrados paso a paso.'
+              : 'Elige un método, escribe tu ejercicio y obtén la solución con su tabla, gráfica y explicación.'}
           </p>
         </div>
       </div>
 
+      {/* Problem family switcher */}
+      <div className="calculator-session-switcher" role="tablist" aria-label="Tipo de problema">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={!isRegression}
+          className={`session-tab ${!isRegression ? 'active' : ''}`}
+          onClick={() => setFamily('roots')}
+        >
+          <span className="session-tab-symbol">f(x)=0</span>
+          <span>Ecuaciones no lineales</span>
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={isRegression}
+          className={`session-tab ${isRegression ? 'active' : ''}`}
+          onClick={() => setFamily('regression')}
+        >
+          <span className="session-tab-symbol"><Sigma size={16} /></span>
+          <span>Regresión</span>
+        </button>
+      </div>
+
+      {isRegression ? (
+        <RegressionCalculator />
+      ) : (
+      <>
       {/* Two Column Layout */}
       <div className="workspace-grid">
         {/* Left Column: Exercise (method, function, parameters, solve) */}
@@ -381,6 +428,8 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
           />
         </section>
       </div>
+      </>
+      )}
     </div>
   );
 };

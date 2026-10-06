@@ -661,3 +661,8 @@
     transform: translateY(0);
   }
 }
+
+.regression-degree-hint {
+  color: var(--slate-400);
+  font-size: 0.78rem;
+}
