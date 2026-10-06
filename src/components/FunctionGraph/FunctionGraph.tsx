@@ -15,6 +15,7 @@ import {
   drawTickLabels,
   prepareCanvas,
   sampleFunction,
+  xTickCount,
 } from './graphEngine';
 import './FunctionGraph.css';
 
@@ -80,9 +81,10 @@ export const FunctionGraph: React.FC<FunctionGraphProps> = ({
     const vp = createViewport(ctx, width, height, [xMin, xMax], computeYRange(points));
     const { toScreenX, pad, plotH } = vp;
 
-    drawGrid(vp);
+    const xTicks = xTickCount(vp.plotW);
+    drawGrid(vp, xTicks);
     drawAxes(vp);
-    drawTickLabels(vp);
+    drawTickLabels(vp, xTicks);
     drawCurve(vp, points);
 
     if (result && result.iterations.length > 0) {

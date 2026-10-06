@@ -128,6 +128,11 @@ export function createViewport(
   };
 }
 
+/** Divisiones del eje x que caben sin que se encimen las etiquetas: una cada ~64 px, entre 2 y 8. */
+export function xTickCount(plotWidth: number): number {
+  return Math.max(2, Math.min(8, Math.floor(plotWidth / 64)));
+}
+
 export function drawGrid(vp: GraphViewport, xTicks = 8, yTicks = 6): void {
   const { ctx, xMin, xMax, yMin, yMax, pad, width, height, toScreenX, toScreenY } = vp;
   ctx.strokeStyle = GRAPH_COLORS.grid;
