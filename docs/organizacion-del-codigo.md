@@ -37,6 +37,6 @@ Guía corta para decidir **dónde colocar cada cosa** en `src`. La regla general
 Se dejan anotados aquí; no se movieron ni se eliminaron porque ese cambio merece su propia decisión.
 
 - `components/MethodSelector/`: no lo importa ningún archivo. La selección de método la hace un `<select>` dentro de `pages/Calculator/Calculator.tsx`.
-- `pages/Calculator/DerivativeCalculator.tsx`: tampoco se importa en ninguna pantalla (la calculadora de derivadas quedó fuera de la navegación). Sus estilos siguen en `Calculator.css` (clases `derivative-*` y `session-tab`).
+- `pages/Calculator/DerivativeCalculator.tsx`: tampoco se importa en ninguna pantalla (la calculadora de derivadas quedó fuera de la navegación). Sus estilos siguen en `Calculator.css` (clases `derivative-*`).
 - `services/NumericalEngine.ts` solo atiende a los métodos de raíces. La regresión se ejecuta directamente con `PolynomialRegression`, sin pasar por el motor.
 - `domain/types.ts` contiene los tipos de los métodos de raíces, mientras que los de regresión están en `domain/regression/types.ts`. Si aparece una tercera familia, conviene que cada una conserve sus tipos junto a su carpeta.
