@@ -51,6 +51,11 @@ export const GaussJordanSteps: React.FC<{ result: RegressionResult }> = ({ resul
 
       <section className="gauss-block">
         <h5><ListOrdered size={15} /> 2. Eliminación de Gauss-Jordan</h5>
+        <p>
+          Se trabaja columna por columna, empezando por la fila 1: primero se divide la fila pivote entre su pivote
+          para obtener un 1 y luego, fila por fila, se resta un múltiplo de la fila pivote para obtener ceros en el
+          resto de la columna. Al terminar queda la matriz identidad.
+        </p>
         <div className="gauss-steps-list">
           {steps.map((step) => (
             <div className="gauss-step" key={step.stepNumber}>
