@@ -13,6 +13,7 @@ import {
   drawTickLabels,
   prepareCanvas,
   sampleFunction,
+  xTickCount,
 } from '../FunctionGraph/graphEngine';
 import '../FunctionGraph/FunctionGraph.css';
 
@@ -47,9 +48,10 @@ export const RegressionGraph: React.FC<RegressionGraphProps> = ({ points, result
     const yRange = computeYRange([...points, ...curve]);
     const vp = createViewport(ctx, width, height, [xMin, xMax], yRange);
 
-    drawGrid(vp);
+    const xTicks = xTickCount(vp.plotW);
+    drawGrid(vp, xTicks);
     drawAxes(vp);
-    drawTickLabels(vp);
+    drawTickLabels(vp, xTicks);
 
     if (result) {
       drawCurve(vp, curve);
