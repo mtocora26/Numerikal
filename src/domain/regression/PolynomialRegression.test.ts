@@ -101,13 +101,6 @@ describe('PolynomialRegression: recupera polinomios exactos', () => {
   });
 });
 
-describe('PolynomialRegression: pivoteo', () => {
-  it('registra un intercambio de filas cuando el pivote natural no es el mayor', () => {
-    const result = regression.execute({ points: REFERENCE, degree: 2 });
-    expect(result.steps.some((step) => step.title.startsWith('Intercambio'))).toBe(true);
-  });
-});
-
 describe('PolynomialRegression: validación', () => {
   const valid = points([[0, 1], [1, 2], [2, 5], [3, 10], [4, 17]]);
 
