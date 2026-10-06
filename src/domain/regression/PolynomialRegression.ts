@@ -148,39 +148,41 @@ export class PolynomialRegression {
 
     snapshot('Matriz aumentada', 'Sistema normal armado con las sumatorias de la tabla.');
 
+    const fmt = (value: number): string => String(Number(value.toPrecision(6)));
+
     for (let col = 0; col < size; col++) {
-      let pivotRow = col;
-      for (let r = col + 1; r < size; r++) {
-        if (Math.abs(a[r][col]) > Math.abs(a[pivotRow][col])) pivotRow = r;
-      }
-      if (Math.abs(a[pivotRow][col]) < SINGULAR_EPS) {
-        throw new Error('El sistema normal es singular: los datos no permiten ajustar un polinomio de este grado.');
-      }
-
-      if (pivotRow !== col) {
-        [a[col], a[pivotRow]] = [a[pivotRow], a[col]];
-        snapshot(`Intercambio F${col + 1} ↔ F${pivotRow + 1}`, 'Se elige como pivote el elemento de mayor valor absoluto de la columna.');
+      // Procedimiento de clase: no se busca el mayor pivote; solo se intercambian filas si el pivote es cero.
+      // Con las ecuaciones normales y valores de x distintos esto no ocurre (la matriz es definida positiva).
+      if (Math.abs(a[col][col]) < SINGULAR_EPS) {
+        const swapRow = a.findIndex((row, r) => r > col && Math.abs(row[col]) >= SINGULAR_EPS);
+        if (swapRow === -1) {
+          throw new Error('El sistema normal es singular: los datos no permiten ajustar un polinomio de este grado.');
+        }
+        [a[col], a[swapRow]] = [a[swapRow], a[col]];
+        snapshot(`Intercambio F${col + 1} ↔ F${swapRow + 1}`, 'El pivote es cero, así que se intercambia la fila con una inferior que tenga un valor distinto de cero.');
       }
 
+      // Convertir el pivote en 1: Fk ← Fk / akk
       const pivot = a[col][col];
       if (pivot !== 1) {
         a[col] = a[col].map((v) => v / pivot);
-        snapshot(`F${col + 1} ← F${col + 1} / ${Number(pivot.toPrecision(6))}`, `Se divide la fila ${col + 1} por el pivote para obtener un 1.`);
+        a[col][col] = 1;
+        snapshot(
+          `F${col + 1} ← F${col + 1} / (${fmt(pivot)})`,
+          `Se divide la fila ${col + 1} entre su pivote (${fmt(pivot)}) para obtener un 1 en la posición (${col + 1}, ${col + 1}).`
+        );
       }
 
-      const eliminated: number[] = [];
+      // Hacer cero el resto de la columna, una fila a la vez: Fr ← Fr − (ark)·Fk
       for (let r = 0; r < size; r++) {
         if (r === col) continue;
         const factor = a[r][col];
         if (factor === 0) continue;
         a[r] = a[r].map((v, c) => v - factor * a[col][c]);
         a[r][col] = 0;
-        eliminated.push(r + 1);
-      }
-      if (eliminated.length > 0) {
         snapshot(
-          `Eliminar columna ${col + 1}`,
-          `Se anulan los demás elementos de la columna ${col + 1} (filas ${eliminated.join(', ')}) restando un múltiplo de F${col + 1}.`
+          `F${r + 1} ← F${r + 1} − (${fmt(factor)})·F${col + 1}`,
+          `Se resta a la fila ${r + 1} la fila ${col + 1} multiplicada por (${fmt(factor)}) para obtener un 0 en la posición (${r + 1}, ${col + 1}).`
         );
       }
     }
