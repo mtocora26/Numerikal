@@ -173,7 +173,7 @@ export const Learn: React.FC = () => {
           </div>
         </div>
 
-        <div className="theory-methods-grid" style={{ gridTemplateColumns: '1fr' }}>
+        <div className="theory-methods-grid theory-methods-grid-single">
           <article className="theory-method-card">
             <div className="theory-method-header">
               <div>

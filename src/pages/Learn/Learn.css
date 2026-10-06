@@ -7,6 +7,12 @@
   gap: var(--space-8);
 }
 
+/* Los hijos de un contenedor flex no se encogen por debajo de su contenido: sin esto una fórmula ancha ensancha toda la página */
+.learn-container > *,
+.theory-method-card {
+  min-width: 0;
+}
+
 .learn-header {
   display: flex;
   flex-direction: column;
@@ -143,6 +149,11 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-5);
+}
+
+/* Una sola tarjeta a todo el ancho; minmax(0, 1fr) evita que una fórmula ancha ensanche la página */
+.theory-methods-grid-single {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .theory-method-card {
