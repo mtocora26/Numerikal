@@ -59,7 +59,7 @@ export const MethodTheoryGraph: React.FC<MethodTheoryGraphProps> = ({ methodId, 
     const canvas = canvasRef.current;
     if (!canvas || !diagram || !solved) return;
 
-    const prepared = prepareCanvas(canvas, { width: 520, height: 280 });
+    const prepared = prepareCanvas(canvas, { width: 520, height: 325 });
     if (!prepared) return;
     const { ctx, width, height } = prepared;
 

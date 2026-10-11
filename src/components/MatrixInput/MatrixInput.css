@@ -1,0 +1,112 @@
+/* La tabla reutiliza los estilos de DataPointsInput.css; aquí solo lo propio de la matriz. */
+.matrix-input {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.matrix-size-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.matrix-size-row label,
+.matrix-initial-label {
+  color: var(--slate-600);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.matrix-size-row select {
+  width: auto;
+  min-width: 6rem;
+}
+
+.matrix-table-scroll {
+  max-height: none;
+}
+
+.matrix-table input {
+  min-width: 3.5rem;
+  text-align: center;
+}
+
+.matrix-cell-diagonal input {
+  background: var(--primary-50);
+  border-color: var(--primary-200);
+}
+
+.matrix-table .matrix-col-b {
+  border-left: 2px solid var(--border-medium);
+}
+
+.matrix-initial-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.matrix-initial-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr));
+  gap: var(--space-2);
+}
+
+.matrix-initial-field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--slate-500);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+
+.matrix-initial-field input {
+  width: 100%;
+  min-width: 0;
+  padding: 0.45rem 0.6rem;
+  color: var(--slate-700);
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  text-align: center;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.matrix-initial-field input:focus {
+  border-color: var(--primary-400);
+  box-shadow: 0 0 0 2px rgba(54, 146, 62, 0.16);
+}
+
+.matrix-hint {
+  color: var(--slate-400);
+  font-size: 0.75rem;
+}
+
+.matrix-initial-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.matrix-initial-preset {
+  padding: 4px 12px;
+  color: var(--primary-900);
+  background: var(--primary-50);
+  border: 1px solid var(--primary-200);
+  border-radius: var(--radius-full);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.matrix-initial-preset:hover {
+  border-color: var(--primary-500);
+}

@@ -290,6 +290,20 @@
   }
 }
 
+/* Con tres familias, en celular se oculta el símbolo para que las pestañas quepan sin desbordar */
+@media (max-width: 560px) {
+  .session-tab {
+    padding: 10px 6px;
+    font-size: 0.8rem;
+    line-height: 1.25;
+    text-align: center;
+  }
+
+  .session-tab-symbol {
+    display: none;
+  }
+}
+
 /* Alert Banner */
 .workspace-alert {
   display: flex;
@@ -449,6 +463,10 @@
   background: var(--bg-subtle);
   border-radius: var(--radius-md);
   text-align: center;
+}
+
+.system-preview {
+  margin-top: var(--space-3);
 }
 
 .solved-exercise-strip {

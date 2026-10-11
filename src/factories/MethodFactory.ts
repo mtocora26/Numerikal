@@ -113,6 +113,34 @@ export class MethodFactory {
     ];
   }
 
+  /** Métodos iterativos para sistemas de ecuaciones lineales Ax = b. */
+  public static getSystemMethods(): MethodMetadata[] {
+    return [
+      {
+        id: 'jacobi',
+        name: 'Método de Jacobi',
+        category: 'systems',
+        description: 'Despeja cada incógnita de su ecuación y calcula todas las incógnitas nuevas usando solo los valores de la iteración anterior.',
+        latexFormula: 'x_i^{(k+1)} = \\frac{b_i - \\sum_{j \\neq i} a_{ij} x_j^{(k)}}{a_{ii}}',
+        icon: 'grid',
+        tag: 'Iterativo • Sistemas Ax = b',
+        difficulty: 'Intermedio',
+        recommendedConvergence: 'Converge si A es estrictamente diagonal dominante',
+      },
+      {
+        id: 'gauss-seidel',
+        name: 'Método de Gauss-Seidel',
+        category: 'systems',
+        description: 'Igual que Jacobi, pero cada incógnita recién calculada se usa de inmediato en las ecuaciones siguientes de la misma iteración.',
+        latexFormula: 'x_i^{(k+1)} = \\frac{b_i - \\sum_{j < i} a_{ij} x_j^{(k+1)} - \\sum_{j > i} a_{ij} x_j^{(k)}}{a_{ii}}',
+        icon: 'grid',
+        tag: 'Iterativo • Sistemas Ax = b',
+        difficulty: 'Intermedio',
+        recommendedConvergence: 'Converge si A es estrictamente diagonal dominante (suele necesitar menos iteraciones que Jacobi)',
+      },
+    ];
+  }
+
   /** Métodos de regresión y ajuste de curvas (no usan f(x), sino una tabla de datos). */
   public static getRegressionMethods(): MethodMetadata[] {
     return [
