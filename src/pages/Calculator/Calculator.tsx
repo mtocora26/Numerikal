@@ -332,49 +332,51 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
             />
           </div>
 
-          {/* Validation Warnings / Error Banner (next to the solve button) */}
-          {hasValidationError && (
-            <div className="workspace-alert alert-error" role="alert">
-              <AlertTriangle size={18} className="alert-icon" />
-              <div className="alert-text">
-                <strong>Error de validación matemática:</strong>
-                <p>{executionError || (validation?.errors || []).join(' ')}</p>
+          <div className="solve-dock">
+            {/* Validation Warnings / Error Banner (next to the solve button) */}
+            {hasValidationError && (
+              <div className="workspace-alert alert-error" role="alert">
+                <AlertTriangle size={18} className="alert-icon" />
+                <div className="alert-text">
+                  <strong>Error de validación matemática:</strong>
+                  <p>{executionError || (validation?.errors || []).join(' ')}</p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {hasWarnings && (
-            <div className="workspace-alert alert-warning">
-              <AlertTriangle size={18} className="alert-icon" />
-              <div className="alert-text">
-                <strong>Advertencia de convergencia:</strong>
-                <p>{validation?.warnings.join(' ')}</p>
+            {hasWarnings && (
+              <div className="workspace-alert alert-warning">
+                <AlertTriangle size={18} className="alert-icon" />
+                <div className="alert-text">
+                  <strong>Advertencia de convergencia:</strong>
+                  <p>{validation?.warnings.join(' ')}</p>
+                </div>
               </div>
+            )}
+
+            {/* Step 4: Solve (sticky so it stays visible while editing) */}
+            <div className="actions-row solve-actions">
+              <button
+                type="button"
+                className="btn-primary calculate-main-btn"
+                onClick={handleCalculate}
+                disabled={isCalculating || !parsedExpression.isValid}
+              >
+                <Play size={18} />
+                <span>{isCalculating ? 'Calculando...' : 'Calcular Solución'}</span>
+              </button>
+
+              <button
+                type="button"
+                className="btn-secondary reset-btn"
+                onClick={handleResetAll}
+                title="Restablecer cálculos"
+                aria-label="Limpiar"
+              >
+                <RotateCcw size={16} />
+                <span>Limpiar</span>
+              </button>
             </div>
-          )}
-
-          {/* Step 4: Solve (sticky so it stays visible while editing) */}
-          <div className="actions-row solve-actions">
-            <button
-              type="button"
-              className="btn-primary calculate-main-btn"
-              onClick={handleCalculate}
-              disabled={isCalculating || !parsedExpression.isValid}
-            >
-              <Play size={18} />
-              <span>{isCalculating ? 'Calculando...' : 'Calcular Solución'}</span>
-            </button>
-
-            <button
-              type="button"
-              className="btn-secondary reset-btn"
-              onClick={handleResetAll}
-              title="Restablecer cálculos"
-              aria-label="Limpiar"
-            >
-              <RotateCcw size={16} />
-              <span>Limpiar</span>
-            </button>
           </div>
         </section>
 

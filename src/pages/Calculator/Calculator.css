@@ -311,38 +311,50 @@
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-lg);
-  font-size: 0.85rem;
+  border-left-width: 5px;
+  font-size: 0.92rem;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.14);
   animation: fadeIn 0.25s ease;
 }
 
+.workspace-alert .alert-icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.alert-text strong {
+  display: block;
+  font-size: 0.95rem;
+}
+
+/* Fondo opaco (tinte sobre blanco): el aviso queda flotando sobre el formulario sin transparentarlo */
 .alert-error {
-  background: var(--error-bg);
-  border: 1px solid var(--error-border);
+  background: linear-gradient(var(--error-bg), var(--error-bg)), #ffffff;
+  border: 1px solid var(--error-500);
+  border-left: 5px solid var(--error-600);
   color: var(--error-600);
 }
 
 .alert-error .alert-icon {
-  color: var(--error-400);
-  flex-shrink: 0;
-  margin-top: 2px;
+  color: var(--error-600);
 }
 
 .alert-warning {
-  background: var(--warning-bg);
-  border: 1px solid var(--warning-border);
-  color: #6d5e00;
+  background: linear-gradient(var(--warning-bg), var(--warning-bg)), #ffffff;
+  border: 1px solid var(--warning-500);
+  border-left: 5px solid var(--warning-500);
+  color: #6d4a00;
 }
 
 .alert-warning .alert-icon {
-  color: var(--warning-400);
-  flex-shrink: 0;
-  margin-top: 2px;
+  color: var(--warning-500);
 }
 
 .alert-text p {
-  font-size: 0.82rem;
+  font-size: 0.88rem;
   margin-top: 2px;
-  color: var(--slate-600);
+  color: var(--slate-700);
 }
 
 /* Workspace Grid (2 Columns) */
@@ -542,10 +554,17 @@
   margin-bottom: var(--space-3);
 }
 
-/* Solve bar stays pinned to the bottom of the viewport while the form is scrolled */
-.actions-row.solve-actions {
+/* Avisos + botón de calcular quedan fijos juntos al fondo de la pantalla: un aviso nunca queda fuera de vista */
+.solve-dock {
   position: sticky;
   bottom: var(--space-3);
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.actions-row.solve-actions {
   margin-bottom: 0;
   border: 2px solid var(--primary-200);
   background: var(--primary-50);
