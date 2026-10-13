@@ -14,20 +14,22 @@ import { MathView } from '../../components/MathView/MathView';
 import { RegressionCalculator } from './RegressionCalculator';
 import { SystemsCalculator } from './SystemsCalculator';
 import { InterpolationCalculator } from './InterpolationCalculator';
+import { TaylorCalculator } from './TaylorCalculator';
 import { ExpressionParser } from '../../services/ExpressionParser';
 import confetti from 'canvas-confetti';
-import { Play, RotateCcw, AlertTriangle, LineChart, Table, BookOpen, Zap, Sigma, Grid3x3, Spline } from 'lucide-react';
+import { Play, RotateCcw, AlertTriangle, LineChart, Table, BookOpen, Zap, Sigma, Grid3x3, Spline, Waves } from 'lucide-react';
 import './Calculator.css';
 
 interface CalculatorProps {
   initialMethodId?: string;
 }
 
-type MethodFamily = 'roots' | 'systems' | 'interpolation' | 'regression';
+type MethodFamily = 'roots' | 'systems' | 'interpolation' | 'series' | 'regression';
 
 const familyOf = (methodId: string): MethodFamily => {
   if (MethodFactory.getSystemMethods().some((method) => method.id === methodId)) return 'systems';
   if (MethodFactory.getInterpolationMethods().some((method) => method.id === methodId)) return 'interpolation';
+  if (MethodFactory.getSeriesMethods().some((method) => method.id === methodId)) return 'series';
   if (MethodFactory.getRegressionMethods().some((method) => method.id === methodId)) return 'regression';
   return 'roots';
 };
@@ -44,6 +46,10 @@ const FAMILY_HEADERS: Record<MethodFamily, { title: string; subtitle: string }> 
   interpolation: {
     title: 'Interpolación Polinomial',
     subtitle: 'Ingresa los puntos (x, y) y el valor x* donde interpolar; obtén el polinomio que pasa exactamente por todos ellos, paso a paso.',
+  },
+  series: {
+    title: 'Series y Polinomio de Taylor',
+    subtitle: 'Escribe f(x), el punto a y el grado n; obtén el polinomio que aproxima a f cerca de a, con sus derivadas, el error y la gráfica.',
   },
   regression: {
     title: 'Regresión y Ajuste de Curvas',
@@ -241,6 +247,16 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
         <button
           type="button"
           role="tab"
+          aria-selected={family === 'series'}
+          className={`session-tab ${family === 'series' ? 'active' : ''}`}
+          onClick={() => setFamily('series')}
+        >
+          <span className="session-tab-symbol"><Waves size={16} /></span>
+          <span>Series</span>
+        </button>
+        <button
+          type="button"
+          role="tab"
           aria-selected={family === 'regression'}
           className={`session-tab ${family === 'regression' ? 'active' : ''}`}
           onClick={() => setFamily('regression')}
@@ -252,6 +268,8 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
 
       {family === 'regression' ? (
         <RegressionCalculator />
+      ) : family === 'series' ? (
+        <TaylorCalculator />
       ) : family === 'interpolation' ? (
         <InterpolationCalculator />
       ) : family === 'systems' ? (
