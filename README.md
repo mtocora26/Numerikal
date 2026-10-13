@@ -80,6 +80,7 @@ Incluye gráfica de dispersión con la curva ajustada y los residuos, tabla de r
 - Teclado matemático y vista previa en LaTeX de la función que escribes.
 - Historial de la sesión para volver a un cálculo anterior.
 - Sección **Teoría** con la definición, la fórmula y una gráfica de cada método.
+- Página de **Ayuda**: qué familia elegir, cómo escribir funciones y datos, cómo leer resultados y gráficas, y los errores y avisos más comunes con qué hacer.
 
 ## Tecnologías
 

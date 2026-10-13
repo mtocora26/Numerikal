@@ -1,11 +1,13 @@
 import React from 'react';
-import { Compass, Calculator, GraduationCap } from 'lucide-react';
+import { Compass, Calculator, GraduationCap, CircleHelp } from 'lucide-react';
 import universitySymbol from '../../assets/SÍMBOLO UNICESAR 2024.png';
 import './Navbar.css';
 
+export type AppView = 'home' | 'calculator' | 'learn' | 'help';
+
 interface NavbarProps {
-  activeView: 'home' | 'calculator' | 'learn';
-  onNavigate: (view: 'home' | 'calculator' | 'learn') => void;
+  activeView: AppView;
+  onNavigate: (view: AppView) => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ activeView, onNavigate }) => {
@@ -52,6 +54,15 @@ export const Navbar: React.FC<NavbarProps> = ({ activeView, onNavigate }) => {
           >
             <GraduationCap size={16} />
             <span>Teoría</span>
+          </button>
+
+          <button
+            type="button"
+            className={`nav-item-btn ${activeView === 'help' ? 'active' : ''}`}
+            onClick={() => onNavigate('help')}
+          >
+            <CircleHelp size={16} />
+            <span>Ayuda</span>
           </button>
         </nav>
       </div>

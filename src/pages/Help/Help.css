@@ -1,0 +1,137 @@
+@import '../Learn/Learn.css';
+
+.help-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+}
+
+.help-table {
+  width: 100%;
+  min-width: 640px;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.help-table th,
+.help-table td {
+  padding: var(--space-3);
+  text-align: left;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.help-table th {
+  color: var(--slate-500);
+  font-weight: 600;
+}
+
+.help-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.help-open-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.help-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
+.help-card h3,
+.help-error-card h3 {
+  margin: 0;
+  font-size: var(--text-base);
+}
+
+.help-example-list,
+.help-plain-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.help-plain-list li {
+  padding-left: var(--space-3);
+  border-left: 3px solid var(--primary-300);
+  color: var(--slate-600);
+}
+
+.help-example-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: #ffffff;
+  border: 1px solid var(--border-medium);
+  border-left-width: 4px;
+  border-radius: var(--radius-md);
+}
+
+.help-example-list li.help-ok {
+  border-left-color: var(--primary-400);
+}
+
+.help-example-list li.help-bad {
+  border-left-color: #c0392b;
+}
+
+.help-example-list code {
+  font-family: var(--font-mono);
+  color: var(--slate-700);
+  overflow-wrap: anywhere;
+}
+
+.help-example-list span {
+  color: var(--slate-500);
+  font-size: var(--text-sm);
+}
+
+.help-note {
+  margin: 0;
+  color: var(--slate-500);
+  font-size: var(--text-sm);
+}
+
+.help-errors {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: var(--space-3);
+}
+
+.help-error-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+}
+
+.help-error-card p {
+  margin: 0;
+  color: var(--slate-600);
+  font-size: var(--text-sm);
+}
+
+.help-next-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.help-next-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
