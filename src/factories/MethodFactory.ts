@@ -157,4 +157,32 @@ export class MethodFactory {
       },
     ];
   }
+
+  /** Métodos de interpolación: el polinomio pasa exactamente por los puntos (x, y). */
+  public static getInterpolationMethods(): MethodMetadata[] {
+    return [
+      {
+        id: 'lagrange',
+        name: 'Interpolación de Lagrange',
+        category: 'interpolation',
+        description: 'Construye el polinomio que pasa por todos los puntos como una suma de polinomios base Lᵢ(x), cada uno multiplicado por su yᵢ.',
+        latexFormula: 'P_n(x) = \\sum_{i=0}^{n} y_i \\prod_{j \\neq i} \\frac{x - x_j}{x_i - x_j}',
+        icon: 'spline',
+        tag: 'Interpolación • Polinomio exacto',
+        difficulty: 'Intermedio',
+        recommendedConvergence: 'Requiere valores de x distintos; con muchos puntos puede oscilar (fenómeno de Runge)',
+      },
+      {
+        id: 'newton-divided-differences',
+        name: 'Diferencias Divididas de Newton',
+        category: 'interpolation',
+        description: 'Obtiene el mismo polinomio interpolante con una tabla triangular de diferencias divididas; su primera fila da los coeficientes de la forma de Newton.',
+        latexFormula: 'P_n(x) = f[x_0] + f[x_0,x_1](x - x_0) + f[x_0,x_1,x_2](x - x_0)(x - x_1) + \\cdots',
+        icon: 'spline',
+        tag: 'Interpolación • Tabla triangular',
+        difficulty: 'Intermedio',
+        recommendedConvergence: 'Requiere valores de x distintos; agregar un punto solo añade un término al polinomio',
+      },
+    ];
+  }
 }

@@ -13,19 +13,21 @@ import { SessionHistory, type HistoryItem } from '../../components/SessionHistor
 import { MathView } from '../../components/MathView/MathView';
 import { RegressionCalculator } from './RegressionCalculator';
 import { SystemsCalculator } from './SystemsCalculator';
+import { InterpolationCalculator } from './InterpolationCalculator';
 import { ExpressionParser } from '../../services/ExpressionParser';
 import confetti from 'canvas-confetti';
-import { Play, RotateCcw, AlertTriangle, LineChart, Table, BookOpen, Zap, Sigma, Grid3x3 } from 'lucide-react';
+import { Play, RotateCcw, AlertTriangle, LineChart, Table, BookOpen, Zap, Sigma, Grid3x3, Spline } from 'lucide-react';
 import './Calculator.css';
 
 interface CalculatorProps {
   initialMethodId?: string;
 }
 
-type MethodFamily = 'roots' | 'systems' | 'regression';
+type MethodFamily = 'roots' | 'systems' | 'interpolation' | 'regression';
 
 const familyOf = (methodId: string): MethodFamily => {
   if (MethodFactory.getSystemMethods().some((method) => method.id === methodId)) return 'systems';
+  if (MethodFactory.getInterpolationMethods().some((method) => method.id === methodId)) return 'interpolation';
   if (MethodFactory.getRegressionMethods().some((method) => method.id === methodId)) return 'regression';
   return 'roots';
 };
@@ -38,6 +40,10 @@ const FAMILY_HEADERS: Record<MethodFamily, { title: string; subtitle: string }> 
   systems: {
     title: 'Sistemas de Ecuaciones Lineales',
     subtitle: 'Escribe la matriz A y el vector b, elige la tolerancia y sigue cada iteración del método hasta la solución de Ax = b.',
+  },
+  interpolation: {
+    title: 'Interpolación Polinomial',
+    subtitle: 'Ingresa los puntos (x, y) y el valor x* donde interpolar; obtén el polinomio que pasa exactamente por todos ellos, paso a paso.',
   },
   regression: {
     title: 'Regresión y Ajuste de Curvas',
@@ -225,6 +231,16 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
         <button
           type="button"
           role="tab"
+          aria-selected={family === 'interpolation'}
+          className={`session-tab ${family === 'interpolation' ? 'active' : ''}`}
+          onClick={() => setFamily('interpolation')}
+        >
+          <span className="session-tab-symbol"><Spline size={16} /></span>
+          <span>Interpolación</span>
+        </button>
+        <button
+          type="button"
+          role="tab"
           aria-selected={family === 'regression'}
           className={`session-tab ${family === 'regression' ? 'active' : ''}`}
           onClick={() => setFamily('regression')}
@@ -236,6 +252,8 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
 
       {family === 'regression' ? (
         <RegressionCalculator />
+      ) : family === 'interpolation' ? (
+        <InterpolationCalculator />
       ) : family === 'systems' ? (
         <SystemsCalculator />
       ) : (
