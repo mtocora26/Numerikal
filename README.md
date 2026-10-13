@@ -27,6 +27,15 @@ Para cada uno obtienes:
 - Explicación pedagógica con la fórmula, la condición de convergencia y, en Newton-Raphson, la derivación paso a paso de f′ y f″.
 - Comprobación de convergencia (por ejemplo, |g′(x)| < 1 en Punto Fijo) y avisos cuando el intervalo no cumple el teorema de Bolzano.
 
+### Sistemas de ecuaciones lineales, Ax = b
+
+**Método de Jacobi** para sistemas de 2×2 hasta 6×6, con editor de la matriz A, el vector b y el vector inicial x⁽⁰⁾:
+
+1. Comprobación de diagonal dominante fila por fila (condición suficiente de convergencia) y aviso si algún aᵢᵢ es cero.
+2. Fórmulas de iteración ya despejadas para cada incógnita y la primera iteración con los valores sustituidos.
+3. Tabla de iteraciones con x₁ … xₙ y el error (absoluto, relativo o porcentual).
+4. Solución aproximada, residuo ‖Ax − b‖∞, número de iteraciones y motivo de finalización.
+
 ### Regresión polinomial por mínimos cuadrados
 
 Ajusta un polinomio de grado 1 a 6 a una tabla de datos (x, y), siguiendo el procedimiento de clase:
@@ -77,7 +86,7 @@ La lógica matemática (`src/services` y `src/domain`) se comprueba con [Vitest]
 npm test
 ```
 
-Cubren las operaciones básicas del analizador de expresiones (incluidos decimales, negativos, expresiones inválidas y división entre cero), el cálculo del error, la validación del motor y que cada método de raíces converja con los valores por defecto de la calculadora.
+Cubren las operaciones básicas del analizador de expresiones (incluidos decimales, negativos, expresiones inválidas y división entre cero), el cálculo del error, la validación del motor, que cada método de raíces converja con los valores por defecto de la calculadora, la regresión polinomial y el método de Jacobi (convergencia, validaciones y que la solución verifique Ax ≈ b).
 
 ## Organización del código
 

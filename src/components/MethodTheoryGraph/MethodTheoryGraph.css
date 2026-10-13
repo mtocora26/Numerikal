@@ -32,6 +32,9 @@
 }
 
 .theory-graph-canvas-wrapper {
+  width: 100%;
+  max-width: 760px;
+  margin-inline: auto;
   overflow: hidden;
   background: #ffffff;
   border: 1px solid var(--border-subtle);
@@ -41,7 +44,8 @@
 .theory-graph-canvas {
   display: block;
   width: 100%;
-  height: 280px;
+  /* Proporción fija: el alto sigue al ancho y la curva no se aplana en pantallas anchas */
+  aspect-ratio: 16 / 10;
 }
 
 .theory-graph-legend {
@@ -93,8 +97,21 @@
   font-style: italic;
 }
 
+/* Contenido de la figura (leyenda, texto y gráfica de regresión) alineado al mismo ancho que la gráfica */
+.method-theory-graph > :not(.theory-graph-canvas-wrapper) {
+  width: 100%;
+  max-width: 760px;
+  margin-inline: auto;
+}
+
+.method-theory-graph .canvas-wrapper {
+  height: auto;
+  aspect-ratio: 16 / 10;
+}
+
 @media (max-width: 560px) {
-  .theory-graph-canvas {
-    height: 230px;
+  .theory-graph-canvas,
+  .method-theory-graph .canvas-wrapper {
+    aspect-ratio: 4 / 3;
   }
 }

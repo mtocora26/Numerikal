@@ -229,35 +229,37 @@ export const RegressionCalculator: React.FC = () => {
           </div>
         </div>
 
-        {errorMessage && (
-          <div className="workspace-alert alert-error" role="alert">
-            <AlertTriangle size={18} className="alert-icon" />
-            <div className="alert-text">
-              <strong>Revisa los datos:</strong>
-              <p>{errorMessage}</p>
+        <div className="solve-dock">
+          {errorMessage && (
+            <div className="workspace-alert alert-error" role="alert">
+              <AlertTriangle size={18} className="alert-icon" />
+              <div className="alert-text">
+                <strong>Revisa los datos:</strong>
+                <p>{errorMessage}</p>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {!errorMessage && warnings.length > 0 && (
-          <div className="workspace-alert alert-warning">
-            <AlertTriangle size={18} className="alert-icon" />
-            <div className="alert-text">
-              <strong>Advertencia:</strong>
-              <p>{warnings.join(' ')}</p>
+          {!errorMessage && warnings.length > 0 && (
+            <div className="workspace-alert alert-warning">
+              <AlertTriangle size={18} className="alert-icon" />
+              <div className="alert-text">
+                <strong>Advertencia:</strong>
+                <p>{warnings.join(' ')}</p>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        <div className="actions-row solve-actions">
-          <button type="button" className="btn-primary calculate-main-btn" onClick={handleCalculate} disabled={!canCalculate}>
-            <Play size={18} />
-            <span>Calcular Regresión</span>
-          </button>
-          <button type="button" className="btn-secondary reset-btn" onClick={handleReset} title="Restablecer ejemplo" aria-label="Limpiar">
-            <RotateCcw size={16} />
-            <span>Limpiar</span>
-          </button>
+          <div className="actions-row solve-actions">
+            <button type="button" className="btn-primary calculate-main-btn" onClick={handleCalculate} disabled={!canCalculate}>
+              <Play size={18} />
+              <span>Calcular Regresión</span>
+            </button>
+            <button type="button" className="btn-secondary reset-btn" onClick={handleReset} title="Restablecer ejemplo" aria-label="Limpiar">
+              <RotateCcw size={16} />
+              <span>Limpiar</span>
+            </button>
+          </div>
         </div>
       </section>
 

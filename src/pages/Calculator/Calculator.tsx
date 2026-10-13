@@ -12,19 +12,38 @@ import { EducationalExplanation } from '../../components/EducationalExplanation/
 import { SessionHistory, type HistoryItem } from '../../components/SessionHistory/SessionHistory';
 import { MathView } from '../../components/MathView/MathView';
 import { RegressionCalculator } from './RegressionCalculator';
+import { SystemsCalculator } from './SystemsCalculator';
 import { ExpressionParser } from '../../services/ExpressionParser';
 import confetti from 'canvas-confetti';
-import { Play, RotateCcw, AlertTriangle, LineChart, Table, BookOpen, Zap, Sigma } from 'lucide-react';
+import { Play, RotateCcw, AlertTriangle, LineChart, Table, BookOpen, Zap, Sigma, Grid3x3 } from 'lucide-react';
 import './Calculator.css';
 
 interface CalculatorProps {
   initialMethodId?: string;
 }
 
-type MethodFamily = 'roots' | 'regression';
+type MethodFamily = 'roots' | 'systems' | 'regression';
 
-const isRegressionMethod = (methodId: string): boolean =>
-  MethodFactory.getRegressionMethods().some((method) => method.id === methodId);
+const familyOf = (methodId: string): MethodFamily => {
+  if (MethodFactory.getSystemMethods().some((method) => method.id === methodId)) return 'systems';
+  if (MethodFactory.getRegressionMethods().some((method) => method.id === methodId)) return 'regression';
+  return 'roots';
+};
+
+const FAMILY_HEADERS: Record<MethodFamily, { title: string; subtitle: string }> = {
+  roots: {
+    title: 'Resolución y Análisis Numérico',
+    subtitle: 'Elige un método, escribe tu ejercicio y obtén la solución con su tabla, gráfica y explicación.',
+  },
+  systems: {
+    title: 'Sistemas de Ecuaciones Lineales',
+    subtitle: 'Escribe la matriz A y el vector b, elige la tolerancia y sigue cada iteración del método hasta la solución de Ax = b.',
+  },
+  regression: {
+    title: 'Regresión y Ajuste de Curvas',
+    subtitle: 'Ingresa tus datos, elige el grado del polinomio y obtén el ajuste por mínimos cuadrados paso a paso.',
+  },
+};
 
 // Ejemplo por defecto: raíz x ≈ 2.1149 en [2, 3]. Punto Fijo necesita la ecuación despejada x = g(x).
 const DEFAULT_EXPRESSION = 'x^3 - 4*x - 1';
@@ -33,9 +52,9 @@ const DEFAULT_FIXED_POINT_EXPRESSION = 'cbrt(4*x + 1)';
 export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisection' }) => {
   const methods = MethodFactory.getAllMethods();
   // State
-  const [family, setFamily] = useState<MethodFamily>(isRegressionMethod(initialMethodId) ? 'regression' : 'roots');
+  const [family, setFamily] = useState<MethodFamily>(familyOf(initialMethodId));
   const [selectedMethodId, setSelectedMethodId] = useState<string>(
-    isRegressionMethod(initialMethodId) ? 'bisection' : initialMethodId
+    familyOf(initialMethodId) === 'roots' ? initialMethodId : 'bisection'
   );
   const [expression, setExpression] = useState<string>(DEFAULT_EXPRESSION);
   const [paramValues, setParamValues] = useState<Record<string, number>>({ xi: 2, xs: 3 });
@@ -68,10 +87,9 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
 
   useEffect(() => {
     if (!initialMethodId) return;
-    if (isRegressionMethod(initialMethodId)) {
-      setFamily('regression');
-    } else {
-      setFamily('roots');
+    const nextFamily = familyOf(initialMethodId);
+    setFamily(nextFamily);
+    if (nextFamily === 'roots') {
       setSelectedMethodId(initialMethodId);
     }
   }, [initialMethodId]);
@@ -166,7 +184,7 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
   const hasValidationError = Boolean(executionError || (validation && !validation.isValid));
   const hasWarnings = Boolean(validation?.warnings && validation.warnings.length > 0);
 
-  const isRegression = family === 'regression';
+  const header = FAMILY_HEADERS[family];
 
   return (
     <div className="calculator-workspace">
@@ -177,14 +195,8 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
             <Zap size={13} />
             <span>Espacio de Trabajo Interactivo</span>
           </div>
-          <h1 className="workspace-title">
-            {isRegression ? 'Regresión y Ajuste de Curvas' : 'Resolución y Análisis Numérico'}
-          </h1>
-          <p className="workspace-subtitle">
-            {isRegression
-              ? 'Ingresa tus datos, elige el grado del polinomio y obtén el ajuste por mínimos cuadrados paso a paso.'
-              : 'Elige un método, escribe tu ejercicio y obtén la solución con su tabla, gráfica y explicación.'}
-          </p>
+          <h1 className="workspace-title">{header.title}</h1>
+          <p className="workspace-subtitle">{header.subtitle}</p>
         </div>
       </div>
 
@@ -193,8 +205,8 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
         <button
           type="button"
           role="tab"
-          aria-selected={!isRegression}
-          className={`session-tab ${!isRegression ? 'active' : ''}`}
+          aria-selected={family === 'roots'}
+          className={`session-tab ${family === 'roots' ? 'active' : ''}`}
           onClick={() => setFamily('roots')}
         >
           <span className="session-tab-symbol">f(x)=0</span>
@@ -203,8 +215,18 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
         <button
           type="button"
           role="tab"
-          aria-selected={isRegression}
-          className={`session-tab ${isRegression ? 'active' : ''}`}
+          aria-selected={family === 'systems'}
+          className={`session-tab ${family === 'systems' ? 'active' : ''}`}
+          onClick={() => setFamily('systems')}
+        >
+          <span className="session-tab-symbol"><Grid3x3 size={16} /></span>
+          <span>Sistemas lineales</span>
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={family === 'regression'}
+          className={`session-tab ${family === 'regression' ? 'active' : ''}`}
           onClick={() => setFamily('regression')}
         >
           <span className="session-tab-symbol"><Sigma size={16} /></span>
@@ -212,8 +234,10 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
         </button>
       </div>
 
-      {isRegression ? (
+      {family === 'regression' ? (
         <RegressionCalculator />
+      ) : family === 'systems' ? (
+        <SystemsCalculator />
       ) : (
       <>
       {/* Two Column Layout */}
@@ -308,49 +332,51 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
             />
           </div>
 
-          {/* Validation Warnings / Error Banner (next to the solve button) */}
-          {hasValidationError && (
-            <div className="workspace-alert alert-error" role="alert">
-              <AlertTriangle size={18} className="alert-icon" />
-              <div className="alert-text">
-                <strong>Error de validación matemática:</strong>
-                <p>{executionError || (validation?.errors || []).join(' ')}</p>
+          <div className="solve-dock">
+            {/* Validation Warnings / Error Banner (next to the solve button) */}
+            {hasValidationError && (
+              <div className="workspace-alert alert-error" role="alert">
+                <AlertTriangle size={18} className="alert-icon" />
+                <div className="alert-text">
+                  <strong>Error de validación matemática:</strong>
+                  <p>{executionError || (validation?.errors || []).join(' ')}</p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {hasWarnings && (
-            <div className="workspace-alert alert-warning">
-              <AlertTriangle size={18} className="alert-icon" />
-              <div className="alert-text">
-                <strong>Advertencia de convergencia:</strong>
-                <p>{validation?.warnings.join(' ')}</p>
+            {hasWarnings && (
+              <div className="workspace-alert alert-warning">
+                <AlertTriangle size={18} className="alert-icon" />
+                <div className="alert-text">
+                  <strong>Advertencia de convergencia:</strong>
+                  <p>{validation?.warnings.join(' ')}</p>
+                </div>
               </div>
+            )}
+
+            {/* Step 4: Solve (sticky so it stays visible while editing) */}
+            <div className="actions-row solve-actions">
+              <button
+                type="button"
+                className="btn-primary calculate-main-btn"
+                onClick={handleCalculate}
+                disabled={isCalculating || !parsedExpression.isValid}
+              >
+                <Play size={18} />
+                <span>{isCalculating ? 'Calculando...' : 'Calcular Solución'}</span>
+              </button>
+
+              <button
+                type="button"
+                className="btn-secondary reset-btn"
+                onClick={handleResetAll}
+                title="Restablecer cálculos"
+                aria-label="Limpiar"
+              >
+                <RotateCcw size={16} />
+                <span>Limpiar</span>
+              </button>
             </div>
-          )}
-
-          {/* Step 4: Solve (sticky so it stays visible while editing) */}
-          <div className="actions-row solve-actions">
-            <button
-              type="button"
-              className="btn-primary calculate-main-btn"
-              onClick={handleCalculate}
-              disabled={isCalculating || !parsedExpression.isValid}
-            >
-              <Play size={18} />
-              <span>{isCalculating ? 'Calculando...' : 'Calcular Solución'}</span>
-            </button>
-
-            <button
-              type="button"
-              className="btn-secondary reset-btn"
-              onClick={handleResetAll}
-              title="Restablecer cálculos"
-              aria-label="Limpiar"
-            >
-              <RotateCcw size={16} />
-              <span>Limpiar</span>
-            </button>
           </div>
         </section>
 

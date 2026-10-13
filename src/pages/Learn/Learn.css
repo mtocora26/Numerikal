@@ -281,3 +281,122 @@
     flex-direction: column;
   }
 }
+
+/* Selector de tema y de método: una sola vista a la vez para que la página no sea larga */
+.learn-topic-switcher {
+  display: flex;
+  gap: 4px;
+  width: fit-content;
+  max-width: 100%;
+  padding: 4px;
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+}
+
+.learn-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--slate-500);
+  font: inherit;
+  cursor: pointer;
+}
+
+.learn-tab.active {
+  color: var(--primary-900);
+  background: var(--primary-50);
+}
+
+.learn-tab-symbol {
+  font-family: var(--font-brand);
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.method-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.method-pill {
+  padding: 8px 14px;
+  color: var(--slate-600);
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  font: inherit;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+.method-pill:hover {
+  border-color: var(--primary-200);
+}
+
+.method-pill.active {
+  color: var(--primary-900);
+  background: var(--primary-50);
+  border-color: var(--primary-500);
+  font-weight: 600;
+}
+
+@media (max-width: 800px) {
+  .learn-topic-switcher {
+    width: 100%;
+  }
+
+  .learn-tab {
+    flex: 1;
+    justify-content: center;
+    padding-inline: 8px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .learn-tab {
+    padding: 10px 6px;
+    font-size: 0.8rem;
+    line-height: 1.25;
+    text-align: center;
+  }
+
+  .learn-tab-symbol {
+    display: none;
+  }
+}
+
+.method-alias {
+  display: block;
+  margin-top: 2px;
+  color: var(--slate-500);
+  font-size: 0.8rem;
+}
+
+.theory-text-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+}
+
+.theory-text-panel > p {
+  color: var(--slate-600);
+  line-height: 1.65;
+}
+
+.theory-text-panel li {
+  margin-left: var(--space-4);
+  color: var(--slate-600);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
