@@ -157,4 +157,21 @@ export class MethodFactory {
       },
     ];
   }
+
+  /** Métodos de interpolación: el polinomio pasa exactamente por los puntos (x, y). */
+  public static getInterpolationMethods(): MethodMetadata[] {
+    return [
+      {
+        id: 'lagrange',
+        name: 'Interpolación de Lagrange',
+        category: 'interpolation',
+        description: 'Construye el polinomio que pasa por todos los puntos como una suma de polinomios base Lᵢ(x), cada uno multiplicado por su yᵢ.',
+        latexFormula: 'P_n(x) = \\sum_{i=0}^{n} y_i \\prod_{j \\neq i} \\frac{x - x_j}{x_i - x_j}',
+        icon: 'spline',
+        tag: 'Interpolación • Polinomio exacto',
+        difficulty: 'Intermedio',
+        recommendedConvergence: 'Requiere valores de x distintos; con muchos puntos puede oscilar (fenómeno de Runge)',
+      },
+    ];
+  }
 }

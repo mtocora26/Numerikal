@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { BookOpen, Grid3x3, Sigma } from 'lucide-react';
+import { BookOpen, Grid3x3, Sigma, Spline } from 'lucide-react';
 import { RootsTopic } from './topics/RootsTopic';
 import { SystemsTopic } from './topics/SystemsTopic';
+import { InterpolationTopic } from './topics/InterpolationTopic';
 import { RegressionTopic } from './topics/RegressionTopic';
 import './Learn.css';
 
-type Topic = 'roots' | 'systems' | 'regression';
+type Topic = 'roots' | 'systems' | 'interpolation' | 'regression';
 
 export const Learn: React.FC = () => {
   const [topic, setTopic] = useState<Topic>('roots');
@@ -17,7 +18,7 @@ export const Learn: React.FC = () => {
           <BookOpen size={14} />
           <span>Guía de estudio</span>
         </div>
-        <h1 className="learn-title">Ecuaciones No Lineales, Sistemas y Regresión</h1>
+        <h1 className="learn-title">Ecuaciones No Lineales, Sistemas, Interpolación y Regresión</h1>
         <p className="learn-subtitle">
           Aprende qué hace cada método, qué fórmula utiliza y qué debes revisar antes de ejecutar una solución.
         </p>
@@ -47,6 +48,16 @@ export const Learn: React.FC = () => {
         <button
           type="button"
           role="tab"
+          aria-selected={topic === 'interpolation'}
+          className={`learn-tab ${topic === 'interpolation' ? 'active' : ''}`}
+          onClick={() => setTopic('interpolation')}
+        >
+          <span className="learn-tab-symbol"><Spline size={16} /></span>
+          <span>Interpolación</span>
+        </button>
+        <button
+          type="button"
+          role="tab"
           aria-selected={topic === 'regression'}
           className={`learn-tab ${topic === 'regression' ? 'active' : ''}`}
           onClick={() => setTopic('regression')}
@@ -58,6 +69,7 @@ export const Learn: React.FC = () => {
 
       {topic === 'roots' && <RootsTopic />}
       {topic === 'systems' && <SystemsTopic />}
+      {topic === 'interpolation' && <InterpolationTopic />}
       {topic === 'regression' && <RegressionTopic />}
     </div>
   );
