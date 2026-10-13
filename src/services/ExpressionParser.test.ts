@@ -72,3 +72,19 @@ describe('ExpressionParser: derivadas', () => {
     expect(parsed.secondDerivativeLatex).toBeTruthy();
   });
 });
+
+describe('ExpressionParser: nombres con dígitos', () => {
+  it('log10 (la tecla log₁₀ del teclado) no se parte con una multiplicación implícita', () => {
+    expect(evaluate('log10(x)', 100)).toBeCloseTo(2, 12);
+    expect(evaluate('2*log10(x) + 1', 1000)).toBeCloseTo(7, 12);
+    expect(evaluate('x^2 + log10(x)', 10)).toBeCloseTo(101, 12);
+  });
+
+  it('sigue completando la multiplicación implícita con números', () => {
+    expect(evaluate('2x', 3)).toBe(6);
+    expect(evaluate('12x', 2)).toBe(24);
+    expect(evaluate('2.5x', 2)).toBe(5);
+    expect(evaluate('3(x+1)', 1)).toBe(6);
+    expect(evaluate('2sin(x)', 0)).toBe(0);
+  });
+});

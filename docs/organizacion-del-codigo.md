@@ -16,7 +16,7 @@ Guía corta para decidir **dónde colocar cada cosa** en `src`. La regla general
 | `services/` | Utilidades de cálculo sin estado: analizador de expresiones, error, formato de números, motor. | `domain/`, `factories/` |
 | `hooks/` | Estado de React que envuelve a `services/` (`useNumericalSolver`, `useExpressionParser`). | `services/`, `domain/` |
 | `components/` | Piezas de interfaz reutilizables, una carpeta por componente. | `domain/` (solo tipos), `services/`, otros componentes |
-| `pages/` | Una pantalla por carpeta (`Home`, `Calculator`, `Learn`). Ensamblan componentes y manejan el estado de la pantalla. | todo lo anterior |
+| `pages/` | Una pantalla por carpeta (`Home`, `Calculator`, `Learn`, `Help`). Ensamblan componentes y manejan el estado de la pantalla. | todo lo anterior |
 | `styles/` | Variables de diseño (`variables.css`), reseteo y estilos globales. | — |
 | `assets/` | Imágenes. | — |
 
@@ -26,7 +26,7 @@ Guía corta para decidir **dónde colocar cada cosa** en `src`. La regla general
 
 1. **¿Es matemática?** Va en `domain/` (o `services/` si no pertenece a un método concreto). Debe poder probarse sin abrir el navegador.
 2. **¿Se dibuja en pantalla?** Va en `components/`. Recibe los datos por props y no llama a los métodos numéricos.
-3. **¿Es una pantalla completa?** Va en `pages/`. Si una pantalla crece, divídela en componentes antes de crear otra página.
+3. **¿Es una pantalla completa?** Va en `pages/`. Si una pantalla crece, divídela en componentes antes de crear otra página. La ayuda (`pages/Help/Help.tsx`) reutiliza los estilos de `Learn`; si cambias un mensaje de error o un aviso de un método, revisa su tabla de errores comunes.
 4. **¿Es un método nuevo de raíces?** Un archivo en `domain/methods/`, registrarlo en `MethodFactory` y añadir su caso en `domain/methods/methods.test.ts` y su diagrama en `MethodTheoryGraph/methodDiagrams.ts`.
 5. **¿Es una familia nueva de problemas** (como la regresión, que no usa f(x))? Crea su propia carpeta en `domain/` con sus tipos, en lugar de forzarla en `NumericalMethod`. Añade su metadata en `MethodFactory` (`getSystemMethods()`, `getInterpolationMethods()`, `getSeriesMethods()`, `getRegressionMethods()`…), su calculadora en `pages/Calculator/` (`SystemsCalculator.tsx`, `InterpolationCalculator.tsx`, `TaylorCalculator.tsx`, `RegressionCalculator.tsx`) y su pestaña en el selector de familias de `Calculator.tsx`.
    - **¿Es un método nuevo de interpolación?** Una clase en `domain/interpolation/` cuyo resultado extienda `InterpolationResultBase` (mismo polinomio, distinta construcción), su entrada en `getInterpolationMethods()` y su opción en `InterpolationCalculator.tsx`; `InterpolationResultCard` e `InterpolationGraph` sirven sin cambios.

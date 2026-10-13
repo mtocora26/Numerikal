@@ -56,7 +56,8 @@ export class ExpressionParser {
       .replace(/\bln\b/gi, 'log');
 
     // Fix implicit multiplication like 4x -> 4*x, 3(x+1) -> 3*(x+1), (x+1)(x-2) -> (x+1)*(x-2)
-    sanitized = sanitized.replace(/(\d+)\s*([a-zA-Z(])/g, '$1*$2');
+    // (los dígitos que son parte de un nombre, como log10, no se separan)
+    sanitized = sanitized.replace(/(?<![A-Za-z_\d])(\d+)\s*([a-zA-Z(])/g, '$1*$2');
     sanitized = sanitized.replace(/(\))\s*([a-zA-Z0-9(])/g, '$1*$2');
     sanitized = sanitized.replace(/(\b(?:e|pi|x)\b)\s+(?=(?:sin|cos|tan|log|exp)\b)/gi, '$1*');
 
