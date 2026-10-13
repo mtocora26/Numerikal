@@ -172,6 +172,17 @@ export class MethodFactory {
         difficulty: 'Intermedio',
         recommendedConvergence: 'Requiere valores de x distintos; con muchos puntos puede oscilar (fenómeno de Runge)',
       },
+      {
+        id: 'newton-divided-differences',
+        name: 'Diferencias Divididas de Newton',
+        category: 'interpolation',
+        description: 'Obtiene el mismo polinomio interpolante con una tabla triangular de diferencias divididas; su primera fila da los coeficientes de la forma de Newton.',
+        latexFormula: 'P_n(x) = f[x_0] + f[x_0,x_1](x - x_0) + f[x_0,x_1,x_2](x - x_0)(x - x_1) + \\cdots',
+        icon: 'spline',
+        tag: 'Interpolación • Tabla triangular',
+        difficulty: 'Intermedio',
+        recommendedConvergence: 'Requiere valores de x distintos; agregar un punto solo añade un término al polinomio',
+      },
     ];
   }
 }

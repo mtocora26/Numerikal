@@ -44,7 +44,7 @@ export const Home: React.FC<HomeProps> = ({ onSelectMethodAndOpenCalc }) => {
 
         <p className="hero-subtitle">
           Numerikal es un entorno didáctico para ingresar funciones, resolver ecuaciones no lineales,
-          resolver sistemas de ecuaciones lineales con el método de Jacobi, interpolar datos con el polinomio de Lagrange, ajustar datos con regresión polinomial, observar cada paso matemático y analizar gráficamente los resultados.
+          resolver sistemas de ecuaciones lineales con el método de Jacobi, interpolar datos con el polinomio de Lagrange o las diferencias divididas de Newton, ajustar datos con regresión polinomial, observar cada paso matemático y analizar gráficamente los resultados.
         </p>
 
         <div className="hero-actions-row">

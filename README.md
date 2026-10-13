@@ -46,6 +46,14 @@ Halla el polinomio de grado n que pasa exactamente por n+1 puntos (x, y) y lo ev
 
 Incluye gráfica con los puntos, la curva y el punto interpolado. Rechaza valores de x repetidos y avisa de extrapolación y del fenómeno de Runge. Los datos se pueden escribir o pegar desde Excel o CSV.
 
+### Diferencias divididas de Newton
+
+Construye el mismo polinomio interpolante con la tabla triangular de diferencias divididas:
+
+1. Tabla completa f[xᵢ, …, xᵢ₊ₖ], con cada diferencia calculada con los valores sustituidos y la primera fila resaltada.
+2. Polinomio de Newton con los símbolos de la tabla, con los valores sustituidos y expandido.
+3. P(x*), con la misma gráfica y las mismas validaciones que Lagrange. Con los mismos datos, ambos métodos dan el mismo polinomio.
+
 ### Regresión polinomial por mínimos cuadrados
 
 Ajusta un polinomio de grado 1 a 6 a una tabla de datos (x, y), siguiendo el procedimiento de clase:

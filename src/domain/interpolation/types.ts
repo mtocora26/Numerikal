@@ -51,3 +51,27 @@ export interface LagrangeResult extends InterpolationResultBase {
   /** P(x) = y₀L₀(x) + y₁L₁(x) + … con los yᵢ sustituidos */
   sumLatex: string;
 }
+
+/** Una diferencia dividida f[xᵢ, …, xᵢ₊ₖ] de la tabla triangular. */
+export interface DividedDifferenceEntry {
+  /** Orden k: 0 = f[xᵢ], 1 = primera diferencia, … */
+  order: number;
+  /** Fila i dentro de su columna */
+  index: number;
+  /** f[xᵢ, …, xᵢ₊ₖ] en LaTeX */
+  labelLatex: string;
+  /** Fórmula con los valores sustituidos y el resultado; vacío en el orden 0 */
+  formulaLatex: string;
+  value: number;
+}
+
+export interface NewtonResult extends InterpolationResultBase {
+  /** columns[k][i] = f[xᵢ, …, xᵢ₊ₖ]; la columna 0 son los yᵢ */
+  columns: DividedDifferenceEntry[][];
+  /** Primera fila de la tabla: f[x₀], f[x₀,x₁], … (coeficientes de la forma de Newton) */
+  newtonCoefficients: number[];
+  /** P(x) = f[x₀] + f[x₀,x₁](x − x₀) + … con los símbolos de la tabla */
+  symbolicLatex: string;
+  /** P(x) con las diferencias y los nodos sustituidos */
+  substitutedLatex: string;
+}

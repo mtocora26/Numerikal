@@ -1,14 +1,16 @@
 import React, { useMemo, useRef, useState } from 'react';
 import confetti from 'canvas-confetti';
-import { AlertTriangle, BookOpen, LineChart, Play, RotateCcw } from 'lucide-react';
+import { AlertTriangle, BookOpen, LineChart, Play, RotateCcw, Table } from 'lucide-react';
 import { MethodFactory } from '../../factories/MethodFactory';
 import { LagrangeInterpolation } from '../../domain/interpolation/Lagrange';
-import type { LagrangeResult } from '../../domain/interpolation/types';
+import { NewtonDividedDifferences } from '../../domain/interpolation/NewtonDividedDifferences';
+import type { LagrangeResult, NewtonResult } from '../../domain/interpolation/types';
 import type { DataPoint } from '../../domain/regression/types';
 import { DataPointsInput, type DataRow } from '../../components/DataPointsInput/DataPointsInput';
 import { InterpolationGraph } from '../../components/InterpolationGraph/InterpolationGraph';
 import { InterpolationResultCard } from '../../components/InterpolationResultCard/InterpolationResultCard';
 import { LagrangeSteps } from '../../components/LagrangeSteps/LagrangeSteps';
+import { DividedDifferencesTable, NewtonSteps } from '../../components/NewtonSteps/NewtonSteps';
 import { MathView } from '../../components/MathView/MathView';
 import '../../components/ParameterForm/ParameterForm.css';
 
@@ -18,7 +20,10 @@ const EXAMPLE_X_STAR = '1.5';
 
 const toNumber = (text: string): number => (text.trim() === '' ? NaN : Number(text.trim().replace(',', '.')));
 
-type ResultTab = 'steps' | 'graph';
+type ResultTab = 'steps' | 'table' | 'graph';
+type InterpolationResult = LagrangeResult | NewtonResult;
+
+const isNewton = (result: InterpolationResult): result is NewtonResult => 'columns' in result;
 
 interface ReadRows {
   points: DataPoint[];
@@ -42,12 +47,17 @@ const readRows = (rows: DataRow[]): ReadRows => {
 };
 
 export const InterpolationCalculator: React.FC = () => {
-  const method = useMemo(() => new LagrangeInterpolation(), []);
-  const methodMeta = MethodFactory.getInterpolationMethods()[0];
+  const methods = useMemo(
+    () => ({ lagrange: new LagrangeInterpolation(), 'newton-divided-differences': new NewtonDividedDifferences() }),
+    []
+  );
+  const [methodId, setMethodId] = useState<keyof typeof methods>('lagrange');
+  const method = methods[methodId];
+  const methodMeta = MethodFactory.getInterpolationMethods().find((m) => m.id === methodId)!;
 
   const [rows, setRows] = useState<DataRow[]>(EXAMPLE_ROWS);
   const [xStarText, setXStarText] = useState<string>(EXAMPLE_X_STAR);
-  const [result, setResult] = useState<LagrangeResult | null>(null);
+  const [result, setResult] = useState<InterpolationResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<ResultTab>('steps');
   const resultsRef = useRef<HTMLElement>(null);
@@ -112,7 +122,17 @@ export const InterpolationCalculator: React.FC = () => {
             <span className="workspace-step-number">1</span>
             Selecciona el método
           </label>
-          <select id="interpolation-method-select" className="method-dropdown" defaultValue={methodMeta.id}>
+          <select
+            id="interpolation-method-select"
+            className="method-dropdown"
+            value={methodId}
+            onChange={(e) => {
+              setMethodId(e.target.value as keyof typeof methods);
+              setResult(null);
+              setError(null);
+              setActiveTab('steps');
+            }}
+          >
             {MethodFactory.getInterpolationMethods().map((m) => (
               <option key={m.id} value={m.id}>{m.name}</option>
             ))}
@@ -209,6 +229,12 @@ export const InterpolationCalculator: React.FC = () => {
                 <BookOpen size={16} />
                 <span>Procedimiento</span>
               </button>
+              {isNewton(result) && (
+                <button type="button" className={`result-tab-btn ${activeTab === 'table' ? 'active' : ''}`} onClick={() => setActiveTab('table')}>
+                  <Table size={16} />
+                  <span>Tabla</span>
+                </button>
+              )}
               <button type="button" className={`result-tab-btn ${activeTab === 'graph' ? 'active' : ''}`} onClick={() => setActiveTab('graph')}>
                 <LineChart size={16} />
                 <span>Gráfica</span>
@@ -216,7 +242,8 @@ export const InterpolationCalculator: React.FC = () => {
             </div>
 
             <div className="tab-pane-view">
-              {activeTab === 'steps' && <LagrangeSteps result={result} />}
+              {activeTab === 'steps' && (isNewton(result) ? <NewtonSteps result={result} /> : <LagrangeSteps result={result} />)}
+              {activeTab === 'table' && isNewton(result) && <DividedDifferencesTable result={result} />}
               {activeTab === 'graph' && (
                 <InterpolationGraph
                   points={result.points}
@@ -234,7 +261,7 @@ export const InterpolationCalculator: React.FC = () => {
               </div>
               <h4 className="placeholder-title">Listo para Interpolar</h4>
               <p className="placeholder-text">
-                Haz clic en <strong>"Interpolar"</strong>. Aquí aparecerán el polinomio, cada Lᵢ(x), el valor en x* y la gráfica.
+                Haz clic en <strong>"Interpolar"</strong>. Aquí aparecerán el polinomio, el procedimiento del método (cada Lᵢ(x) o la tabla de diferencias), el valor en x* y la gráfica.
               </p>
             </div>
             <InterpolationGraph points={live.points} coefficients={null} interpolated={null} />

@@ -2,13 +2,20 @@ import React from 'react';
 import { CheckCircle2 } from 'lucide-react';
 import { MethodFactory } from '../../../factories/MethodFactory';
 import { MathView } from '../../../components/MathView/MathView';
+import { DividedDifferencesTable } from '../../../components/NewtonSteps/NewtonSteps';
 import { InterpolationGraph } from '../../../components/InterpolationGraph/InterpolationGraph';
 import { LagrangeInterpolation } from '../../../domain/interpolation/Lagrange';
+import { NewtonDividedDifferences } from '../../../domain/interpolation/NewtonDividedDifferences';
 import { StepsGrid, TopicIntro } from './shared';
 
 const INTERPOLATION_EXAMPLE_POINTS = [{ x: 0, y: 7 }, { x: 1, y: 4 }, { x: 2, y: 11 }, { x: 3, y: 34 }];
 
 const LAGRANGE_EXAMPLE = new LagrangeInterpolation().execute({ points: INTERPOLATION_EXAMPLE_POINTS, xStar: 1.5 });
+
+const NEWTON_EXAMPLE = new NewtonDividedDifferences().execute({ points: INTERPOLATION_EXAMPLE_POINTS, xStar: 1.5 });
+
+const NEWTON_DIFFERENCE =
+  'f[x_i, \\ldots, x_{i+k}] = \\frac{f[x_{i+1}, \\ldots, x_{i+k}] - f[x_i, \\ldots, x_{i+k-1}]}{x_{i+k} - x_i}';
 
 const LAGRANGE_BASIS = 'L_i(x) = \\prod_{j \\neq i} \\frac{x - x_j}{x_i - x_j}';
 
@@ -19,8 +26,15 @@ const LAGRANGE_STEPS = [
   { title: 'Expande y evalúa', text: 'Reduce términos semejantes para obtener el polinomio y sustituye x* para obtener el valor interpolado.' },
 ];
 
+const NEWTON_STEPS = [
+  { title: 'Identifica los puntos', text: 'Escribe cada xᵢ y su f(xᵢ); estos últimos son las diferencias de orden 0.' },
+  { title: 'Llena la tabla triangular', text: 'Cada columna se calcula restando dos valores consecutivos de la anterior y dividiendo entre la diferencia de los nodos extremos.' },
+  { title: 'Toma la primera fila', text: 'f[x₀], f[x₀,x₁], f[x₀,x₁,x₂], … son los coeficientes del polinomio de Newton.' },
+  { title: 'Arma, expande y evalúa', text: 'Multiplica cada coeficiente por (x − x₀)(x − x₁)… , suma, reduce términos y sustituye x*.' },
+];
+
 export const InterpolationTopic: React.FC = () => {
-  const lagrangeMeta = MethodFactory.getInterpolationMethods()[0];
+  const [lagrangeMeta, newtonMeta] = MethodFactory.getInterpolationMethods();
 
   return (
     <>
@@ -89,6 +103,62 @@ export const InterpolationTopic: React.FC = () => {
           <h2 className="section-block-title">Cómo interpolar con Lagrange</h2>
         </div>
         <StepsGrid steps={LAGRANGE_STEPS} />
+      </section>
+      <section className="methods-theory-section">
+        <div>
+          <span className="section-kicker">El mismo polinomio, otra construcción</span>
+          <h2 className="section-block-title">Diferencias Divididas de Newton</h2>
+        </div>
+
+        <div className="theory-methods-grid theory-methods-grid-single">
+          <article className="theory-method-card">
+            <div className="theory-method-header">
+              <div>
+                <span className="method-difficulty">{newtonMeta.difficulty}</span>
+                <h3>{newtonMeta.name}</h3>
+              </div>
+              <span className="method-tag">{newtonMeta.tag}</span>
+            </div>
+            <p className="method-definition">
+              <strong>¿Qué es?</strong> Construye el polinomio interpolador con los coeficientes f[x₀], f[x₀,x₁], … que salen de
+              la primera fila de una tabla triangular de diferencias divididas.
+            </p>
+            <div className="method-formula">
+              <span className="method-formula-label">Diferencia dividida</span>
+              <MathView math={NEWTON_DIFFERENCE} block />
+            </div>
+            <div className="method-formula">
+              <span className="method-formula-label">Polinomio de Newton</span>
+              <MathView math={newtonMeta.latexFormula} block />
+            </div>
+            <figure className="method-theory-graph">
+              <DividedDifferencesTable result={NEWTON_EXAMPLE} />
+              <figcaption className="theory-graph-caption">
+                <p>Con los mismos datos del ejemplo, la primera fila es 7, −3, 5, 1.</p>
+                <p className="theory-graph-root">
+                  Polinomio obtenido por Numerikal: <MathView math={NEWTON_EXAMPLE.substitutedLatex} />, que al expandirse es{' '}
+                  <MathView math={NEWTON_EXAMPLE.expandedLatex} />: el mismo de Lagrange.
+                </p>
+              </figcaption>
+            </figure>
+            <div className="method-guidance-row">
+              <div><strong>¿Cuándo usarlo?</strong><p>Cuando puedes agregar datos después: añadir un punto solo agrega una diagonal a la tabla y un término al polinomio, sin rehacer lo anterior.</p></div>
+              <div><strong>¿Qué revisar?</strong><p>Que los valores de x sean distintos (la división entre xᵢ₊ₖ − xᵢ no puede ser 0). Si las últimas diferencias dan 0, los datos vienen de un polinomio de menor grado.</p></div>
+            </div>
+            <div className="method-convergence">
+              <CheckCircle2 size={16} />
+              <span>{newtonMeta.recommendedConvergence}</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section className="methods-theory-section">
+        <div>
+          <span className="section-kicker">Paso a paso</span>
+          <h2 className="section-block-title">Cómo interpolar con diferencias divididas</h2>
+        </div>
+        <StepsGrid steps={NEWTON_STEPS} />
       </section>
     </>
   );
