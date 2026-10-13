@@ -54,6 +54,16 @@ Construye el mismo polinomio interpolante con la tabla triangular de diferencias
 2. Polinomio de Newton con los símbolos de la tabla, con los valores sustituidos y expandido.
 3. P(x*), con la misma gráfica y las mismas validaciones que Lagrange. Con los mismos datos, ambos métodos dan el mismo polinomio.
 
+### Polinomio de Taylor y Maclaurin
+
+Aproxima f(x) cerca de un punto a con el polinomio de grado n (1 a 10) que iguala a f y a sus primeras n derivadas en a:
+
+1. Derivadas simbólicas f′, f″, …, f⁽ⁿ⁾ y su valor en a, en una tabla.
+2. Coeficientes f⁽ᵏ⁾(a)/k!, polinomio sustituido y, si a ≠ 0, expandido en potencias de x. Con a = 0 se indica que es de Maclaurin.
+3. P(x*), f(x*) y el error |f(x*) − P(x*)|, con la gráfica de f y P juntas.
+
+Avisa si f o alguna derivada no está definida en a.
+
 ### Regresión polinomial por mínimos cuadrados
 
 Ajusta un polinomio de grado 1 a 6 a una tabla de datos (x, y), siguiendo el procedimiento de clase:

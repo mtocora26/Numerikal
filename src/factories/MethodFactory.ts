@@ -9,7 +9,7 @@ import { ModifiedNewtonRaphsonMethod } from '../domain/methods/ModifiedNewtonRap
 export interface MethodMetadata {
   id: string;
   name: string;
-  category: 'roots' | 'systems' | 'interpolation' | 'regression' | 'calculus';
+  category: 'roots' | 'systems' | 'interpolation' | 'regression' | 'series' | 'calculus';
   description: string;
   latexFormula: string;
   icon: string;
@@ -182,6 +182,23 @@ export class MethodFactory {
         tag: 'Interpolación • Tabla triangular',
         difficulty: 'Intermedio',
         recommendedConvergence: 'Requiere valores de x distintos; agregar un punto solo añade un término al polinomio',
+      },
+    ];
+  }
+
+  /** Aproximación de funciones con series (Taylor): trabaja con f(x) y sus derivadas. */
+  public static getSeriesMethods(): MethodMetadata[] {
+    return [
+      {
+        id: 'taylor',
+        name: 'Polinomio de Taylor',
+        category: 'series',
+        description: 'Aproxima f(x) cerca de un punto a con el polinomio que iguala a f y a sus primeras n derivadas en a.',
+        latexFormula: 'P_n(x) = \\sum_{k=0}^{n} \\frac{f^{(k)}(a)}{k!}(x - a)^k',
+        icon: 'sigma',
+        tag: 'Serie • Aproximación local',
+        difficulty: 'Intermedio',
+        recommendedConvergence: 'La aproximación es mejor cerca de a y al subir el grado n',
       },
     ];
   }
