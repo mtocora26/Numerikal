@@ -3,9 +3,11 @@ import { CheckCircle2 } from 'lucide-react';
 import { MethodFactory } from '../../../factories/MethodFactory';
 import { MathView } from '../../../components/MathView/MathView';
 import { DividedDifferencesTable } from '../../../components/NewtonSteps/NewtonSteps';
+import { NevilleTable } from '../../../components/NevilleSteps/NevilleSteps';
 import { InterpolationGraph } from '../../../components/InterpolationGraph/InterpolationGraph';
 import { LagrangeInterpolation } from '../../../domain/interpolation/Lagrange';
 import { NewtonDividedDifferences } from '../../../domain/interpolation/NewtonDividedDifferences';
+import { NevilleInterpolation } from '../../../domain/interpolation/Neville';
 import { StepsGrid, TopicIntro } from './shared';
 
 const INTERPOLATION_EXAMPLE_POINTS = [{ x: 0, y: 7 }, { x: 1, y: 4 }, { x: 2, y: 11 }, { x: 3, y: 34 }];
@@ -13,6 +15,8 @@ const INTERPOLATION_EXAMPLE_POINTS = [{ x: 0, y: 7 }, { x: 1, y: 4 }, { x: 2, y:
 const LAGRANGE_EXAMPLE = new LagrangeInterpolation().execute({ points: INTERPOLATION_EXAMPLE_POINTS, xStar: 1.5 });
 
 const NEWTON_EXAMPLE = new NewtonDividedDifferences().execute({ points: INTERPOLATION_EXAMPLE_POINTS, xStar: 1.5 });
+
+const NEVILLE_EXAMPLE = new NevilleInterpolation().execute({ points: INTERPOLATION_EXAMPLE_POINTS, xStar: 1.5 });
 
 const NEWTON_DIFFERENCE =
   'f[x_i, \\ldots, x_{i+k}] = \\frac{f[x_{i+1}, \\ldots, x_{i+k}] - f[x_i, \\ldots, x_{i+k-1}]}{x_{i+k} - x_i}';
@@ -33,8 +37,15 @@ const NEWTON_STEPS = [
   { title: 'Arma, expande y evalúa', text: 'Multiplica cada coeficiente por (x − x₀)(x − x₁)… , suma, reduce términos y sustituye x*.' },
 ];
 
+const NEVILLE_STEPS = [
+  { title: 'Identifica los puntos', text: 'Escribe cada xᵢ y su f(xᵢ). La primera columna de la tabla es P(i,i) = f(xᵢ).' },
+  { title: 'Calcula la columna siguiente', text: 'Cada P(i,j) combina dos valores de la columna anterior: (x* − xᵢ)·P(i+1,j) − (x* − xⱼ)·P(i,j−1), todo dividido entre xⱼ − xᵢ.' },
+  { title: 'Repite hasta quedar con un valor', text: 'Cada columna tiene un valor menos que la anterior; la última tiene solo P(0,n).' },
+  { title: 'Lee el resultado', text: 'P(0,n) es el valor del polinomio interpolante en x*. No hace falta construir el polinomio.' },
+];
+
 export const InterpolationTopic: React.FC = () => {
-  const [lagrangeMeta, newtonMeta] = MethodFactory.getInterpolationMethods();
+  const [lagrangeMeta, newtonMeta, nevilleMeta] = MethodFactory.getInterpolationMethods();
 
   return (
     <>
@@ -159,6 +170,58 @@ export const InterpolationTopic: React.FC = () => {
           <h2 className="section-block-title">Cómo interpolar con diferencias divididas</h2>
         </div>
         <StepsGrid steps={NEWTON_STEPS} />
+      </section>
+
+      <section className="methods-theory-section">
+        <div>
+          <span className="section-kicker">Evaluar sin construir el polinomio</span>
+          <h2 className="section-block-title">Interpolación de Neville</h2>
+        </div>
+
+        <div className="theory-methods-grid theory-methods-grid-single">
+          <article className="theory-method-card">
+            <div className="theory-method-header">
+              <div>
+                <span className="method-difficulty">{nevilleMeta.difficulty}</span>
+                <h3>{nevilleMeta.name}</h3>
+              </div>
+              <span className="method-tag">{nevilleMeta.tag}</span>
+            </div>
+            <p className="method-definition">
+              <strong>¿Qué es?</strong> Evalúa en x* el polinomio que pasa por los puntos llenando una tabla triangular. P(i,j) es el
+              valor en x* del polinomio que pasa solo por los nodos xᵢ, …, xⱼ; cada columna mejora la anterior usando un nodo más.
+            </p>
+            <div className="method-formula">
+              <span className="method-formula-label">Recurrencia de Neville</span>
+              <MathView math={nevilleMeta.latexFormula} block />
+            </div>
+            <figure className="method-theory-graph">
+              <NevilleTable result={NEVILLE_EXAMPLE} />
+              <figcaption className="theory-graph-caption">
+                <p>Con los mismos datos y x* = 1.5, la última columna da P(0,3) = {NEVILLE_EXAMPLE.valueAtXStar}.</p>
+                <p className="theory-graph-root">
+                  Coincide con Lagrange y Newton: P(1.5) = {LAGRANGE_EXAMPLE.valueAtXStar}.
+                </p>
+              </figcaption>
+            </figure>
+            <div className="method-guidance-row">
+              <div><strong>¿Cuándo usarlo?</strong><p>Cuando solo necesitas el valor en un x* y no el polinomio completo. Para evaluar en otro x* hay que rehacer la tabla.</p></div>
+              <div><strong>¿Qué revisar?</strong><p>Que los valores de x sean distintos (se divide entre xⱼ − xᵢ) y no confundir el orden de los factores: (x* − xᵢ) multiplica a P(i+1,j).</p></div>
+            </div>
+            <div className="method-convergence">
+              <CheckCircle2 size={16} />
+              <span>{nevilleMeta.recommendedConvergence}</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section className="methods-theory-section">
+        <div>
+          <span className="section-kicker">Paso a paso</span>
+          <h2 className="section-block-title">Cómo interpolar con Neville</h2>
+        </div>
+        <StepsGrid steps={NEVILLE_STEPS} />
       </section>
     </>
   );
