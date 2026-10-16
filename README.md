@@ -54,6 +54,14 @@ Construye el mismo polinomio interpolante con la tabla triangular de diferencias
 2. Polinomio de Newton con los símbolos de la tabla, con los valores sustituidos y expandido.
 3. P(x*), con la misma gráfica y las mismas validaciones que Lagrange. Con los mismos datos, ambos métodos dan el mismo polinomio.
 
+### Interpolación de Neville
+
+Evalúa en x* el polinomio interpolante llenando la tabla de Neville, tal como en clase:
+
+1. Primera columna P(i,i) = yᵢ y recurrencia P(i,j) = [(x* − xᵢ)·P(i+1,j) − (x* − xⱼ)·P(i,j−1)] / (xⱼ − xᵢ), con cada valor calculado con los números sustituidos.
+2. Tabla triangular con el valor final P(0,n) resaltado.
+3. P(x*), más el polinomio expandido (aplicando la misma recurrencia a los polinomios) y la gráfica. Mismas validaciones que Lagrange.
+
 ### Polinomio de Taylor y Maclaurin
 
 Aproxima f(x) cerca de un punto a con el polinomio de grado n (1 a 10) que iguala a f y a sus primeras n derivadas en a:

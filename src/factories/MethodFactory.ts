@@ -183,6 +183,17 @@ export class MethodFactory {
         difficulty: 'Intermedio',
         recommendedConvergence: 'Requiere valores de x distintos; agregar un punto solo añade un término al polinomio',
       },
+      {
+        id: 'neville',
+        name: 'Interpolación de Neville',
+        category: 'interpolation',
+        description: 'Evalúa el polinomio interpolante en x* llenando una tabla triangular con una recurrencia; no necesita construir el polinomio.',
+        latexFormula: 'P_{i,j}(x) = \\frac{(x - x_i)\\,P_{i+1,j}(x) - (x - x_j)\\,P_{i,j-1}(x)}{x_j - x_i}',
+        icon: 'spline',
+        tag: 'Interpolación • Tabla de Neville',
+        difficulty: 'Intermedio',
+        recommendedConvergence: 'Requiere valores de x distintos; ideal cuando solo interesa el valor en un x*',
+      },
     ];
   }
 

@@ -11,7 +11,7 @@ interface HelpProps {
 const CHOOSE_ROWS = [
   { have: 'Una ecuación f(x) = 0 y quiero su raíz', family: 'Ecuaciones no lineales', example: 'x³ − 4x − 1 = 0', methodId: 'bisection' },
   { have: 'Un sistema de ecuaciones Ax = b', family: 'Sistemas lineales (Jacobi, Gauss-Seidel)', example: '4x₁ − x₂ = 3, −x₁ + 4x₂ = 3', methodId: 'jacobi' },
-  { have: 'Puntos (x, y) y quiero una curva que pase exactamente por todos', family: 'Interpolación (Lagrange, Newton)', example: '(0, 7), (1, 4), (2, 11), (3, 34)', methodId: 'lagrange' },
+  { have: 'Puntos (x, y) y quiero una curva que pase exactamente por todos', family: 'Interpolación (Lagrange, Newton, Neville)', example: '(0, 7), (1, 4), (2, 11), (3, 34)', methodId: 'lagrange' },
   { have: 'Una función conocida y quiero aproximarla cerca de un punto con un polinomio', family: 'Series (Taylor)', example: 'sen(x) cerca de a = 0', methodId: 'taylor' },
   { have: 'Datos medidos con ruido y quiero la curva que mejor siga la tendencia', family: 'Regresión polinomial', example: 'mediciones de un experimento', methodId: 'polynomial-regression' },
 ];

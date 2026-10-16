@@ -75,3 +75,23 @@ export interface NewtonResult extends InterpolationResultBase {
   /** P(x) con las diferencias y los nodos sustituidos */
   substitutedLatex: string;
 }
+
+/** Un valor P_{i,j} de la tabla de Neville: el polinomio que pasa por xᵢ, …, xⱼ evaluado en x*. */
+export interface NevilleEntry {
+  /** Orden k = j − i: 0 = P_{i,i} = yᵢ */
+  order: number;
+  /** Fila i dentro de su columna */
+  index: number;
+  /** P_{i,j} en LaTeX */
+  labelLatex: string;
+  /** Fórmula con los valores sustituidos y el resultado; vacío en el orden 0 */
+  formulaLatex: string;
+  value: number;
+}
+
+export interface NevilleResult extends InterpolationResultBase {
+  /** columns[k][i] = P_{i,i+k}(x*); la columna 0 son los yᵢ */
+  columns: NevilleEntry[][];
+  /** Recurrencia general de Neville en LaTeX */
+  recurrenceLatex: string;
+}
