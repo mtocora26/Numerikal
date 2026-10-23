@@ -13,6 +13,7 @@ import { MathView } from '../../components/MathView/MathView';
 import { SystemResultCard } from '../../components/SystemResultCard/SystemResultCard';
 import { IterationTable } from '../../components/IterationTable/IterationTable';
 import { LinearSystemSteps } from '../../components/LinearSystemSteps/LinearSystemSteps';
+import { parseInitialValue, parseSystemNumber } from '../../components/MatrixInput/systemInput';
 
 /** Ejemplo por defecto: 4x₁ − x₂ = 3, −x₁ + 4x₂ = 3 → x₁ = x₂ = 1 */
 const EXAMPLE_ROWS: LinearSystemRows = {
@@ -20,8 +21,6 @@ const EXAMPLE_ROWS: LinearSystemRows = {
   b: ['3', '3'],
   x0: ['0', '0'],
 };
-
-const toNumber = (text: string): number => (text.trim() === '' ? NaN : Number(text.trim().replace(',', '.')));
 
 type ResultTab = 'table' | 'steps';
 
@@ -46,9 +45,9 @@ export const SystemsCalculator: React.FC = () => {
 
   const input: LinearSystemInput = useMemo(
     () => ({
-      a: rows.a.map((row) => row.map(toNumber)),
-      b: rows.b.map(toNumber),
-      x0: rows.x0.map(toNumber),
+      a: rows.a.map((row) => row.map(parseSystemNumber)),
+      b: rows.b.map(parseSystemNumber),
+      x0: rows.x0.map(parseInitialValue),
       tolerance,
       maxIterations,
       errorType,
@@ -94,6 +93,8 @@ export const SystemsCalculator: React.FC = () => {
     error ??
     (hasEmptyCell
       ? 'Completa todas las celdas de A, b y x⁽⁰⁾ (escribe 0 donde la incógnita no aparece).'
+      : input.x0.some((v) => !Number.isFinite(v))
+        ? 'Revisa x⁽⁰⁾: ingresa números o fracciones válidas (ej. 3/4), con denominador distinto de cero.'
       : validation.isValid
         ? null
         : validation.errors.join(' '));

@@ -110,3 +110,8 @@
 .matrix-initial-preset:hover {
   border-color: var(--primary-500);
 }
+
+.matrix-initial-preset:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
