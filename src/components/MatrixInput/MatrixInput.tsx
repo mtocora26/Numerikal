@@ -1,6 +1,7 @@
 import React from 'react';
 import '../DataPointsInput/DataPointsInput.css';
 import './MatrixInput.css';
+import { canUseDiagonalQuotients, diagonalQuotients, emptySystemRows } from './systemInput';
 
 /** Valores tal como se escriben en las celdas (texto), para poder borrar y reescribir libremente. */
 export interface LinearSystemRows {
@@ -15,22 +16,6 @@ interface MatrixInputProps {
   minSize: number;
   maxSize: number;
 }
-
-/** Cambia el tamaño conservando lo ya escrito; las celdas nuevas de A y b quedan vacías y x⁽⁰⁾ en cero. */
-const resizeSystemRows = ({ a, b, x0 }: LinearSystemRows, n: number): LinearSystemRows => ({
-  a: Array.from({ length: n }, (_, i) => Array.from({ length: n }, (_, j) => a[i]?.[j] ?? '')),
-  b: Array.from({ length: n }, (_, i) => b[i] ?? ''),
-  x0: Array.from({ length: n }, (_, i) => x0[i] ?? '0'),
-});
-
-const parseCell = (text: string): number => (text.trim() === '' ? NaN : Number(text.trim().replace(',', '.')));
-
-/** Vector inicial sugerido en clase: xᵢ⁽⁰⁾ = bᵢ / aᵢᵢ (queda en 0 si la celda no es válida o aᵢᵢ = 0). */
-const diagonalQuotients = ({ a, b }: LinearSystemRows): string[] =>
-  b.map((text, i) => {
-    const value = parseCell(text) / parseCell(a[i][i]);
-    return Number.isFinite(value) ? String(Number(value.toPrecision(10))) : '0';
-  });
 
 const sub = (i: number) => String(i + 1);
 
@@ -51,7 +36,7 @@ export const MatrixInput: React.FC<MatrixInputProps> = ({ value, onChange, minSi
           id="matrix-size"
           className="param-select-input"
           value={n}
-          onChange={(e) => onChange(resizeSystemRows(value, Number(e.target.value)))}
+          onChange={(e) => onChange(emptySystemRows(Number(e.target.value)))}
         >
           {Array.from({ length: maxSize - minSize + 1 }, (_, k) => minSize + k).map((size) => (
             <option key={size} value={size}>{size}×{size}</option>
@@ -108,7 +93,11 @@ export const MatrixInput: React.FC<MatrixInputProps> = ({ value, onChange, minSi
           <button
             type="button"
             className="matrix-initial-preset"
-            onClick={() => onChange({ ...value, x0: diagonalQuotients(value) })}
+            onClick={() => {
+              const x0 = diagonalQuotients(value);
+              if (x0) onChange({ ...value, x0 });
+            }}
+            disabled={!canUseDiagonalQuotients(value)}
             title="Calcula xᵢ⁽⁰⁾ = bᵢ / aᵢᵢ con los valores actuales de A y b"
           >
             Usar bᵢ/aᵢᵢ
@@ -123,7 +112,7 @@ export const MatrixInput: React.FC<MatrixInputProps> = ({ value, onChange, minSi
                 inputMode="decimal"
                 aria-label={`Valor inicial de x${sub(i)}`}
                 value={value.x0[i]}
-                placeholder="0"
+                placeholder="Ej. 3/4"
                 onChange={(e) => setX0(i, e.target.value)}
               />
             </label>
@@ -131,7 +120,7 @@ export const MatrixInput: React.FC<MatrixInputProps> = ({ value, onChange, minSi
         </div>
       </div>
 
-      <p className="matrix-hint">Las celdas resaltadas son la diagonal (aᵢᵢ): no pueden ser cero, porque de ahí se despeja cada incógnita.</p>
+      <p className="matrix-hint">En x⁽⁰⁾ puedes escribir fracciones (p. ej. 3/4) o decimales. Para usar bᵢ/aᵢᵢ, completa A y b con números válidos y una diagonal distinta de cero.</p>
     </div>
   );
 };
