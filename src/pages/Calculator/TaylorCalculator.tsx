@@ -33,13 +33,13 @@ export const TaylorCalculator: React.FC = () => {
   const resultsRef = useRef<HTMLElement>(null);
 
   const parsed = useExpressionParser(expression);
-  const input = useMemo(
-    () => ({ expression, a: toNumber(aText), degree, xStar: toNumber(xStarText) }),
-    [expression, aText, degree, xStarText]
-  );
-  const validation = useMemo(() => method.validate(input), [method, input]);
 
+  // Sin validación en vivo (mismo criterio que Integración): validar en cada
+  // tecla reparsaba f(x) —con su derivada simbólica— y mostraba errores a
+  // medias mientras se escribía a o x*. Ahora se valida al calcular, porque
+  // `execute` ya valida por dentro y su mensaje llega a `error`.
   const handleCalculate = () => {
+    const input = { expression, a: toNumber(aText), degree, xStar: toNumber(xStarText) };
     try {
       setResult(method.execute(input));
       setError(null);
@@ -70,9 +70,6 @@ export const TaylorCalculator: React.FC = () => {
     setDegree(EXAMPLE.degree);
     setXStarText(EXAMPLE.xStar);
   };
-
-  const errorMessage = error ?? (!validation.isValid ? validation.errors.join(' ') : null);
-  const warnings = validation.isValid ? validation.warnings : [];
 
   return (
     <div className="workspace-grid">
@@ -152,28 +149,18 @@ export const TaylorCalculator: React.FC = () => {
         </div>
 
         <div className="solve-dock">
-          {errorMessage && (
+          {error && (
             <div className="workspace-alert alert-error" role="alert">
               <AlertTriangle size={18} className="alert-icon" />
               <div className="alert-text">
                 <strong>Revisa los datos:</strong>
-                <p>{errorMessage}</p>
-              </div>
-            </div>
-          )}
-
-          {!errorMessage && warnings.length > 0 && (
-            <div className="workspace-alert alert-warning">
-              <AlertTriangle size={18} className="alert-icon" />
-              <div className="alert-text">
-                <strong>Advertencia:</strong>
-                <p>{warnings.join(' ')}</p>
+                <p>{error}</p>
               </div>
             </div>
           )}
 
           <div className="actions-row solve-actions">
-            <button type="button" className="btn-primary calculate-main-btn" onClick={handleCalculate} disabled={!validation.isValid}>
+            <button type="button" className="btn-primary calculate-main-btn" onClick={handleCalculate}>
               <Play size={18} />
               <span>Calcular Polinomio</span>
             </button>

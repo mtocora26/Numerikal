@@ -241,6 +241,31 @@ export function drawSegment(
   ctx.setLineDash([]);
 }
 
+/** Polígono cerrado en coordenadas matemáticas, relleno y con borde opcional (áreas bajo la curva). */
+export function fillPolygon(
+  vp: GraphViewport,
+  points: CurvePoint[],
+  options: { fill?: string; stroke?: string; lineWidth?: number } = {}
+): void {
+  if (points.length < 3) return;
+  const { ctx, toScreenX, toScreenY } = vp;
+  ctx.beginPath();
+  points.forEach((p, i) => {
+    const sx = toScreenX(p.x);
+    const sy = toScreenY(p.y);
+    if (i === 0) ctx.moveTo(sx, sy);
+    else ctx.lineTo(sx, sy);
+  });
+  ctx.closePath();
+  ctx.fillStyle = options.fill ?? GRAPH_COLORS.interval;
+  ctx.fill();
+  if (options.stroke) {
+    ctx.strokeStyle = options.stroke;
+    ctx.lineWidth = options.lineWidth ?? 1;
+    ctx.stroke();
+  }
+}
+
 /** Recta que pasa por dos puntos, prolongada a todo el ancho visible. */
 export function drawLineThrough(
   vp: GraphViewport,

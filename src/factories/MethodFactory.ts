@@ -9,7 +9,7 @@ import { ModifiedNewtonRaphsonMethod } from '../domain/methods/ModifiedNewtonRap
 export interface MethodMetadata {
   id: string;
   name: string;
-  category: 'roots' | 'systems' | 'interpolation' | 'regression' | 'series' | 'calculus';
+  category: 'roots' | 'systems' | 'interpolation' | 'regression' | 'series' | 'integration' | 'calculus';
   description: string;
   latexFormula: string;
   icon: string;
@@ -210,6 +210,56 @@ export class MethodFactory {
         tag: 'Serie • Aproximación local',
         difficulty: 'Intermedio',
         recommendedConvergence: 'La aproximación es mejor cerca de a y al subir el grado n',
+      },
+    ];
+  }
+
+  /** Integración numérica (fórmulas de Newton-Cotes compuestas): trabaja con f(x) y los límites a, b. */
+  public static getIntegrationMethods(): MethodMetadata[] {
+    return [
+      {
+        id: 'trapezoid',
+        name: 'Regla del Trapecio',
+        category: 'integration',
+        description: 'Une los puntos de la curva con segmentos rectos: cada subintervalo se convierte en un trapecio y el área total es la suma de todos.',
+        latexFormula: 'I \\approx \\frac{h}{2}\\left[f(x_0) + 2\\sum_{i=1}^{n-1} f(x_i) + f(x_n)\\right]',
+        icon: 'area-chart',
+        tag: 'Integración • Newton-Cotes',
+        difficulty: 'Básico',
+        recommendedConvergence: 'Error de orden h²: al duplicar n el error baja unas 4 veces; es exacta para rectas',
+      },
+      {
+        id: 'simpson-1-3',
+        name: 'Regla de Simpson 1/3',
+        category: 'integration',
+        description: 'Reemplaza f por una parábola en cada par de subintervalos, por lo que sigue mejor las curvas que el trapecio con los mismos nodos.',
+        latexFormula: 'I \\approx \\frac{h}{3}\\left[f(x_0) + 4\\sum_{i=1,3,5}^{n-1} f(x_i) + 2\\sum_{i=2,4,6}^{n-2} f(x_i) + f(x_n)\\right]',
+        icon: 'area-chart',
+        tag: 'Integración • Newton-Cotes',
+        difficulty: 'Intermedio',
+        recommendedConvergence: 'Error de orden h⁴: al duplicar n el error baja unas 16 veces; exacta hasta polinomios de grado 3; n debe ser par',
+      },
+      {
+        id: 'simpson-3-8',
+        name: 'Regla de Simpson 3/8',
+        category: 'integration',
+        description: 'Reemplaza f por una cúbica en cada grupo de tres subintervalos; sirve cuando n es múltiplo de 3, por ejemplo con n impar combinada con Simpson 1/3.',
+        latexFormula: 'I \\approx \\frac{3h}{8}\\left[f(x_0) + 3\\sum_{i \\not\\equiv 0\\ (\\mathrm{mod}\\ 3)} f(x_i) + 2\\sum_{i=3,6,9}^{n-3} f(x_i) + f(x_n)\\right]',
+        icon: 'area-chart',
+        tag: 'Integración • Newton-Cotes',
+        difficulty: 'Intermedio',
+        recommendedConvergence: 'Error de orden h⁴ (igual que Simpson 1/3); exacta hasta polinomios de grado 3; n debe ser múltiplo de 3',
+      },
+      {
+        id: 'romberg',
+        name: 'Integración de Romberg',
+        category: 'integration',
+        description: 'Refina el trapecio duplicando los subintervalos en cada fila y combina pares de aproximaciones con extrapolación de Richardson, llenando una tabla triangular cuya diagonal converge mucho más rápido que ninguna regla directa.',
+        latexFormula: 'R_{i,j} = \\frac{4^{j}\\,R_{i,j-1} - R_{i-1,j-1}}{4^{j} - 1}',
+        icon: 'area-chart',
+        tag: 'Integración • Extrapolación de Richardson',
+        difficulty: 'Avanzado',
+        recommendedConvergence: 'La celda R(i,j) es exacta hasta polinomios de grado 2j+1: la diagonal gana dos órdenes de h por fila; la primera columna es el trapecio con 2^i subintervalos',
       },
     ];
   }

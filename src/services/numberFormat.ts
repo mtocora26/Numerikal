@@ -14,3 +14,8 @@ export function formatNumberLatex(value: number, significant = 6): string {
   const match = /^(-?[\d.]+)e([+-]?\d+)$/.exec(text);
   return match ? `${match[1]} \\times 10^{${Number(match[2])}}` : text;
 }
+
+/** Número para usar dentro de una suma: los negativos van entre paréntesis para no escribir "+ -0.5". */
+export function termLatex(value: number, significant = 6): string {
+  return value < 0 ? `(${formatNumberLatex(value, significant)})` : formatNumberLatex(value, significant);
+}
