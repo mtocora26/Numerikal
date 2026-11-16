@@ -72,6 +72,26 @@ Aproxima f(x) cerca de un punto a con el polinomio de grado n (1 a 10) que igual
 
 Avisa si f o alguna derivada no está definida en a.
 
+### Integración numérica: trapecio, Simpson y Romberg
+
+Aproxima la integral definida de f(x) entre a y b dividiendo [a, b] en n subintervalos (1 a 100) de ancho h = (b − a)/n. Los límites aceptan constantes como `pi`, `2pi` o `pi/2`. Cuatro métodos, con la misma interfaz:
+
+| Método | Fórmula | Notas |
+|---|---|---|
+| Regla del Trapecio | h/2 · [f(x₀) + 2Σ f(xᵢ) + f(xₙ)] | Cualquier n ≥ 1; con n = 1 es la regla simple. Error de orden h². |
+| Regla de Simpson 1/3 | h/3 · [f(x₀) + 4Σ impares + 2Σ pares + f(xₙ)] | n par; con n = 2 es la regla simple. Error de orden h⁴. |
+| Regla de Simpson 3/8 | 3h/8 · [f(x₀) + 3Σ (i no múltiplo de 3) + 2Σ (i múltiplo de 3) + f(xₙ)] | n múltiplo de 3; con n = 3 es la regla simple. Error de orden h⁴. |
+| Integración de Romberg | R(i,j) = (4ʲ·R(i,j−1) − R(i−1,j−1)) / (4ʲ − 1) | Tabla triangular de k filas (1 a 10); la primera columna es el trapecio con 2ⁱ subintervalos. |
+
+1. Ancho h, nodos xᵢ = a + i·h y valores f(xᵢ), con los coeficientes de cada nodo (1, 2, …, 2, 1; 1, 4, 2, 4, …, 4, 1 o 1, 3, 3, 2, 3, 3, …, 3, 3, 1) en una tabla.
+2. Sumas parciales (extremos, interiores o impares y pares), fórmula con los números sustituidos y el resultado.
+3. Comparación con el valor exacto de la integral, calculado con su primitiva (F(b) − F(a)), no con otra aproximación: F(x), el error verdadero con signo, el error absoluto y el relativo. Reconoce polinomios, potencias de (ax + b), 1/(ax + b), √(ax + b), eᵃˣ⁺ᵇ, bᵃˣ⁺ᵇ, sen, cos, tan, senh, cosh y ln de (ax + b), y polinomio × exp, sen o cos (por partes). Si la integral no tiene primitiva (como e^(−x²)) o ninguna regla la encuentra, lo indica y no muestra error.
+4. Gráfica de f con el área sombreada: trapecios, parábolas o cúbicas, según el método.
+
+**Integración de Romberg** no dibuja figuras nuevas: refina el trapecio y corrige su error con la extrapolación de Richardson. Llena una tabla triangular donde R(i, 0) es el trapecio compuesto con 2ⁱ subintervalos (f se evalúa una sola vez, en los 2^(k−1) + 1 nodos de la partición más fina) y R(i, j) = (4ʲ·R(i,j−1) − R(i−1,j−1))/(4ʲ − 1) elimina el término principal del error en cada columna. Muestra la tabla completa con la celda R(k−1, k−1) resaltada, cada extrapolación con los números sustituidos, y la comparación con el valor exacto cuando hay primitiva. La celda R(i, j) es exacta para polinomios de grado 2j + 1: la diagonal gana dos órdenes de h con cada fila.
+
+Rechaza a ≥ b, un n fuera de rango (impar en Simpson 1/3, o no múltiplo de 3 en Simpson 3/8), un número de filas k fuera de 1 a 10 en Romberg y funciones no definidas en algún nodo.
+
 ### Regresión polinomial por mínimos cuadrados
 
 Ajusta un polinomio de grado 1 a 6 a una tabla de datos (x, y), siguiendo el procedimiento de clase:
@@ -123,7 +143,7 @@ La lógica matemática (`src/services` y `src/domain`) se comprueba con [Vitest]
 npm test
 ```
 
-Cubren las operaciones básicas del analizador de expresiones (incluidos decimales, negativos, expresiones inválidas y división entre cero), el cálculo del error, la validación del motor, que cada método de raíces converja con los valores por defecto de la calculadora, la regresión polinomial y el método de Jacobi (convergencia, validaciones y que la solución verifique Ax ≈ b).
+Cubren las operaciones básicas del analizador de expresiones (incluidos decimales, negativos, expresiones inválidas y división entre cero), el cálculo del error, la validación del motor, que cada método de raíces converja con los valores por defecto de la calculadora, la regresión polinomial, el método de Jacobi (convergencia, validaciones y que la solución verifique Ax ≈ b) y la integración numérica (valores calculados a mano, exactitud con rectas y cúbicas, orden del error al duplicar n, la primitiva simbólica contra más de 30 integrales de valor conocido, que se rechace una con un polo dentro del intervalo, y la tabla de Romberg: primera columna idéntica al trapecio, segunda columna idéntica a Simpson 1/3, exactitud en polinomios y la diagonal con error decreciente).
 
 ## Organización del código
 

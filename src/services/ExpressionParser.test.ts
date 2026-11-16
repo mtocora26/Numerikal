@@ -64,6 +64,26 @@ describe('ExpressionParser: errores', () => {
   });
 });
 
+describe('ExpressionParser: evaluateConstant', () => {
+  it('evalúa números y constantes sin derivar', () => {
+    expect(ExpressionParser.evaluateConstant('2.5')).toBe(2.5);
+    expect(ExpressionParser.evaluateConstant('-3')).toBe(-3);
+    expect(ExpressionParser.evaluateConstant('pi')).toBeCloseTo(Math.PI, 12);
+    expect(ExpressionParser.evaluateConstant('pi/2')).toBeCloseTo(Math.PI / 2, 12);
+    expect(ExpressionParser.evaluateConstant('2pi')).toBeCloseTo(2 * Math.PI, 12);
+    expect(ExpressionParser.evaluateConstant('sqrt(2)')).toBeCloseTo(Math.SQRT2, 12);
+    expect(ExpressionParser.evaluateConstant('π')).toBeCloseTo(Math.PI, 12);
+  });
+
+  it('devuelve NaN si no es una constante evaluable', () => {
+    expect(ExpressionParser.evaluateConstant('')).toBeNaN();
+    expect(ExpressionParser.evaluateConstant('x')).toBeNaN();
+    expect(ExpressionParser.evaluateConstant('x + 1')).toBeNaN();
+    expect(ExpressionParser.evaluateConstant('2 +')).toBeNaN();
+    expect(ExpressionParser.evaluateConstant('1 / 0')).toBeNaN();
+  });
+});
+
 describe('ExpressionParser: derivadas', () => {
   it('deriva simbólicamente', () => {
     const parsed = ExpressionParser.parse('x^3 - 4*x - 1');

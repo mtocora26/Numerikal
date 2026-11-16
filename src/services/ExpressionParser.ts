@@ -65,6 +65,24 @@ export class ExpressionParser {
   }
 
   /**
+   * Evalúa una constante sin variable (límites como `pi`, `pi/2` o `sqrt(2)`).
+   * Versión ligera de `parse`: no genera LaTeX ni deriva, porque una constante
+   * no necesita ninguna de las dos cosas. Devuelve NaN si no es evaluable.
+   */
+  public static evaluateConstant(expressionStr: string): number {
+    const cleanStr = this.sanitize(expressionStr);
+    if (!cleanStr) return NaN;
+
+    try {
+      const compiled = parse(cleanStr).compile();
+      const value = compiled.evaluate({ e: Math.E, pi: Math.PI });
+      return typeof value === 'number' && Number.isFinite(value) ? value : NaN;
+    } catch {
+      return NaN;
+    }
+  }
+
+  /**
    * Parses an expression string and creates an evaluable object
    */
   public static parse(expressionStr: string): ParsedExpression {
@@ -112,41 +130,56 @@ export class ExpressionParser {
         }
       };
 
-      // Attempt symbolic derivative computation
-      let derivFn: ((x: number) => number) | undefined;
-      let derivLatex: string | undefined;
-      let secondDerivLatex: string | undefined;
-
-      try {
-        const derivNode = derivative(this.normalizeForDifferentiation(cleanStr), 'x');
-        const compiledDeriv = derivNode.compile();
-        derivLatex = derivNode.toTex({ parenthesis: 'keep', implicit: 'hide' });
+      // Derivada simbólica perezosa: solo los métodos de raíces la usan
+      // (Newton, Punto Fijo…). Calculatla en cada `parse` —como se hacía antes—
+      // costaba la mayor parte del parse (dos derivadas con mathjs por tecla en
+      // la vista previa y en los `validate` de Taylor/Integración, que solo
+      // necesitan `isValid`, `latex` y `evaluate`). Se calcula al primer acceso
+      // y se cachea, así quienes no la piden no pagan por ella.
+      let derivativeCache:
+        | { fn?: (x: number) => number; firstLatex?: string; secondLatex?: string }
+        | null = null;
+      const loadDerivative = (): { fn?: (x: number) => number; firstLatex?: string; secondLatex?: string } => {
+        if (derivativeCache) return derivativeCache;
+        derivativeCache = {};
         try {
-          const secondDerivNode = derivative(derivNode, 'x');
-          secondDerivLatex = secondDerivNode.toTex({ parenthesis: 'keep', implicit: 'hide' });
-        } catch {
-          secondDerivLatex = undefined;
-        }
-        derivFn = (x: number): number => {
+          const derivNode = derivative(this.normalizeForDifferentiation(cleanStr), 'x');
+          const compiledDeriv = derivNode.compile();
+          derivativeCache.firstLatex = derivNode.toTex({ parenthesis: 'keep', implicit: 'hide' });
           try {
-            const val = compiledDeriv.evaluate({ x, e: Math.E, pi: Math.PI });
-            return typeof val === 'number' && Number.isFinite(val) ? val : NaN;
+            const secondDerivNode = derivative(derivNode, 'x');
+            derivativeCache.secondLatex = secondDerivNode.toTex({ parenthesis: 'keep', implicit: 'hide' });
           } catch {
-            return NaN;
+            derivativeCache.secondLatex = undefined;
           }
-        };
-      } catch {
-        // Derivative fallback
-      }
+          derivativeCache.fn = (x: number): number => {
+            try {
+              const val = compiledDeriv.evaluate({ x, e: Math.E, pi: Math.PI });
+              return typeof val === 'number' && Number.isFinite(val) ? val : NaN;
+            } catch {
+              return NaN;
+            }
+          };
+        } catch {
+          // Derivative fallback: queda sin derivada, como antes
+        }
+        return derivativeCache;
+      };
 
       return {
         isValid: true,
         rawExpression: cleanStr,
         latex,
         evaluate,
-        derivative: derivFn,
-        derivativeLatex: derivLatex,
-        secondDerivativeLatex: secondDerivLatex,
+        get derivative() {
+          return loadDerivative().fn;
+        },
+        get derivativeLatex() {
+          return loadDerivative().firstLatex;
+        },
+        get secondDerivativeLatex() {
+          return loadDerivative().secondLatex;
+        },
       };
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Sintaxis de expresión matemática no válida';

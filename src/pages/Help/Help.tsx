@@ -13,11 +13,12 @@ const CHOOSE_ROWS = [
   { have: 'Un sistema de ecuaciones Ax = b', family: 'Sistemas lineales (Jacobi, Gauss-Seidel)', example: '4x₁ − x₂ = 3, −x₁ + 4x₂ = 3', methodId: 'jacobi' },
   { have: 'Puntos (x, y) y quiero una curva que pase exactamente por todos', family: 'Interpolación (Lagrange, Newton, Neville)', example: '(0, 7), (1, 4), (2, 11), (3, 34)', methodId: 'lagrange' },
   { have: 'Una función conocida y quiero aproximarla cerca de un punto con un polinomio', family: 'Series (Taylor)', example: 'sen(x) cerca de a = 0', methodId: 'taylor' },
+  { have: 'Una función y quiero el área bajo su curva entre dos límites', family: 'Integración numérica (Trapecio, Simpson 1/3, 3/8 y Romberg)', example: '∫ sen(x) dx de 0 a π', methodId: 'trapezoid' },
   { have: 'Datos medidos con ruido y quiero la curva que mejor siga la tendencia', family: 'Regresión polinomial', example: 'mediciones de un experimento', methodId: 'polynomial-regression' },
 ];
 
 const USE_STEPS = [
-  { title: 'Elige la familia', text: 'En Métodos, las pestañas de arriba separan los tipos de problema: ecuaciones, sistemas, interpolación, series y regresión.' },
+  { title: 'Elige la familia', text: 'En Métodos, las pestañas de arriba separan los tipos de problema: ecuaciones, sistemas, interpolación, series, integración y regresión.' },
   { title: 'Selecciona el método', text: 'El desplegable del paso 1 muestra la fórmula, la dificultad y cuándo converge o qué requiere cada método.' },
   { title: 'Escribe tu ejercicio', text: 'Función, matriz o tabla de datos, según la familia. La vista previa en LaTeX te confirma cómo se entendió.' },
   { title: 'Calcula y revisa', text: 'Si algo falta o es inválido, un aviso rojo te dice qué corregir y el botón de calcular se desactiva. Un aviso amarillo no impide calcular, solo advierte.' },
@@ -36,6 +37,7 @@ const EXPRESSIONS = [
 const DATA_TIPS = [
   'Puntos (x, y): una fila por dato. Puedes escribirlos o usar "Pegar datos" con filas copiadas de Excel, CSV o texto (separados por tabulador, coma, punto y coma o espacio).',
   'En interpolación y series, el valor x* y el punto a se escriben con punto o coma decimal (2.5 o 2,5).',
+  'Integración: escribe f(x), los límites a < b (también valen pi, 2pi, pi/2…) y el número de subintervalos n, un entero de 1 a 100. Simpson 1/3 necesita n par y Simpson 3/8, n múltiplo de 3. En Romberg el último campo son las filas k de la tabla (1 a 10): la fila i usa 2ⁱ subintervalos y la esquina de la tabla es la mejor aproximación. El valor exacto y el error aparecen cuando Numerikal encuentra la primitiva (polinomios, sen, cos, exp, ln, 1/(ax + b), raíces…); si no, solo verás la aproximación.',
   'Sistemas: elige el tamaño (2×2 a 6×6), llena A, b y el vector inicial x⁽⁰⁾. Un vector inicial de ceros funciona para empezar.',
   'Punto Fijo pide la ecuación despejada x = g(x), no f(x) = 0.',
 ];
@@ -43,7 +45,7 @@ const DATA_TIPS = [
 const READ_STEPS = [
   { title: 'Tarjeta de resultado', text: 'Arriba aparece el valor principal (raíz, solución, polinomio o P(x*)), cuántas iteraciones tomó y el motivo de finalización.' },
   { title: 'Tabla', text: 'Cada fila es una iteración con su error. El cálculo termina cuando el error baja de la tolerancia o se llega al máximo de iteraciones.' },
-  { title: 'Procedimiento', text: 'En sistemas, interpolación, series y regresión, la pestaña de pasos repite el procedimiento de clase con los valores sustituidos para que lo compares con tu cuaderno.' },
+  { title: 'Procedimiento', text: 'En sistemas, interpolación, series, integración y regresión, la pestaña de pasos repite el procedimiento de clase con los valores sustituidos para que lo compares con tu cuaderno.' },
   { title: 'Gráfica', text: 'Muestra la función o los datos con el resultado marcado. Sirve para comprobar que la respuesta tiene sentido a simple vista.' },
 ];
 
@@ -51,6 +53,7 @@ const GRAPH_ROWS = [
   { family: 'Ecuaciones', text: 'Curva de f(x), la raíz encontrada y la construcción del método (intervalo, rectas secantes o tangentes).' },
   { family: 'Interpolación', text: 'Puntos de los datos, el polinomio que pasa por todos y el punto interpolado (x*, P(x*)) en amarillo.' },
   { family: 'Series', text: 'f(x) en gris y el polinomio P(x) en verde. Se separan al alejarse de a: ahí se ve cuánto error hay.' },
+  { family: 'Integración', text: 'La curva de f(x) y el área aproximada sombreada: trapecios en la regla del trapecio, parábolas en Simpson 1/3 y cúbicas en Simpson 3/8. En Romberg se dibuja la partición más fina de la tabla (trapecios). Los puntos verdes son los nodos.' },
   { family: 'Regresión', text: 'Los datos, la curva ajustada y segmentos punteados que son los residuos.' },
 ];
 
@@ -63,6 +66,12 @@ const COMMON_ERRORS = [
   { problem: 'Valores de x repetidos (Interpolación)', cause: 'Un polinomio no puede pasar por dos puntos con la misma x y distinta y.', fix: 'Quita o corrige la fila repetida.' },
   { problem: 'Menos puntos de los necesarios', cause: 'La interpolación necesita al menos 2 puntos y un polinomio de grado m necesita m + 1 valores de x distintos.', fix: 'Agrega datos o baja el grado.' },
   { problem: 'Derivada demasiado larga (Taylor)', cause: 'En funciones racionales como 1/(1+x²), la derivada crece muy rápido con el orden.', fix: 'Baja el grado o usa una función más simple.' },
+  { problem: 'Simpson 1/3 con n impar', cause: 'Cada parábola cubre dos subintervalos, así que n debe ser par.', fix: 'Usa n = 2, 4, 6… (con n = 2 es la regla simple).' },
+  { problem: 'Simpson 3/8 con n que no es múltiplo de 3', cause: 'Cada cúbica cubre tres subintervalos, así que n debe ser 3, 6, 9…', fix: 'Usa un n múltiplo de 3 (con n = 3 es la regla simple).' },
+  { problem: 'Romberg con un k fuera de rango', cause: 'En Romberg el último campo son las filas de la tabla, no subintervalos: cada fila duplica la partición y con k filas la más fina tiene 2^(k−1) subintervalos.', fix: 'Usa un entero de 1 a 10; con k = 4 o 5 ya se alcanzan muchas cifras correctas en funciones suaves.' },
+  { problem: 'Límites invertidos o iguales (Integración)', cause: 'Los métodos exigen a < b.', fix: 'Escribe el menor como límite inferior; si necesitas ∫ de b a a, calcula de a a b y cambia el signo.' },
+  { problem: 'La función no está definida en un nodo (Integración)', cause: 'Alguno de los puntos xᵢ = a + i·h cae donde f no existe, por ejemplo ln(x) en 0 o 1/x en 0.', fix: 'Cambia los límites o el número de subintervalos para que ningún nodo caiga ahí.' },
+  { problem: 'Sin valor exacto ni error (Integración)', cause: 'Numerikal no encontró una primitiva de f: puede que no exista en forma elemental (como e^(−x²) o sen(x)/x), que ninguna de sus reglas la cubra, o que haya un polo dentro del intervalo (como 1/x entre −1 y 2).', fix: 'La aproximación sigue siendo válida. Para el error, calcula la integral a mano o con otra herramienta y compara; Numerikal no sustituye el valor exacto por otra aproximación.' },
   { problem: 'Muchos puntos u oscilaciones (Interpolación)', cause: 'Con 8 o más puntos el polinomio puede oscilar entre los nodos (fenómeno de Runge).', fix: 'Usa menos puntos o ajusta una regresión de grado bajo.' },
   { problem: 'Extrapolación', cause: 'x* está fuera del rango de los datos y el resultado es poco confiable.', fix: 'Usa un x* dentro del rango, o interprétalo con cuidado.' },
 ];
@@ -82,7 +91,7 @@ export const Help: React.FC<HelpProps> = ({ onOpenMethod, onOpenLearn }) => (
 
     <TopicIntro title="¿Qué es Numerikal?">
       Un entorno educativo para resolver problemas de métodos numéricos <strong>paso a paso</strong>: ecuaciones no lineales,
-      sistemas lineales, interpolación, series de Taylor y regresión. No solo da la respuesta: muestra el procedimiento, las
+      sistemas lineales, interpolación, series de Taylor, integración numérica y regresión. No solo da la respuesta: muestra el procedimiento, las
       tablas y la gráfica para que puedas comparar con lo que haces en clase.
     </TopicIntro>
 

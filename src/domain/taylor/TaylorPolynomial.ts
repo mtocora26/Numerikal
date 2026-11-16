@@ -17,11 +17,19 @@ export const MAX_TAYLOR_DEGREE = 10;
 const NOISE = 1e-12;
 
 /**
- * Tiempo máximo para derivar. En funciones racionales como 1/(1+x²) la derivada simbólica crece
- * ~6 veces por orden (varios segundos hacia el orden 6) y congelaría la pantalla.
+ * Tamaño máximo del árbol de la derivada (nodos de mathjs) antes de cortar.
+ * En funciones racionales como 1/(1+x²) la derivada crece de forma explosiva
+ * (~2,3× por orden: 8 → 12 → 21 → 41 → 107 → 248 nodos, con el tiempo de
+ * cálculo creciendo igual) y seguir derivando congelaría la pantalla.
+ * La guarda anterior medía tiempo real (1000 ms), así que el mismo grado
+ * pasaba o fallaba según la carga de la CPU del momento —en la suite de tests
+ * y en equipos lentos eso se volvía intermitente—. El tamaño del árbol es
+ * determinista: el mismo f y el mismo grado dan siempre el mismo resultado,
+ * y corta *antes* de computar la derivada que ya no cabe. Las funciones
+ * simples se quedan muy por debajo (exp(x): 3 nodos en todos los órdenes).
  */
-const DERIVATION_BUDGET_MS = 1000;
-const GROWTH_PER_ORDER = 6;
+const MAX_DERIVATIVE_NODES = 150;
+const nodeCount = (node: MathNode): number => node.filter(() => true).length;
 
 const SCOPE = { e: Math.E, pi: Math.PI };
 
@@ -127,14 +135,12 @@ export class TaylorPolynomial {
   private buildTerms(expression: string, a: number, degree: number): TaylorTerm[] {
     const terms: TaylorTerm[] = [];
     let node: MathNode = parse(ExpressionParser.normalizeForDifferentiation(expression));
-    const startedAt = performance.now();
-    let lastStepMs = 0;
 
     for (let k = 0; k <= degree; k++) {
       if (k > 0) {
-        const stepStart = performance.now();
-        // Si el siguiente orden ya no cabe en el presupuesto, se corta antes de bloquear la pantalla
-        if (stepStart - startedAt + lastStepMs * GROWTH_PER_ORDER > DERIVATION_BUDGET_MS) {
+        // Si la derivada actual ya es demasiado grande, la siguiente solo puede
+        // crecer: se corta antes de pagar el cálculo que bloquearía la pantalla
+        if (nodeCount(node) > MAX_DERIVATIVE_NODES) {
           throw new Error(
             `La derivada de orden ${k} es demasiado larga para calcularla simbólicamente (pasa con funciones racionales). ` +
               `Prueba con un grado menor que ${k} o con una función más simple.`
@@ -145,7 +151,6 @@ export class TaylorPolynomial {
         } catch {
           throw new Error(`No fue posible calcular la derivada de orden ${k} de la función.`);
         }
-        lastStepMs = performance.now() - stepStart;
       }
 
       let value: number;

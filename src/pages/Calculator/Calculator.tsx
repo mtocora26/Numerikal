@@ -15,6 +15,7 @@ import { RegressionCalculator } from './RegressionCalculator';
 import { SystemsCalculator } from './SystemsCalculator';
 import { InterpolationCalculator } from './InterpolationCalculator';
 import { TaylorCalculator } from './TaylorCalculator';
+import { IntegrationCalculator } from './IntegrationCalculator';
 import { ExpressionParser } from '../../services/ExpressionParser';
 import confetti from 'canvas-confetti';
 import { Play, RotateCcw, AlertTriangle, LineChart, Table, BookOpen, Zap, Sigma, Grid3x3, Spline, Waves } from 'lucide-react';
@@ -24,12 +25,13 @@ interface CalculatorProps {
   initialMethodId?: string;
 }
 
-type MethodFamily = 'roots' | 'systems' | 'interpolation' | 'series' | 'regression';
+type MethodFamily = 'roots' | 'systems' | 'interpolation' | 'series' | 'integration' | 'regression';
 
 const familyOf = (methodId: string): MethodFamily => {
   if (MethodFactory.getSystemMethods().some((method) => method.id === methodId)) return 'systems';
   if (MethodFactory.getInterpolationMethods().some((method) => method.id === methodId)) return 'interpolation';
   if (MethodFactory.getSeriesMethods().some((method) => method.id === methodId)) return 'series';
+  if (MethodFactory.getIntegrationMethods().some((method) => method.id === methodId)) return 'integration';
   if (MethodFactory.getRegressionMethods().some((method) => method.id === methodId)) return 'regression';
   return 'roots';
 };
@@ -50,6 +52,10 @@ const FAMILY_HEADERS: Record<MethodFamily, { title: string; subtitle: string }> 
   series: {
     title: 'Series y Polinomio de Taylor',
     subtitle: 'Escribe f(x), el punto a y el grado n; obtén el polinomio que aproxima a f cerca de a, con sus derivadas, el error y la gráfica.',
+  },
+  integration: {
+    title: 'Integración Numérica',
+    subtitle: 'Escribe f(x), los límites a y b y el número de subintervalos n; aproxima la integral con el trapecio o Simpson (1/3 y 3/8), con su error y el área bajo la curva.',
   },
   regression: {
     title: 'Regresión y Ajuste de Curvas',
@@ -257,6 +263,16 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
         <button
           type="button"
           role="tab"
+          aria-selected={family === 'integration'}
+          className={`session-tab ${family === 'integration' ? 'active' : ''}`}
+          onClick={() => setFamily('integration')}
+        >
+          <span className="session-tab-symbol">∫dx</span>
+          <span>Integración</span>
+        </button>
+        <button
+          type="button"
+          role="tab"
           aria-selected={family === 'regression'}
           className={`session-tab ${family === 'regression' ? 'active' : ''}`}
           onClick={() => setFamily('regression')}
@@ -268,6 +284,8 @@ export const Calculator: React.FC<CalculatorProps> = ({ initialMethodId = 'bisec
 
       {family === 'regression' ? (
         <RegressionCalculator />
+      ) : family === 'integration' ? (
+        <IntegrationCalculator />
       ) : family === 'series' ? (
         <TaylorCalculator />
       ) : family === 'interpolation' ? (

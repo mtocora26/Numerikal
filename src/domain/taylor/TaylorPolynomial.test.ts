@@ -93,9 +93,9 @@ describe('TaylorPolynomial: derivadas muy largas', () => {
   });
 
   it('corta con un mensaje claro en vez de bloquear cuando la derivada crece demasiado', () => {
-    const started = performance.now();
+    // La guarda es determinista (tamaño del árbol de la derivada), no mide tiempo de reloj:
+    // el mismo f y el mismo grado dan siempre el mismo resultado
     expect(() => run('1/(1+x^2)', 0, 10, 0.2)).toThrow(/demasiado larga/);
-    expect(performance.now() - started).toBeLessThan(3000);
   });
 });
 

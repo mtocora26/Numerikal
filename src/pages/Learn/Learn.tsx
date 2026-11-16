@@ -4,10 +4,11 @@ import { RootsTopic } from './topics/RootsTopic';
 import { SystemsTopic } from './topics/SystemsTopic';
 import { InterpolationTopic } from './topics/InterpolationTopic';
 import { SeriesTopic } from './topics/SeriesTopic';
+import { IntegrationTopic } from './topics/IntegrationTopic';
 import { RegressionTopic } from './topics/RegressionTopic';
 import './Learn.css';
 
-type Topic = 'roots' | 'systems' | 'interpolation' | 'series' | 'regression';
+type Topic = 'roots' | 'systems' | 'interpolation' | 'series' | 'integration' | 'regression';
 
 export const Learn: React.FC = () => {
   const [topic, setTopic] = useState<Topic>('roots');
@@ -19,7 +20,7 @@ export const Learn: React.FC = () => {
           <BookOpen size={14} />
           <span>Guía de estudio</span>
         </div>
-        <h1 className="learn-title">Ecuaciones No Lineales, Sistemas, Interpolación, Series y Regresión</h1>
+        <h1 className="learn-title">Ecuaciones No Lineales, Sistemas, Interpolación, Series, Integración y Regresión</h1>
         <p className="learn-subtitle">
           Aprende qué hace cada método, qué fórmula utiliza y qué debes revisar antes de ejecutar una solución.
         </p>
@@ -69,6 +70,16 @@ export const Learn: React.FC = () => {
         <button
           type="button"
           role="tab"
+          aria-selected={topic === 'integration'}
+          className={`learn-tab ${topic === 'integration' ? 'active' : ''}`}
+          onClick={() => setTopic('integration')}
+        >
+          <span className="learn-tab-symbol">∫dx</span>
+          <span>Integración</span>
+        </button>
+        <button
+          type="button"
+          role="tab"
           aria-selected={topic === 'regression'}
           className={`learn-tab ${topic === 'regression' ? 'active' : ''}`}
           onClick={() => setTopic('regression')}
@@ -82,6 +93,7 @@ export const Learn: React.FC = () => {
       {topic === 'systems' && <SystemsTopic />}
       {topic === 'interpolation' && <InterpolationTopic />}
       {topic === 'series' && <SeriesTopic />}
+      {topic === 'integration' && <IntegrationTopic />}
       {topic === 'regression' && <RegressionTopic />}
     </div>
   );
