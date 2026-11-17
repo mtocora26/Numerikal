@@ -12,7 +12,7 @@ import type { IntegrationResult } from '../../domain/integration/types';
 import { isRombergResult } from '../../domain/integration/types';
 import { IntegrationGraph } from '../../components/IntegrationGraph/IntegrationGraph';
 import { IntegrationResultCard } from '../../components/IntegrationResultCard/IntegrationResultCard';
-import { IntegrationSteps, NodesTable, RombergTable } from '../../components/IntegrationSteps/IntegrationSteps';
+import { IntegrationSteps, NodesTable, RombergNodesTable, RombergTable } from '../../components/IntegrationSteps/IntegrationSteps';
 import { MathInput } from '../../components/MathInput/MathInput';
 import { MathView } from '../../components/MathView/MathView';
 import { ExpressionParser } from '../../services/ExpressionParser';
@@ -245,7 +245,16 @@ export const IntegrationCalculator: React.FC = () => {
 
             <div className="tab-pane-view">
               {activeTab === 'steps' && <IntegrationSteps result={result} />}
-              {activeTab === 'table' && (isRombergResult(result) ? <RombergTable result={result} /> : <NodesTable result={result} />)}
+              {activeTab === 'table' && (
+                isRombergResult(result) ? (
+                  <>
+                    <RombergNodesTable result={result} />
+                    <RombergTable result={result} />
+                  </>
+                ) : (
+                  <NodesTable result={result} />
+                )
+              )}
               {activeTab === 'graph' && <IntegrationGraph result={result} />}
             </div>
           </div>
