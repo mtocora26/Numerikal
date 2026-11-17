@@ -4,7 +4,7 @@ import { AlertTriangle, BookOpen, LineChart, Play, RotateCcw, Table } from 'luci
 import { MethodFactory } from '../../factories/MethodFactory';
 import { useExpressionParser } from '../../hooks/useExpressionParser';
 import { MAX_SUBINTERVALS } from '../../domain/integration/quadrature';
-import { MAX_ROMBERG_LEVELS, RombergRule } from '../../domain/integration/Romberg';
+import { MAX_ROMBERG_SUBINTERVALS, RombergRule } from '../../domain/integration/Romberg';
 import { Simpson13Rule } from '../../domain/integration/Simpson13';
 import { Simpson38Rule } from '../../domain/integration/Simpson38';
 import { TrapezoidRule } from '../../domain/integration/Trapezoid';
@@ -111,7 +111,7 @@ export const IntegrationCalculator: React.FC = () => {
     trapezoid: `Entero de 1 a ${MAX_SUBINTERVALS}. Con n = 1 es la regla simple: un solo trapecio.`,
     'simpson-1-3': `Debe ser par (2 a ${MAX_SUBINTERVALS}). Con n = 2 es la regla simple: una sola parábola.`,
     'simpson-3-8': `Debe ser múltiplo de 3 (3 a ${MAX_SUBINTERVALS - 1}). Con n = 3 es la regla simple: una sola cúbica.`,
-    romberg: `Filas de la tabla, de 1 a ${MAX_ROMBERG_LEVELS}. La fila i usa 2ⁱ subintervalos: con k = 4 la partición más fina tiene 8 y la esquina de la tabla es la mejor aproximación.`,
+    romberg: `Potencia de 2 (1 a ${MAX_ROMBERG_SUBINTERVALS}): la tabla tiene log₂(n) + 1 filas. Con n = 8 son 4 filas y la esquina R₄,₄ es la mejor aproximación.`,
   }[methodId];
 
   return (
@@ -186,7 +186,7 @@ export const IntegrationCalculator: React.FC = () => {
             <span className="regression-degree-hint">Los límites pueden ser pi, 2pi, pi/2, sqrt(2)… Debe cumplirse a &lt; b.</span>
           </div>
           <div className="param-field-group">
-            <label htmlFor="integration-n" className="param-label">{methodId === 'romberg' ? 'Filas de la tabla' : 'Subintervalos'} <span className="param-subname">({methodId === 'romberg' ? 'k' : 'n'})</span></label>
+            <label htmlFor="integration-n" className="param-label">Subintervalos <span className="param-subname">(n)</span></label>
             <input
               id="integration-n"
               type="text"

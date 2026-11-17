@@ -274,14 +274,19 @@ const ExactComparisonSection: React.FC<{ result: IntegrationResult; refineHint: 
   </section>
 );
 
-const ROMBERG_EXTRAPOLATION = 'R_{i,j} = \\frac{4^{j}\\,R_{i,j-1} - R_{i-1,j-1}}{4^{j} - 1}';
+const ROMBERG_EXTRAPOLATION = 'R_{k,j} = R_{k,j-1} + \\frac{R_{k,j-1} - R_{k-1,j-1}}{4^{j-1} - 1}';
+const ROMBERG_RECURRENCE = 'R_{k,1} = \\frac{1}{2}\\left[R_{k-1,1} + h_{k-1}\\sum_{i=1}^{2^{k-2}} f\\!\\left(a + (2i-1)\\,s_k\\right)\\right], \\quad s_k = \\frac{H}{2^{k-1}}';
+
+/** Encabezado de columna de la tabla: R(k, j) con el divisor de clase (3, 15, 63…). */
+const rombergColumnHeader = (j: number): string =>
+  j <= 1 ? 'R_{k,1}' : `R_{k,${j}}\\ \\left(/ ${4 ** (j - 1) - 1}\\right)`;
 
 /** Hasta esta cantidad de celdas se desarrollan todas las extrapolaciones; con más, solo las últimas filas. */
 const MAX_SHOWN_DERIVATIONS = 21;
 
-/** Tabla triangular de Romberg: fila i = trapecio con 2^i subintervalos y sus extrapolaciones; la esquina inferior derecha va resaltada. */
+/** Tabla triangular de Romberg como en clase: fila k = trapecio con 2^(k−1) subintervalos y sus extrapolaciones; la esquina inferior derecha va resaltada. */
 export const RombergTable: React.FC<{ result: RombergResult }> = ({ result }) => {
-  const { rows, levels, h } = result;
+  const { rows, k, h } = result;
 
   return (
     <div className="iteration-table-card">
@@ -289,7 +294,7 @@ export const RombergTable: React.FC<{ result: RombergResult }> = ({ result }) =>
         <div className="table-title-group">
           <Table size={16} className="title-icon" />
           <h4 className="table-title">Tabla de Romberg</h4>
-          <span className="row-count-badge">k = {levels} filas · h mínimo = {formatNumber(h)}</span>
+          <span className="row-count-badge">k = {k} filas · h mínimo = {formatNumber(h)}</span>
         </div>
       </div>
 
@@ -297,13 +302,13 @@ export const RombergTable: React.FC<{ result: RombergResult }> = ({ result }) =>
         <table className="numerical-table">
           <thead>
             <tr>
-              <th className="table-th td-iter"><div className="th-content"><span className="th-label">i</span></div></th>
+              <th className="table-th td-iter"><div className="th-content"><span className="th-label">k</span></div></th>
               <th className="table-th"><div className="th-content"><span className="th-label">Subintervalos</span></div></th>
               {rows.map((row) => (
-                <th key={row.i} className="table-th">
+                <th key={row.k} className="table-th">
                   <div className="th-content">
-                    <span className="th-label">Extrapolación {row.i}</span>
-                    <span className="th-latex"><MathView math={`R_{i,${row.i}}`} /></span>
+                    <span className="th-label">Columna {row.k}</span>
+                    <span className="th-latex"><MathView math={rombergColumnHeader(row.k)} /></span>
                   </div>
                 </th>
               ))}
@@ -311,13 +316,13 @@ export const RombergTable: React.FC<{ result: RombergResult }> = ({ result }) =>
           </thead>
           <tbody>
             {rows.map((row) => (
-              <tr key={row.i} className="table-row">
-                <td className="table-td td-iter">{row.i}</td>
+              <tr key={row.k} className="table-row">
+                <td className="table-td td-iter">{row.k}</td>
                 <td className="table-td">{row.subintervals}</td>
                 {rows.map((_, j) => {
                   const entry = row.entries[j];
                   return (
-                    <td key={j} className={`table-td ${row.i === levels - 1 && j === levels - 1 ? 'newton-coefficient-cell' : ''}`}>
+                    <td key={j} className={`table-td ${row.k === k && j === k - 1 ? 'newton-coefficient-cell' : ''}`}>
                       {entry ? formatNumber(entry.value, 8) : ''}
                     </td>
                   );
@@ -328,16 +333,16 @@ export const RombergTable: React.FC<{ result: RombergResult }> = ({ result }) =>
         </table>
       </div>
       <p className="newton-table-note">
-        La celda resaltada R<sub>{levels - 1},{levels - 1}</sub> es la mejor aproximación: {levels} extrapolaciones sobre el trapecio con {rows[levels - 1].subintervals} subintervalos.
+        La celda resaltada R<sub>{k},{k}</sub> es la mejor aproximación: {k - 1} extrapolaciones sobre el trapecio con {rows[k - 1].subintervals} subintervalos.
       </p>
     </div>
   );
 };
 
 const RombergSteps: React.FC<{ result: RombergResult }> = ({ result }) => {
-  const { a, b, levels, rows } = result;
-  const best = levels - 1;
-  // Con pocas celdas se muestran todas las extrapolaciones; con muchas, solo las dos últimas filas (el resto vive en la pestaña Tabla)
+  const { a, b, k, rows, nodes } = result;
+  const H = b - a;
+  // Con pocas celdas se muestran todas las extrapolaciones; con muchas, solo las últimas filas (el resto vive en la pestaña Tabla)
   const shownRows = rows.reduce((total, row) => total + row.entries.length, 0) <= MAX_SHOWN_DERIVATIONS ? rows.slice(1) : rows.slice(-2);
 
   return (
@@ -353,51 +358,62 @@ const RombergSteps: React.FC<{ result: RombergResult }> = ({ result }) => {
           <MathView math={`I = \\int_{${formatNumberLatex(a)}}^{${formatNumberLatex(b)}} ${result.functionLatex}\\,dx`} block />
         </div>
         <p>
-          Romberg no dibuja ninguna figura nueva sobre f: <strong>refina el trapecio y corrige su error</strong>. La primera columna de la tabla es
-          el trapecio compuesto con 1, 2, 4, …, {rows[best].subintervals} subintervalos (cada fila duplica la partición de la anterior) y cada celda
-          de las demás columnas combina dos vecinos de la columna anterior con la <strong>extrapolación de Richardson</strong>:
+          Romberg refina el trapecio y corrige su error sin dibujar figuras nuevas. Con H = {formatNumberLatex(H)} y el n de la
+          partición más fina ({nodes.length - 1} subintervalos), la tabla tiene k = {k} fila{k === 1 ? '' : 's'}: la primera columna
+          es el trapecio refinado (cada fila duplica la partición) y las demás aplican la <strong>extrapolación de Richardson</strong>:
         </p>
         <div className="gauss-formula-box">
           <MathView math={ROMBERG_EXTRAPOLATION} block />
         </div>
-        <p>
-          La tabla tiene k = {levels} fila{levels === 1 ? '' : 's'}: la celda R(i, j) es exacta para polinomios de grado 2j + 1, así que la diagonal
-          gana dos órdenes de h con cada fila.
-        </p>
+        <p>Los divisores salen de 4^(j−1) − 1: 3, 15, 63… La celda R(k, j) es exacta para polinomios de grado 2j − 1, así que la diagonal gana dos órdenes de h con cada fila.</p>
       </section>
 
       <section className="gauss-block">
         <h5>2. Primera columna: trapecio refinado</h5>
-        <p>Cada R(i, 0) es la regla del trapecio con 2<sup>i</sup> subintervalos de ancho h<sub>i</sub> = (b − a)/2<sup>i</sup>:</p>
+        <p>La primera celda es la regla simple y las demás se llenan por recurrencia con los puntos nuevos:</p>
+        <div className="gauss-formula-box">
+          <MathView math={`R_{1,1} = \\frac{H}{2}\\left[f(a) + f(b)\\right] = ${formatNumberLatex(rows[0].entries[0].value, 8)}`} block />
+        </div>
+        <div className="gauss-formula-box">
+          <MathView math={ROMBERG_RECURRENCE} block />
+        </div>
         <div className="gauss-formula-box">
           <MathView
             math={`\\begin{aligned}${rows
-              .map((row) => `R_{${row.i},0} &= ${formatNumberLatex(row.entries[0].value, 8)} & \\left(2^{${row.i}} = ${row.subintervals}\\ \\text{subintervalos},\\ h_{${row.i}} = ${formatNumberLatex(row.h, 8)}\\right)`)
+              .slice(1)
+              .map((row) => {
+                const stride = (nodes.length - 1) / row.subintervals;
+                const newPoints = Array.from({ length: row.subintervals / 2 }, (_, i) => `f(${formatNumberLatex(nodes[(2 * (i + 1) - 1) * stride].x, 8)})`);
+                return `R_{${row.k},1} &= ${formatNumberLatex(row.entries[0].value, 8)} & \\left(h_{k-1} = ${formatNumberLatex(H / (row.subintervals / 2), 8)},\\ \\text{nuevos: } ${newPoints.join(',\\ }')}\\right)`;
+              })
               .join(' \\\\ ')}\\end{aligned}`}
             block
           />
         </div>
+        {rows.length > 8 && <p>La lista completa de puntos nuevos por fila está en la pestaña <strong>Tabla</strong>.</p>}
       </section>
 
-      {best > 0 && (
+      {k > 1 && (
         <section className="gauss-block">
           <h5>3. Extrapolación de Richardson</h5>
           {shownRows.length < rows.length - 1 && <p>Se muestran las últimas filas; la tabla completa está en la pestaña <strong>Tabla</strong>.</p>}
           <div className="gauss-steps-list">
             {shownRows.map((row) => (
-              <div className="gauss-step" key={row.i}>
+              <div className="gauss-step" key={row.k}>
                 <div className="gauss-step-heading">
-                  <span className="gauss-step-number">{row.i + 1}</span>
-                  <div><strong>Fila {row.i}: con {row.subintervals} subintervalos</strong></div>
+                  <span className="gauss-step-number">{row.k}</span>
+                  <div><strong>Fila {row.k}: con {row.subintervals} subintervalos</strong></div>
                 </div>
                 <div className="gauss-formula-box">
                   <MathView
                     math={`\\begin{aligned}${row.entries
                       .slice(1)
                       .map((entry) => {
-                        const power = 4 ** entry.j;
+                        const divisor = 4 ** (entry.j - 1) - 1;
+                        const left = row.entries[entry.j - 2].value;
+                        const above = rows[row.k - 2].entries[entry.j - 2].value;
                         return (
-                          `R_{${row.i},${entry.j}} &= \\frac{4^{${entry.j}}\\,(${formatNumberLatex(row.entries[entry.j - 1].value, 8)}) - (${formatNumberLatex(rows[row.i - 1].entries[entry.j - 1].value, 8)})}{${formatNumberLatex(power)} - 1}` +
+                          `R_{${row.k},${entry.j}} &= ${formatNumberLatex(left, 8)} + \\frac{${formatNumberLatex(left, 8)} - (${formatNumberLatex(above, 8)})}{${formatNumberLatex(divisor)}}` +
                           ` = ${formatNumberLatex(entry.value, 8)}`
                         );
                       })
@@ -415,16 +431,16 @@ const RombergSteps: React.FC<{ result: RombergResult }> = ({ result }) => {
         <h5>4. Mejor aproximación</h5>
         <p>La esquina inferior derecha de la tabla es la celda con más extrapolaciones y la mejor aproximación de la integral:</p>
         <div className="gauss-formula-box emphasized">
-          <MathView math={`\\int_{${formatNumberLatex(a)}}^{${formatNumberLatex(b)}} ${result.functionLatex}\\,dx \\approx R_{${best},${best}} = ${formatNumberLatex(result.value, 8)}`} block />
+          <MathView math={`\\int_{${formatNumberLatex(a)}}^{${formatNumberLatex(b)}} ${result.functionLatex}\\,dx \\approx R_{${k},${k}} = ${formatNumberLatex(result.value, 8)}`} block />
         </div>
         <p className="newton-note">
-          Con k filas se evalúan f en 2<sup>{levels - 1}</sup> + 1 = {result.nodes.length} nodos, menos de lo que pide una regla directa con esta precisión.
+          Con {k} filas se evalúan f en {nodes.length} nodos (n = {nodes.length - 1}), menos de lo que pide una regla directa con esta precisión.
         </p>
       </section>
 
       <ExactComparisonSection
         result={result}
-        refineHint="Prueba subir una fila k y observa cómo baja el error: sobre la diagonal cada fila gana dos órdenes de h en funciones suaves."
+        refineHint="Prueba duplicar n y observa cómo baja el error: sobre la diagonal cada fila gana dos órdenes de h en funciones suaves."
       />
     </div>
   );

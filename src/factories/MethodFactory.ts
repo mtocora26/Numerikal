@@ -255,11 +255,11 @@ export class MethodFactory {
         name: 'Integración de Romberg',
         category: 'integration',
         description: 'Refina el trapecio duplicando los subintervalos en cada fila y combina pares de aproximaciones con extrapolación de Richardson, llenando una tabla triangular cuya diagonal converge mucho más rápido que ninguna regla directa.',
-        latexFormula: 'R_{i,j} = \\frac{4^{j}\\,R_{i,j-1} - R_{i-1,j-1}}{4^{j} - 1}',
+        latexFormula: 'R_{k,j} = R_{k,j-1} + \\frac{R_{k,j-1} - R_{k-1,j-1}}{4^{j-1} - 1}',
         icon: 'area-chart',
         tag: 'Integración • Extrapolación de Richardson',
         difficulty: 'Avanzado',
-        recommendedConvergence: 'La celda R(i,j) es exacta hasta polinomios de grado 2j+1: la diagonal gana dos órdenes de h por fila; la primera columna es el trapecio con 2^i subintervalos',
+        recommendedConvergence: 'n debe ser potencia de 2 (1, 2, 4, 8…): la tabla tiene log₂(n) + 1 filas y la celda R(k,j) es exacta hasta polinomios de grado 2j−1; la diagonal gana dos órdenes de h por fila',
       },
     ];
   }

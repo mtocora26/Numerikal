@@ -13,7 +13,7 @@ export const IntegrationResultCard: React.FC<{ result: IntegrationResult }> = ({
     <div className="result-status-header">
       <div className="status-badge-wrapper">
         <div className="badge-converged"><CheckCircle size={16} /><span>Integral calculada</span></div>
-        <span className="method-pill">{result.methodName} · {isRombergResult(result) ? `k = ${result.levels} filas` : `n = ${result.n}`}</span>
+        <span className="method-pill">{result.methodName} · {isRombergResult(result) ? `n = ${result.nodes.length - 1} (k = ${result.k} filas)` : `n = ${result.n}`}</span>
       </div>
       <div className="execution-meta">
         <span className="meta-item" title="Tiempo de ejecución">
@@ -56,9 +56,15 @@ export const IntegrationResultCard: React.FC<{ result: IntegrationResult }> = ({
         <div className="metric-value">{formatNumber(result.h)}</div>
       </div>
       <div className="metric-box">
-        <div className="metric-icon-label"><Hash size={14} className="metric-icon" /><span>{isRombergResult(result) ? 'Filas de la tabla (k)' : 'Subintervalos (n)'}</span></div>
-        <div className="metric-value">{isRombergResult(result) ? result.levels : result.n}</div>
+        <div className="metric-icon-label"><Hash size={14} className="metric-icon" /><span>Subintervalos (n)</span></div>
+        <div className="metric-value">{isRombergResult(result) ? result.nodes.length - 1 : result.n}</div>
       </div>
+      {isRombergResult(result) && (
+        <div className="metric-box">
+          <div className="metric-icon-label"><Hash size={14} className="metric-icon" /><span>Filas de la tabla (k)</span></div>
+          <div className="metric-value">{result.k}</div>
+        </div>
+      )}
     </div>
 
     {result.exactValue === null && (

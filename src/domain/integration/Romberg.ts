@@ -3,17 +3,18 @@ import { formatNumber, formatNumberLatex, termLatex } from '../../services/numbe
 import { buildNodes, compareWithExact, sumTerms } from './quadrature';
 import type { IntegrationInput, IntegrationValidationResult, RombergEntry, RombergResult, RombergRow } from './types';
 
-export const MIN_ROMBERG_LEVELS = 1;
-/** Con 10 filas la partición más fina tiene 2⁹ = 512 subintervalos: 513 evaluaciones de f. */
-export const MAX_ROMBERG_LEVELS = 10;
+/** Con n = 512 = 2^9 la tabla tiene K = 10 filas y f se evalúa 513 veces. */
+export const MAX_ROMBERG_SUBINTERVALS = 512;
+
+const isPowerOfTwo = (n: number): boolean => n >= 1 && (n & (n - 1)) === 0;
 
 /**
- * Validación propia: aquí n cuenta filas de la tabla, no subintervalos, así que la comprobación común de
- * `validateIntegrationInput` no aplica. Se exigen enteros de 1 a MAX_ROMBERG_LEVELS y que f esté definida en los
- * nodos de la partición más fina (2^(k−1) subintervalos): si falla ahí, falla en todas las filas.
+ * Validación propia: aquí n es la partición más fina de la tabla y debe ser potencia de 2 (1, 2, 4, 8…), porque cada
+ * fila duplica la partición de la anterior. Se exige que f esté definida en los n + 1 nodos de esa partición: si falla
+ * ahí, falla en todas las filas.
  */
 function validateRombergInput(
-  { a, b, n: levels }: IntegrationInput,
+  { a, b, n }: IntegrationInput,
   parsed: ReturnType<typeof ExpressionParser.parse>
 ): IntegrationValidationResult {
   const errors: string[] = [];
@@ -27,15 +28,14 @@ function validateRombergInput(
     errors.push('El límite inferior a debe ser menor que el límite superior b.');
   }
 
-  if (!Number.isInteger(levels) || levels < MIN_ROMBERG_LEVELS || levels > MAX_ROMBERG_LEVELS) {
-    errors.push(`El número de filas k debe ser un entero entre ${MIN_ROMBERG_LEVELS} y ${MAX_ROMBERG_LEVELS}.`);
+  if (!Number.isInteger(n) || !isPowerOfTwo(n) || n > MAX_ROMBERG_SUBINTERVALS) {
+    errors.push(`El número de subintervalos n debe ser una potencia de 2 (1, 2, 4, 8, 16…) hasta ${MAX_ROMBERG_SUBINTERVALS}.`);
   } else if (errors.length === 0) {
-    const panels = 2 ** (levels - 1);
-    const h = (b - a) / panels;
-    for (let i = 0; i <= panels; i++) {
-      const x = i === panels ? b : a + i * h;
+    const h = (b - a) / n;
+    for (let i = 0; i <= n; i++) {
+      const x = i === n ? b : a + i * h;
       if (!Number.isFinite(parsed.evaluate(x))) {
-        errors.push(`La función no está definida en x = ${formatNumber(x)}, que es un nodo del intervalo: cambia los límites o el número de filas.`);
+        errors.push(`La función no está definida en x = ${formatNumber(x)}, que es un nodo del intervalo: cambia los límites o el número de subintervalos.`);
         break;
       }
     }
@@ -45,12 +45,14 @@ function validateRombergInput(
 }
 
 /**
- * Integración de Romberg: tabla triangular R(i, j) donde
- *   R(i, 0) = trapecio compuesto con 2^i subintervalos,
- *   R(i, j) = (4^j · R(i, j−1) − R(i−1, j−1)) / (4^j − 1)   (extrapolación de Richardson).
- * La primera columna reutiliza los nodos de la partición más fina (2^(levels−1) subintervalos): los nodos de cada
- * fila son un subconjunto de esa partición, así que f se evalúa una sola vez. La mejor aproximación es la esquina
- * inferior derecha R(levels−1, levels−1), exacta para polinomios de grado 2·levels − 1.
+ * Integración de Romberg, con el procedimiento de clase (tablas numeradas desde 1):
+ *   R(1,1) = H/2 · [f(a) + f(b)],                         H = b − a
+ *   R(k,1) = 1/2 · [R(k−1,1) + h_ant · Σ f(puntos nuevos)],  con h_ant = H/2^(k−2)
+ *            y puntos nuevos f(a + (2i−1)·s), s = H/2^(k−1), i = 1 … 2^(k−2)
+ *   R(k,j) = R(k,j−1) + [R(k,j−1) − R(k−1,j−1)] / (4^(j−1) − 1)   (extrapolación, divisores 3, 15, 63…)
+ * El resultado es la esquina inferior derecha R(K,K), con K = log₂(n) + 1 filas para el n dado.
+ * Todos los valores f(x) salen de una sola evaluación sobre la partición más fina (n subintervalos): los nodos de cada
+ * fila son un subconjunto de esa partición, y el factor de los puntos nuevos es el h ANTERIOR, no el nuevo.
  */
 export class RombergRule {
   public readonly id = 'romberg';
@@ -69,48 +71,53 @@ export class RombergRule {
       throw new Error(validation.errors.join(' '));
     }
 
-    const { a, b, n: levels } = input;
+    const { a, b, n } = input;
+    const H = b - a;
 
     // Partición más fina: de aquí salen todos los valores f(xᵢ) que usa la tabla, con el ruido de redondeo limpio
-    const finestPanels = 2 ** (levels - 1);
-    const { h: hFinest, nodes } = buildNodes(parsed.evaluate, { ...input, n: finestPanels }, (index, last) =>
+    const { h: hFinest, nodes } = buildNodes(parsed.evaluate, input, (index, last) =>
       index === 0 || index === last ? 1 : 2
     );
 
-    // Primera columna: trapecio compuesto con 2^i subintervalos, sumado sobre los nodos de la partición más fina
-    const firstColumn: number[] = [];
-    for (let i = 0; i < levels; i++) {
-      const panels = 2 ** i;
-      const step = finestPanels / panels;
-      const h = hFinest * step;
-      const terms: number[] = [];
-      for (let k = 0; k <= panels; k++) {
-        const fx = nodes[k * step].fx;
-        terms.push(k === 0 || k === panels ? fx : 2 * fx);
-      }
-      firstColumn.push((h / 2) * sumTerms(terms));
-    }
-
-    // Extrapolación de Richardson: cada celda combina la de su izquierda con la de la fila anterior
+    // Primera columna por la recurrencia de clase: R(k,1) = 1/2 · [R(k−1,1) + h_ant · Σ f(puntos nuevos)]
     const rows: RombergRow[] = [];
-    for (let i = 0; i < levels; i++) {
-      const entries: RombergEntry[] = [{ j: 0, value: firstColumn[i] }];
-      for (let j = 1; j <= i; j++) {
-        const power = 4 ** j;
-        entries.push({
-          j,
-          value: (power * entries[j - 1].value - rows[i - 1].entries[j - 1].value) / (power - 1),
-        });
+    let previousFirst = 0;
+    for (let k = 1; k <= Math.log2(n) + 1; k++) {
+      const panels = 2 ** (k - 1);
+      const h = H / panels;
+      let first: number;
+      if (k === 1) {
+        first = (H / 2) * sumTerms([nodes[0].fx, nodes[n].fx]);
+      } else {
+        // Los puntos nuevos son los impares de esta partición: a + (2i−1)·s, con s = H/2^(k−1)
+        const stride = n / panels;
+        const hAnt = H / 2 ** (k - 2);
+        const newValues: number[] = [];
+        for (let i = 1; i <= panels / 2; i++) {
+          newValues.push(nodes[(2 * i - 1) * stride].fx);
+        }
+        first = (previousFirst + hAnt * sumTerms(newValues)) / 2;
       }
-      rows.push({ i, subintervals: 2 ** i, h: hFinest * (finestPanels / 2 ** i), entries });
+
+      // Extrapolación de Richardson: R(k,j) = R(k,j−1) + [R(k,j−1) − R(k−1,j−1)] / (4^(j−1) − 1)
+      const entries: RombergEntry[] = [{ j: 1, value: first }];
+      for (let j = 2; j <= k; j++) {
+        const left = entries[j - 2].value;
+        const above = rows[k - 2].entries[j - 2].value;
+        entries.push({ j, value: left + (left - above) / (4 ** (j - 1) - 1) });
+      }
+      rows.push({ k, subintervals: panels, h, entries });
+      previousFirst = first;
     }
 
-    const best = rows[levels - 1].entries[levels - 1].value;
+    const K = rows.length;
+    const best = rows[K - 1].entries[K - 1].value;
+    const lastDivisor = 4 ** (K - 1) - 1;
     const substitutedLatex =
-      levels === 1
-        ? `R_{0,0} = \\frac{${formatNumberLatex(b - a)}}{2}\\left[${termLatex(nodes[0].fx)} + ${termLatex(nodes[1].fx)}\\right] = ${formatNumberLatex(best, 8)}`
-        : `R_{${levels - 1},${levels - 1}} = \\frac{4^{${levels - 1}}\\,R_{${levels - 1},${levels - 2}} - R_{${levels - 2},${levels - 2}}}{4^{${levels - 1}} - 1}` +
-          ` = \\frac{${formatNumberLatex(4 ** (levels - 1))}\\,(${formatNumberLatex(rows[levels - 1].entries[levels - 2].value, 8)}) - (${formatNumberLatex(rows[levels - 2].entries[levels - 2].value, 8)})}{${formatNumberLatex(4 ** (levels - 1) - 1)}}` +
+      K === 1
+        ? `R_{1,1} = \\frac{${formatNumberLatex(H)}}{2}\\left[${termLatex(nodes[0].fx)} + ${termLatex(nodes[n].fx)}\\right] = ${formatNumberLatex(best, 8)}`
+        : `R_{${K},${K}} = R_{${K},${K - 1}} + \\frac{R_{${K},${K - 1}} - R_{${K - 1},${K - 1}}}{${formatNumberLatex(lastDivisor)}}` +
+          ` = ${formatNumberLatex(rows[K - 1].entries[K - 2].value, 8)} + \\frac{${formatNumberLatex(rows[K - 1].entries[K - 2].value, 8)} - (${formatNumberLatex(rows[K - 2].entries[K - 2].value, 8)})}{${formatNumberLatex(lastDivisor)}}` +
           ` = ${formatNumberLatex(best, 8)}`;
 
     return {
@@ -120,7 +127,7 @@ export class RombergRule {
       functionLatex: parsed.latex,
       a,
       b,
-      levels,
+      k: K,
       h: hFinest,
       nodes,
       rows,

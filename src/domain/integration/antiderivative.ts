@@ -201,6 +201,38 @@ const factorsOf = (raw: MathNode): MathNode[] => {
   return isOperatorNode(node) && node.fn === 'multiply' ? node.args.flatMap(factorsOf) : [node];
 };
 
+/**
+ * p = c + a·x², sin término lineal y con a y c del mismo signo: la forma que tiene primitiva con atan o asinh.
+ * Devuelve a y c positivos; si la cuadrática era negativa, `negated` avisa para voltear el numerador (1/(−Q) = −1/Q).
+ */
+const pureQuadraticOf = (raw: MathNode): { a: number; c: number; negated: boolean } | null => {
+  const p = polyOf(raw);
+  if (!p || p.length !== 3 || p[1] !== 0 || p[0] === 0 || p[2] === 0) return null;
+  if (p[0] * p[2] <= 0) return null;
+  return p[0] > 0 ? { a: p[2], c: p[0], negated: false } : { a: -p[2], c: -p[0], negated: true };
+};
+
+/**
+ * Numerador constante sobre una cuadrática pura, las dos reglas de los ejercicios de clase:
+ *   ∫ m/(a·x² + c) dx  = (m/√(a·c))·atan(x·√(a/c))          (ej. 1/(1+x²) = atan x)
+ *   ∫ m/√(a·x² + c) dx = (m/√a)·asinh(x·√(a/c))             (ej. 1/√(x²+4) = asinh(x/2))
+ */
+const quadraticDenominatorText = (raw: MathNode, coefficient: number): string | null => {
+  const node = unwrap(raw);
+  const isSqrt = isFunctionNode(node) && node.fn.name === 'sqrt';
+  const quadratic = isSqrt ? pureQuadraticOf(node.args[0]) : pureQuadraticOf(node);
+  if (!quadratic) return null;
+  // asinh solo queda real si la cuadrática interna es positiva; con negativa no hay regla
+  if (isSqrt && quadratic.negated) return null;
+
+  const coef = formatCoefficient(quadratic.negated ? -coefficient : coefficient);
+  const ratio = formatCoefficient(quadratic.a / quadratic.c);
+  const argument = `x*sqrt(${ratio})`;
+  return isSqrt
+    ? `${coef}*asinh(${argument})/sqrt(${formatCoefficient(quadratic.a)})`
+    : `${coef}*atan(${argument})/sqrt(${formatCoefficient(quadratic.a * quadratic.c)})`;
+};
+
 /** Texto de mathjs de una primitiva de `raw`, o null si ninguna regla aplica. */
 const integrate = (raw: MathNode): string | null => {
   const node = unwrap(raw);
@@ -236,6 +268,14 @@ const integrate = (raw: MathNode): string | null => {
       if (!dependsOnX(second)) {
         const numerator = integrate(first);
         return numerator && `${wrap(numerator)}/${wrap(second.toString())}`;
+      }
+      // Numerador constante sobre una cuadrática pura: atan (1/(1+x²)) o asinh (1/√(x²+4)), los ejercicios de clase
+      if (!dependsOnX(first)) {
+        const numerator = constantValue(first);
+        if (numerator !== null && numerator !== 0) {
+          const quadratic = quadraticDenominatorText(second, numerator);
+          if (quadratic) return quadratic;
+        }
       }
       const power = dependsOnX(first) ? null : asPower(second);
       return power && `${wrap(first.toString())}*${wrap(powerText(power.lin, -power.p))}`;
@@ -286,8 +326,9 @@ const integrate = (raw: MathNode): string | null => {
 
 /**
  * Primitiva simbólica de f(x), si las reglas de Numerikal la encuentran: sumas y múltiplos de polinomios,
- * potencias de (ax + b), 1/(ax + b), √(ax + b), e^(ax+b), b^(ax+b), sen, cos, tan, senh, cosh y ln de (ax + b),
- * y polinomio × exp, sen o cos. Devuelve null cuando no hay regla (aunque la integral tenga solución, como x/(x² + 1))
+ * potencias de (ax + b), 1/(ax + b), 1/(a·x² + c) (atan), 1/√(a·x² + c) (asinh), √(ax + b), e^(ax+b), b^(ax+b),
+ * sen, cos, tan, senh, cosh y ln de (ax + b), y polinomio × exp, sen o cos.
+ * Devuelve null cuando no hay regla (aunque la integral tenga solución, como x/(x² + 1))
  * y también cuando no existe en forma elemental (como e^(−x²) o sen(x)/x).
  * Que F sea una primitiva en todo [a, b] (sin polos adentro) lo comprueba `exactIntegral`.
  */

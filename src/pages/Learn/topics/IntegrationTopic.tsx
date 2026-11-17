@@ -16,8 +16,8 @@ const SIMPSON_EXAMPLE = new Simpson13Rule().execute(EXAMPLE_INPUT);
 /** Simpson 3/8 pide n múltiplo de 3, así que el ejemplo usa n = 6 (y se compara con Simpson 1/3 con el mismo n). */
 const SIMPSON38_EXAMPLE = new Simpson38Rule().execute({ ...EXAMPLE_INPUT, n: 6 });
 const SIMPSON_N6_EXAMPLE = new Simpson13Rule().execute({ ...EXAMPLE_INPUT, n: 6 });
-/** Romberg con k = 4 filas: llega a 9 decimales de ∫₀¹ eˣ dx = e − 1 con solo 9 evaluaciones de f. */
-const ROMBERG_EXAMPLE = new RombergRule().execute({ expression: 'exp(x)', a: 0, b: 1, n: 4 });
+/** Romberg con n = 8 subintervalos (k = 4 filas): llega a 8 decimales de ∫₀¹ eˣ dx = e − 1 con solo 9 evaluaciones de f. */
+const ROMBERG_EXAMPLE = new RombergRule().execute({ expression: 'exp(x)', a: 0, b: 1, n: 8 });
 
 const PARTITION = 'h = \\frac{b - a}{n}, \\qquad x_i = a + i\\,h, \\quad i = 0, 1, \\ldots, n';
 
@@ -46,13 +46,13 @@ const SIMPSON38_STEPS = [
   { title: 'Multiplica por 3h/8', text: 'El corchete por 3h/8 da el área bajo todas las cúbicas.' },
 ];
 
-const ROMBERG_ERROR = 'R_{i,j} \\text{ es exacta para polinomios de grado } 2j + 1: \\quad E \\sim O\\left(h^{2j+2}\\right)';
+const ROMBERG_ERROR = 'R_{k,j} \\text{ es exacta para polinomios de grado } 2j - 1: \\quad E \\sim O\\left(h^{2j}\\right)';
 
 const ROMBERG_STEPS = [
-  { title: 'Llena la primera columna con el trapecio', text: 'R(i, 0) es el trapecio compuesto con 2ⁱ subintervalos: la fila 0 usa 1, la fila 1 usa 2, la fila 2 usa 4… Cada nueva fila reutiliza los nodos de la anterior y solo evalúa f en los puntos nuevos.' },
-  { title: 'Extrapola con Richardson', text: 'Cada celda R(i, j) combina su vecina izquierda con la de la fila anterior: R(i, j) = (4^j·R(i, j−1) − R(i−1, j−1))/(4^j − 1). La columna 1 elimina el término h² del error del trapecio, la columna 2 el h⁴, y así sigue.' },
-  { title: 'Lee la diagonal', text: 'La esquina inferior derecha R(k−1, k−1) acumula todas las extrapolaciones y es la mejor aproximación: es exacta para polinomios de grado 2k − 1.' },
-  { title: 'Compara y decide', text: 'Si la última diagonal y la anterior coinciden en las cifras que necesitas, ya convergió; si no, agrega una fila más (duplica los subintervalos de la partición más fina).' },
+  { title: 'Parte del trapecio simple', text: 'Con H = b − a, la primera celda es R(1,1) = (H/2)·[f(a) + f(b)]: un solo trapecio. La tabla se numera desde 1, como en clase.' },
+  { title: 'Llena la primera columna por recurrencia', text: 'Cada fila duplica la partición y solo evalúa f en los puntos nuevos: R(k,1) = ½·[R(k−1,1) + h_ant·Σ f(a + (2i−1)·s)], con h_ant = H/2^(k−2) (el h del renglón de arriba), s = H/2^(k−1) e i = 1, …, 2^(k−2).' },
+  { title: 'Extrapola con Richardson', text: 'Cada celda combina su vecina izquierda con la de la fila anterior: R(k,j) = R(k,j−1) + (R(k,j−1) − R(k−1,j−1))/(4^(j−1) − 1). Los divisores son 3, 15, 63… y cada columna elimina el término siguiente del error del trapecio.' },
+  { title: 'Lee la esquina inferior derecha', text: 'El profe da n subintervalos (potencia de 2) y la tabla tiene K = log₂(n) + 1 filas: la celda R(K,K) acumula todas las extrapolaciones y es la mejor aproximación, exacta para polinomios de grado 2K − 1.' },
 ];
 
 export const IntegrationTopic: React.FC = () => {
@@ -284,7 +284,7 @@ export const IntegrationTopic: React.FC = () => {
               <MathView math={rombergMeta.latexFormula} block />
             </div>
             <div className="method-formula">
-              <span className="method-formula-label">Orden de la celda R(i, j)</span>
+              <span className="method-formula-label">Orden de la celda R(k, j)</span>
               <MathView math={ROMBERG_ERROR} block />
             </div>
             <figure className="method-theory-graph">
@@ -292,14 +292,14 @@ export const IntegrationTopic: React.FC = () => {
               <figcaption className="theory-graph-caption">
                 <p>Romberg reutiliza la misma partición del trapecio: la gráfica muestra los 8 trapecios de la partición más fina, cuyos valores alimentan toda la tabla.</p>
                 <p className="theory-graph-root">
-                  Para ∫₀¹ eˣ dx = e − 1, Numerikal obtiene <MathView math={`R_{3,3} \\approx ${ROMBERG_EXAMPLE.value.toFixed(10)}`} /> con solo k = 4 filas
-                  (error {ROMBERG_EXAMPLE.absoluteError?.toExponential(2)}), con 9 evaluaciones de f.
+                  Para ∫₀¹ eˣ dx = e − 1, Numerikal obtiene <MathView math={`R_{4,4} \\approx ${ROMBERG_EXAMPLE.value.toFixed(10)}`} /> con n = 8 subintervalos
+                  (k = 4 filas, error {ROMBERG_EXAMPLE.absoluteError?.toExponential(2)}), con 9 evaluaciones de f.
                 </p>
               </figcaption>
             </figure>
             <div className="method-guidance-row">
               <div><strong>¿Cuándo usarlo?</strong><p>Cuando f es suave y quieres muchas cifras correctas sin cambiar de método: la diagonal crece dos órdenes de h por fila, más rápido que cualquier regla de Newton-Cotes con las mismas evaluaciones.</p></div>
-              <div><strong>¿Qué revisar?</strong><p>Que f esté definida en los nodos de la partición más fina (2^(k−1) subintervalos) y que sea suave: si f tiene picos o derivadas que saltan, la extrapolación pierde fuerza y conviene más bien subir n en Simpson o el trapecio.</p></div>
+              <div><strong>¿Qué revisar?</strong><p>Que n sea potencia de 2 (1, 2, 4, 8… hasta 512): cada fila duplica la partición de la anterior. Que f esté definida en los nodos de esa partición más fina y que sea suave: si f tiene picos o derivadas que saltan, la extrapolación pierde fuerza y conviene más bien subir n en Simpson o el trapecio.</p></div>
             </div>
             <div className="method-convergence">
               <CheckCircle2 size={16} />
