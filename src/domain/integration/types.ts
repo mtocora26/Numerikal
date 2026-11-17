@@ -72,21 +72,21 @@ export interface Simpson38Result extends IntegrationResultBase {
   sharedSum: number;
 }
 
-/** Una celda R(i, j) de la tabla de Romberg: el trapecio con 2^i subintervalos tras j extrapolaciones de Richardson. */
+/** Una celda R(k, j) de la tabla de Romberg: el trapecio con 2^(k−1) subintervalos tras j − 1 extrapolaciones de Richardson. */
 export interface RombergEntry {
-  /** Número de extrapolaciones aplicadas (0 = trapecio puro) */
+  /** Columna j de la tabla (1 = trapecio puro, 2 = primera extrapolación con divisor 3, …) */
   j: number;
   value: number;
 }
 
-/** Fila i de la tabla: la primera columna es el trapecio con 2^i subintervalos y las demás, extrapolaciones. */
+/** Fila k de la tabla (numerada desde 1, como en clase): la primera columna es el trapecio con 2^(k−1) subintervalos y las demás, extrapolaciones. */
 export interface RombergRow {
-  i: number;
-  /** 2^i: los subintervalos de la primera columna de esta fila */
+  k: number;
+  /** 2^(k−1): los subintervalos de la primera columna de esta fila */
   subintervals: number;
-  /** h de esta fila = (b − a)/2^i */
+  /** h de esta fila = H/2^(k−1), con H = b − a */
   h: number;
-  /** R(i, 0), R(i, 1), …, R(i, i) */
+  /** R(k, 1), R(k, 2), …, R(k, k) */
   entries: RombergEntry[];
 }
 
@@ -98,15 +98,15 @@ export interface RombergResult extends ExactComparison {
   functionLatex: string;
   a: number;
   b: number;
-  /** Filas de la tabla: la fila i trabaja con 2^i subintervalos */
-  levels: number;
-  /** h de la partición más fina = (b − a)/2^(levels−1) */
+  /** Filas de la tabla K: la fila k usa 2^(k−1) subintervalos, así que el n pedido cumple n = 2^(K−1) */
+  k: number;
+  /** h de la partición más fina = (b − a)/n */
   h: number;
   /** Nodos de la partición más fina, con el coeficiente del trapecio (1, 2, …, 2, 1); de aquí salen todas las filas */
   nodes: IntegrationNode[];
-  /** La tabla triangular completa: rows[i].entries[j] es R(i, j) */
+  /** La tabla triangular completa: rows[k−1].entries[j−1] es R(k, j) */
   rows: RombergRow[];
-  /** La mejor aproximación: R(levels−1, levels−1), la esquina inferior derecha de la tabla */
+  /** La mejor aproximación: R(K, K), la esquina inferior derecha de la tabla */
   value: number;
   /** La última extrapolación con los números sustituidos, en LaTeX */
   substitutedLatex: string;
