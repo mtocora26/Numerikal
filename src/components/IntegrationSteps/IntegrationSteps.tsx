@@ -275,11 +275,11 @@ const ExactComparisonSection: React.FC<{ result: IntegrationResult; refineHint: 
 );
 
 const ROMBERG_EXTRAPOLATION = 'R_{k,j} = R_{k,j-1} + \\frac{R_{k,j-1} - R_{k-1,j-1}}{4^{j-1} - 1}';
-const ROMBERG_RECURRENCE = 'R_{k,1} = \\frac{1}{2}\\left[R_{k-1,1} + h_{k-1}\\sum_{i=1}^{2^{k-2}} f\\!\\left(a + (2i-1)\\,s_k\\right)\\right], \\quad s_k = \\frac{H}{2^{k-1}}';
+const ROMBERG_RECURRENCE = 'R_{k,1} = \\frac{1}{2}\\left[R_{k-1,1} + h_{k-1}\\sum_{i=1}^{2^{k-2}} f\\!\\left(a + (2i-1)\\,s_k\\right)\\right], \\quad h_{k-1} = \\frac{H}{2^{k-2}},\\quad s_k = \\frac{H}{2^{k-1}}';
 
 /** Encabezado de columna de la tabla: R(k, j) con el divisor de clase (3, 15, 63…). */
 const rombergColumnHeader = (j: number): string =>
-  j <= 1 ? 'R_{k,1}' : `R_{k,${j}}\\ \\left(/ ${4 ** (j - 1) - 1}\\right)`;
+  j <= 1 ? 'R_{k,1}' : `R_{k,${j}}\\;(/${4 ** (j - 1) - 1})`;
 
 /** Hasta esta cantidad de celdas se desarrollan todas las extrapolaciones; con más, solo las últimas filas. */
 const MAX_SHOWN_DERIVATIONS = 21;
@@ -307,7 +307,7 @@ export const RombergTable: React.FC<{ result: RombergResult }> = ({ result }) =>
               {rows.map((row) => (
                 <th key={row.k} className="table-th">
                   <div className="th-content">
-                    <span className="th-label">Columna {row.k}</span>
+                    <span className="th-label">{row.k === 1 ? 'Trapecio' : `Columna ${row.k}`}</span>
                     <span className="th-latex"><MathView math={rombergColumnHeader(row.k)} /></span>
                   </div>
                 </th>
@@ -333,11 +333,49 @@ export const RombergTable: React.FC<{ result: RombergResult }> = ({ result }) =>
         </table>
       </div>
       <p className="newton-table-note">
-        La celda resaltada R<sub>{k},{k}</sub> es la mejor aproximación: {k - 1} extrapolaciones sobre el trapecio con {rows[k - 1].subintervals} subintervalos.
+        La celda resaltada R<sub>{k},{k}</sub> es la mejor aproximación: {k - 1} extrapolaciones sobre el trapecio con {rows[k - 1].subintervals} subintervalo{rows[k - 1].subintervals === 1 ? '' : 's'}.
       </p>
     </div>
   );
 };
+
+/** Los valores de f(x) en la partición más fina: la tabla del ejercicio de clase que alimenta toda la tabla de Romberg. */
+export const RombergNodesTable: React.FC<{ result: RombergResult }> = ({ result }) => (
+  <div className="iteration-table-card">
+    <div className="table-header-toolbar">
+      <div className="table-title-group">
+        <Table size={16} className="title-icon" />
+        <h4 className="table-title">Valores de f(x) en los nodos</h4>
+        <span className="row-count-badge">n = {result.nodes.length - 1} · h = {formatNumber(result.h)}</span>
+      </div>
+    </div>
+
+    <div className="table-scroll-container">
+      <table className="numerical-table">
+        <thead>
+          <tr>
+            <th className="table-th td-iter"><div className="th-content"><span className="th-label">i</span></div></th>
+            <th className="table-th"><div className="th-content"><span className="th-latex"><MathView math="x_i" /></span></div></th>
+            <th className="table-th"><div className="th-content"><span className="th-latex"><MathView math="f(x_i)" /></span></div></th>
+          </tr>
+        </thead>
+        <tbody>
+          {result.nodes.map((node) => (
+            <tr key={node.index} className="table-row">
+              <td className="table-td td-iter">{node.index}</td>
+              <td className="table-td">{formatNumber(node.x)}</td>
+              <td className="table-td">{formatNumber(node.fx, 8)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <p className="newton-table-note">
+      Son los n + 1 valores de la partición más fina (xᵢ = a + i·h): toda la tabla de Romberg se arma con ellos, porque cada fila de la
+      primera columna solo suma los puntos nuevos, los f(xᵢ) en las x impares de su partición.
+    </p>
+  </div>
+);
 
 const RombergSteps: React.FC<{ result: RombergResult }> = ({ result }) => {
   const { a, b, k, rows, nodes } = result;
@@ -384,13 +422,14 @@ const RombergSteps: React.FC<{ result: RombergResult }> = ({ result }) => {
               .map((row) => {
                 const stride = (nodes.length - 1) / row.subintervals;
                 const newPoints = Array.from({ length: row.subintervals / 2 }, (_, i) => `f(${formatNumberLatex(nodes[(2 * (i + 1) - 1) * stride].x, 8)})`);
-                return `R_{${row.k},1} &= ${formatNumberLatex(row.entries[0].value, 8)} & \\left(h_{k-1} = ${formatNumberLatex(H / (row.subintervals / 2), 8)},\\ \\text{nuevos: } ${newPoints.join(',\\ }')}\\right)`;
+                return `R_{${row.k},1} &= ${formatNumberLatex(row.entries[0].value, 8)} & \\left(h_{${row.k - 1}} = ${formatNumberLatex(H / (row.subintervals / 2), 8)},\\ \\text{nuevos: } ${newPoints.join(',\\ ')}\\right)`;
               })
               .join(' \\\\ ')}\\end{aligned}`}
             block
           />
         </div>
         {rows.length > 8 && <p>La lista completa de puntos nuevos por fila está en la pestaña <strong>Tabla</strong>.</p>}
+        <p>Todos los valores f(xᵢ) que usan estas fórmulas están en la pestaña <strong>Tabla</strong>, en la tabla de nodos.</p>
       </section>
 
       {k > 1 && (
